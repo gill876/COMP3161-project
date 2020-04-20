@@ -44,7 +44,8 @@ def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
         csv_writer.writerow(column)
         
         for count, item in enumerate(lst):
-            item.insert(0, prefix[count])
+            #item.insert(0, prefix[count])
+            item = prefix[count]+item
             csv_writer.writerow(item)
 
 
@@ -114,10 +115,11 @@ print("done")"""
 #lst_to_csv(generate_gender_fullnames(3, 'female'), (['fname', 'lname', 'gender']))
 
 
-amount = 7
-prefix = list(range(amount))
+amount = 2
+#prefix = list(range(amount))
+prefix = [[1, 'test_1'], [2, 'test_1']]
 gender ='male'
-column_name = ['id', 'fname', 'lname', 'gender']
+column_name = ['id', 'test_col', 'fname', 'lname', 'gender']
 filename = 'test'
 
 lst_to_csv(generate_gender_fullnames(amount, gender), (column_name), filename, prefix)
