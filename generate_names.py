@@ -117,7 +117,7 @@ print("done")"""
 
 amount = 2
 #prefix = list(range(amount))
-prefix = [[1, 'test_1'], [2, 'test_1']]
+prefix = [[1, 'test_1'], [2, 'test_2']]
 gender ='male'
 column_name = ['id', 'test_col', 'fname', 'lname', 'gender']
 filename = 'test'
