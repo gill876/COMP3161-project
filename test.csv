@@ -1,3 +1,4 @@
-id,test_col,fname,lname,gender
-1,test_1,Christopher,Hesser,MALE
-2,test_2,Leonard,Hall,MALE
+id,test_pref,fname,lname,gender,test_suff1,test_suff2
+1,testP_1,Alejandro,Allard,MALE,testS_1,testSS_1
+2,testP_2,David,Moore,MALE,testS_2,testSS_2
+3,testP_3,George,Rodgers,MALE,testS_3,testSS_3

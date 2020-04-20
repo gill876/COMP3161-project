@@ -37,17 +37,37 @@ def generate_gender_fullnames(amount, gender='', prefix=[],suffix=[], format='ls
         return 0
 
 def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
+    """converts list into csv file by accepting the list, the column names for the csv, the filename without an extension,
+    prefix with items in a list that could be added to each list item and suffix items in a list to add to each list item
+    
+    :::::::::::Example:::::::::::
+
+    amount = 3
+    prefix = [[1, 'testP_1'], [2, 'testP_2'], [3, 'testP_3']] #used for more than one prefix
+    suffix = [['testS_1', 'testSS_1'], ['testS_2', 'testSS_2'], ['testS_3', 'testSS_3']]
+    gender ='male'
+    column_name = ['id', 'test_pref', 'fname', 'lname', 'gender', 'test_suff1', 'test_suff2']
+    filename = 'test'
+    names_list = [['Alejandro', 'Allard', 'MALE'], ['David', 'Moore', 'MALE'], ['George', 'Rodgers', 'MALE']]
+
+    lst_to_csv(names_list, (column_name), filename, prefix, suffix)lst_to_csv(generate_gender_fullnames(amount, gender), (column_name), filename, prefix, suffix)
+    
+    :::::::::CSV FILE::::::::::
+    id,test_pref,fname,lname,gender,test_suff1,test_suff2
+    1,testP_1,Alejandro,Allard,MALE,testS_1,testSS_1
+    2,testP_2,David,Moore,MALE,testS_2,testSS_2
+    3,testP_3,George,Rodgers,MALE,testS_3,testSS_3
+    """
     filename+='.csv'
     with open(filename, 'w', newline='') as f:
         csv_writer = csv.writer(f)
 
         csv_writer.writerow(column)
-        
-        for count, item in enumerate(lst):
-            #item.insert(0, prefix[count])
-            item = prefix[count]+item
-            csv_writer.writerow(item)
 
+        for count, item in enumerate(lst):
+            item = prefix[count]+item
+            item += suffix[count]
+            csv_writer.writerow(item)
 
 def connect_database(db_user, db_passwd, db_name, host_addr="localhost"):
     """accepts host address, database username, database password and database name then returns the database object"""
@@ -114,12 +134,15 @@ print("done")"""
 #lst_to_csv(generate_gender_fullnames(3, 'female', [1, 2, 3]), (['id', 'fname', 'lname', 'gender']))
 #lst_to_csv(generate_gender_fullnames(3, 'female'), (['fname', 'lname', 'gender']))
 
-
-amount = 2
-#prefix = list(range(amount))
-prefix = [[1, 'test_1'], [2, 'test_2']]
+##################################################
+amount = 3
+#prefix = list(range(amount)) #prefix for id num
+prefix = [[1, 'testP_1'], [2, 'testP_2'], [3, 'testP_3']] #used for more than one prefix
+suffix = [['testS_1', 'testSS_1'], ['testS_2', 'testSS_2'], ['testS_3', 'testSS_3']]
 gender ='male'
-column_name = ['id', 'test_col', 'fname', 'lname', 'gender']
+column_name = ['id', 'test_pref', 'fname', 'lname', 'gender', 'test_suff1', 'test_suff2']
 filename = 'test'
+names_list = generate_gender_fullnames(amount, gender)
 
-lst_to_csv(generate_gender_fullnames(amount, gender), (column_name), filename, prefix)
+lst_to_csv(names_list, (column_name), filename, prefix, suffix)
+##################################################
