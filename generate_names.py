@@ -36,6 +36,7 @@ def generate_gender_fullnames(amount, gender='', prefix=[],suffix=[], format='ls
         print("Enter output format: lst or dict")
         return 0
 
+####mysqlimport -h 'localhost' -u root -p --fields-terminated-by=, --ignore-lines=1 <db_name> /var/lib/mysql-files/mycsv.csv
 def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
     """converts list into csv file by accepting the list, the column names for the csv, the filename without an extension,
     prefix with items in a list that could be added to each list item and suffix items in a list to add to each list item
@@ -65,8 +66,10 @@ def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
         csv_writer.writerow(column)
 
         for count, item in enumerate(lst):
-            item = prefix[count]+item
-            item += suffix[count]
+            if prefix != []:
+                item = prefix[count]+item
+            if suffix != []:
+                item += suffix[count]
             csv_writer.writerow(item)
 
 def connect_database(db_user, db_passwd, db_name, host_addr="localhost"):
@@ -86,48 +89,110 @@ def connect_database(db_user, db_passwd, db_name, host_addr="localhost"):
         print("database connected")
 
     return mydb
-    
 
-"""print("starting")
+"""def main(mydb, lst):
+    print("starting")
+
+    mycursor = mydb.cursor()
+
+    db_lst = []
+    fname_lst, lname_lst = [], []
+
+    print("generating names...")
+
+    for full_name in list(map(lambda x: x.split(" ") , lst)): #splits the fullname into a list of first and last names
+        fname_lst+= [full_name[0]]
+        lname_lst+= [full_name[1]]
+
+    print(len(fname_lst), " first and ", len(lname_lst), " last names generated")
+
+    rec_num = 0
+
+    print("inserting names into database...")
+
+    for lname in lname_lst: #assigns each last name with all first names generated
+        for fname in fname_lst:
+            #db_lst+= [fname + " " + lname]
+            fullName = fname + " " + lname
+            sql = "INSERT INTO users (fullname) VALUES (%s)"
+            val = (fullName)
+            mycursor.execute(sql, (val,))
+            rec_num+=1
+        
+    print(rec_num, "fullnames created")
+
+    mycursor.execute("SELECT * FROM `users`")
+    mycursor.fetchall()
+    print(mycursor.rowcount, "record inserted.")
+
+    mydb.commit()
+    mycursor.close()
+    mydb.close()
+    print("done")
 
 mydb = connect_database("cargill_db", "password", "facelook")
+lst = generate_fullnames(708)
+main(mydb, lst)"""
 
-mycursor = mydb.cursor()
+def get_FandL_name_from_fullname(fullnames):
+    """accepts lists of fullnames and splits first and last names into 2 separate lists and stores each list in a dictionary to be returned"""
+    fullnames_dict = {}
+    fnames = []
+    lnames = []
 
-db_lst = []
-fname_lst, lname_lst = [], []
-
-print("generating names...")
-
-for full_name in list(map(lambda x: x.split(" ") , generate_fullnames(708))): #splits the fullname into a list of first and last names
-    fname_lst+= [full_name[0]]
-    lname_lst+= [full_name[1]]
-
-print(len(fname_lst), " first and ", len(lname_lst), " last names generated")
-
-rec_num = 0
-
-print("inserting names into database...")
-
-for lname in lname_lst: #assigns each last name with all first names generated
-    for fname in fname_lst:
-        #db_lst+= [fname + " " + lname]
-        fullName = fname + " " + lname
-        sql = "INSERT INTO users (fullname) VALUES (%s)"
-        val = (fullName)
-        mycursor.execute(sql, (val,))
-        rec_num+=1
+    for names in fullnames:
         
-print(rec_num, "fullnames created")
+        fnames+= [names[0]]
+        lnames+= [names[1]]
 
-mycursor.execute("SELECT * FROM `users`")
-mycursor.fetchall()
-print(mycursor.rowcount, "record inserted.")
+    fullnames_dict['fname'] = fnames
+    fullnames_dict['lname'] = lnames
 
-mydb.commit()
-mycursor.close()
-mydb.close()
-print("done")"""
+    return fullnames_dict
+        
+def multiply_names(fnames, lnames, gender=''):
+    """multiply names by assigning all first names to each lastnames; adding a gender that applies to all names:
+    input = (['all', 'first', 'names'], ['all', 'last', 'names'], 'gender')
+    output = ([['all', 'all', 'gender'], ['all', 'last', 'gender'], ['all', 'names', 'gender'], ['first', 'all', 'gender'], ....])
+    """
+    m_fullnames = []
+
+    for lname in lnames:
+        for fname in fnames:
+            if gender != '':
+                m_fullnames+= [[fname, lname, gender]]
+            else:
+                m_fullnames+= [[fname, lname]]
+    return m_fullnames
+
+def main(column_names, filename, amount):
+    """accepts list of column names for csv, filename for csv, amount of unique male and female names to be generated"""
+    print("started...")
+    grand_lst =[]
+    print("generating ", amount, " unique male fullnames...")
+    male_fullnames = generate_gender_fullnames(amount, 'male')
+    print("generating ", amount, " unique female fullnames...")
+    female_fullnames = generate_gender_fullnames(amount, 'female')
+
+    print("splitting male fullnames...")
+    male_names = get_FandL_name_from_fullname(male_fullnames)
+    print("splitting female fullnames...")
+    female_names = get_FandL_name_from_fullname(female_fullnames)
+    
+    print("multiplying male fullnames...")
+    grand_lst += multiply_names(male_names['fname'], male_names['lname'], 'MALE')
+    print("multiplying female fullnames...")
+    grand_lst += multiply_names(female_names['fname'], female_names['lname'], 'FEMALE')
+
+    print(len(grand_lst), "records generated")
+
+    print("adding names to csv file named: ", filename,"...")
+    lst_to_csv(grand_lst, column_names, filename)
+    print("done")
+
+    
+
+main(['fname', 'lname', 'gender'], 'users', 520)
 
 #################TEST GROUNDS#####################
 #print(generate_gender_fullnames(3, 'female', 'dict'))
@@ -135,14 +200,21 @@ print("done")"""
 #lst_to_csv(generate_gender_fullnames(3, 'female'), (['fname', 'lname', 'gender']))
 
 ##################################################
-amount = 3
+#amount = 3
 #prefix = list(range(amount)) #prefix for id num
-prefix = [[1, 'testP_1'], [2, 'testP_2'], [3, 'testP_3']] #used for more than one prefix
-suffix = [['testS_1', 'testSS_1'], ['testS_2', 'testSS_2'], ['testS_3', 'testSS_3']]
-gender ='male'
-column_name = ['id', 'test_pref', 'fname', 'lname', 'gender', 'test_suff1', 'test_suff2']
-filename = 'test'
-names_list = generate_gender_fullnames(amount, gender)
+#prefix = [[1, 'testP_1'], [2, 'testP_2'], [3, 'testP_3']] #used for more than one prefix
+#suffix = [['testS_1', 'testSS_1'], ['testS_2', 'testSS_2'], ['testS_3', 'testSS_3']]
+#gender ='male'
+#column_name = ['id', 'test_pref', 'fname', 'lname', 'gender', 'test_suff1', 'test_suff2']
+#filename = 'test'
+#names_list = generate_gender_fullnames(amount, gender)
 
-lst_to_csv(names_list, (column_name), filename, prefix, suffix)
+#lst_to_csv(names_list, (column_name), filename, prefix, suffix)
 ##################################################
+
+#lst_to_csv(generate_gender_fullnames(100000, 'male'),['fname', 'lname', 'gender'])
+
+#################################3
+#output = get_FandL_name_from_fullname(generate_gender_fullnames(4, 'male'))
+#print(output)
+#print(multiply_names(output['fname'], output['lname'], 'MALE'))
