@@ -51,7 +51,7 @@ def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
     filename = 'test'
     names_list = [['Alejandro', 'Allard', 'MALE'], ['David', 'Moore', 'MALE'], ['George', 'Rodgers', 'MALE']]
 
-    lst_to_csv(names_list, (column_name), filename, prefix, suffix)lst_to_csv(generate_gender_fullnames(amount, gender), (column_name), filename, prefix, suffix)
+    lst_to_csv(names_list, (column_name), filename, prefix, suffix)
     
     :::::::::CSV FILE::::::::::
     id,test_pref,fname,lname,gender,test_suff1,test_suff2
