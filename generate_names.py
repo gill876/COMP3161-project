@@ -90,50 +90,6 @@ def connect_database(db_user, db_passwd, db_name, host_addr="localhost"):
 
     return mydb
 
-"""def main(mydb, lst):
-    print("starting")
-
-    mycursor = mydb.cursor()
-
-    db_lst = []
-    fname_lst, lname_lst = [], []
-
-    print("generating names...")
-
-    for full_name in list(map(lambda x: x.split(" ") , lst)): #splits the fullname into a list of first and last names
-        fname_lst+= [full_name[0]]
-        lname_lst+= [full_name[1]]
-
-    print(len(fname_lst), " first and ", len(lname_lst), " last names generated")
-
-    rec_num = 0
-
-    print("inserting names into database...")
-
-    for lname in lname_lst: #assigns each last name with all first names generated
-        for fname in fname_lst:
-            #db_lst+= [fname + " " + lname]
-            fullName = fname + " " + lname
-            sql = "INSERT INTO users (fullname) VALUES (%s)"
-            val = (fullName)
-            mycursor.execute(sql, (val,))
-            rec_num+=1
-        
-    print(rec_num, "fullnames created")
-
-    mycursor.execute("SELECT * FROM `users`")
-    mycursor.fetchall()
-    print(mycursor.rowcount, "record inserted.")
-
-    mydb.commit()
-    mycursor.close()
-    mydb.close()
-    print("done")
-
-mydb = connect_database("cargill_db", "password", "facelook")
-lst = generate_fullnames(708)
-main(mydb, lst)"""
-
 def get_FandL_name_from_fullname(fullnames):
     """accepts lists of fullnames and splits first and last names into 2 separate lists and stores each list in a dictionary to be returned"""
     fullnames_dict = {}
