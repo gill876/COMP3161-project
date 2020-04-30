@@ -8,27 +8,47 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Photogram</title>
+    <title>MyBook</title>
 
     <!-- Bootstrap -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Satisfy|Tangerine" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<!-- <link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css"> -->
+		<link href="{{ url_for('static', filename='fonts/material-design-iconic-font/css/material-design-iconic-font.min.css') }}" rel="stylesheet">
+   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+		<!-- STYLE CSS -->
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
     {% block css %} {% endblock%}
   </head>
   <body>
-    <div id="main">
-        {% block main %}{% endblock %}
-    </div>
+    <header>
+        {% include "header.html" %}
+    </header>
+    <main>
+        <div class="container">
+            {% block main %}{% endblock %}
+        </div>
+    </main>
+    <footer>
+        <!-- <div class="container">
+            {% include "footer.html" %} -->
+        </div>
+    </footer>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
-    <script>const token = "{{ csrf_token() }}";</script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    	<!-- <script src="js/jquery-3.3.1.min.js"></script> -->
+		<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+		<!-- <script src="js/jquery.form-validator.min.js"></script> -->
+		<script src="{{ url_for('static', filename='js/jquery.form-validator.min.js') }}"></script>
+		<!-- <script src="js/main.js"></script> -->
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block js %} {% endblock%}
   </body>
 </html>

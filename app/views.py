@@ -1,60 +1,61 @@
-from flask import render_template, request, url_for ,redirect,flash,jsonify, g, session
-from flask_login import login_user, logout_user, current_user, login_required
-from werkzeug.utils import secure_filename
-import os
-import datetime
-import jwt
-from functools import wraps
-from flask_mysqldb import MySQL
-import yaml
+"""
+Flask Documentation:     http://flask.pocoo.org/docs/
+Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
+Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
+This file creates your application.
+"""
+
+from app import app
+from flask import render_template, request, redirect, url_for
+import time
 
 
-
-"""  Routes START HERE  """
+###
+# Routing for your application.
+###
 
 @app.route('/')
-def index():
-    """Render website's initial page and let VueJS take over."""
-    return render_template('index.html')
+def home():
+    """Render website's home page."""
+    return render_template('home.html')
 
 
-
-""" 
-@app.route("/api/users/register",methods=["POST"])
-def register():
-
-    return render_template('html')
-
-
-
-@app.route("/api/auth/login", methods=["POST"])
-def login():
-    return 1
-
-
-
-@app.route("/api/auth/logout",methods=["GET"])
-@requires_auth
-def logout():
-
-    return 1 """
+@app.route('/about/')
+def about():
+    """Render the website's about page."""
+    return render_template('about.html', name="User")
+    
+@app.route('/profile')
+def profile():
+    """Render the website's profile page."""
+    return render_template('profile.html', name="User", today=timeinfo())
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
 
 
+###
+# The functions below should be applicable to all Flask apps.
+###
 
+def timeinfo():
+    return time.strftime("%a, %d %b %Y")
 
-
-
-
-
-
-
+@app.route('/<file_name>.txt')
+def send_text_file(file_name):
+    """Send your static text file."""
+    file_dot_text = file_name + '.txt'
+    return app.send_static_file(file_dot_text)
 
 
 @app.after_request
 def add_header(response):
-
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-    response.headers['Cache-Control'] = 'public, max-age=0'
+    response.headers['Cache-Control'] = 'public, max-age=600'
     return response
 
 
@@ -65,4 +66,4 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host="0.0.0.0",port="8080")
