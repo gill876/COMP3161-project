@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block main %}
-  <div class="login-form center-block">
+<div class="container">
+  <!-- component matched by the route will render here -->
+ 
+  <div class="shadow jumbotron homedisplay col-md-5 col-sm-10">
     <h2>Please Log in</h2>
     {% include 'flash_messages.html' %}
     <form action="{{ url_for('register') }}" method="post">
@@ -40,4 +43,6 @@
       <button type="submit" name="submit" class="btn btn-primary btn-block">Register</button>
     </form>
   </div>
+  
+</div>
 {% endblock %}

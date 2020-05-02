@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block main %}
-  <div class="login-form center-block">
+  <div class="shadow jumbotron homedisplay col-md-5 col-sm-10">
     <h2>Please Log in</h2>
     {% include 'flash_messages.html' %}
     <form action="{{ url_for('login') }}" method="post">
