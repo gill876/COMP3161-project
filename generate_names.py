@@ -75,7 +75,7 @@ def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
             password = username + spec_char[random.randint(0,27)]
             email_addresses = ['@coach.net', '@quarantine.com', '@stayin.com', '@tiktok.com']
             email_addr = username + email_addresses[random.randint(0,3)]
-            prefix = [(username), (email_addr), password]
+            prefix = [count + 1, (username), (email_addr), password]
             #####################################################################################
             if prefix != []:
                 #item = prefix[count]+item #for different prefixes
@@ -161,7 +161,7 @@ def main(column_names, filename, amount):
 
     
 
-main(['username', 'email', 'password','fname', 'lname', 'gender'], 'csv_users', 520)
+main(["id", 'username', 'email', 'password','fname', 'lname', 'gender'], 'csv_users', 520)
 
 #################TEST GROUNDS#####################
 #print(generate_gender_fullnames(3, 'female', 'dict'))

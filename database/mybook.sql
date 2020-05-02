@@ -12,10 +12,11 @@ DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS csv_users;
 /*SHOW WARNINGS;*/
-drop trigger IF EXISTS Load_User; /*add trigger*/
-SHOW WARNINGS;
+DROP trigger IF EXISTS Load_User_Profile; /*add trigger*/
+/*SHOW WARNINGS;*/
 
 CREATE TABLE csv_users(
+    id INT NOT NULL,
     username VARCHAR(100) NOT NULL,
     email VARCHAR(70) NOT NULL,
     password VARCHAR(256) NOT NULL,
@@ -35,14 +36,14 @@ CREATE TABLE user(
 
 CREATE TABLE profile(
     profile_id INT NOT NULL AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    user_id INT DEFAULT 0 NOT NULL,
     firstname VARCHAR(75) NOT NULL,
     lastname VARCHAR(75) NOT NULL,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    profile_img VARCHAR(100) NOT NULL,
+    /*username VARCHAR(100) NOT NULL UNIQUE,*/
+    profile_img VARCHAR(100) DEFAULT 'GENERIC' NOT NULL,
     friends INT DEFAULT 0 NOT NULL,
     biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
-    gender ENUM('MALE', 'FEMALE', 'OTHER') NOT NULL,
+    gender VARCHAR(10) NOT NULL,
     PRIMARY KEY(profile_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -124,15 +125,19 @@ CREATE TABLE contains(
 );
 
 DELIMITER $$
-    CREATE TRIGGER Load_User
+    CREATE TRIGGER Load_User_Profile
     AFTER INSERT ON csv_users
     FOR EACH ROW
     BEGIN
     INSERT INTO user(username, email_address, user_password, datejoined)
-    /*SELECT * FROM 
-    (SELECT (username, email, SHA2(password, 256), CURDATE())
-    FROM csv_users) AS T;*/
     VALUES
     (NEW.username, NEW.email, SHA2(NEW.password, 256), CURDATE());
+
+    INSERT INTO profile(user_id, firstname, lastname, gender)
+    VALUES
+    (NEW.id, NEW.firstname, NEW.lastname, NEW.gender);
     END $$
 DELIMITER ;
+
+
+/*SELECT user_id FROM user WHERE user_password = SHA2('blangar539732>', 256) AND username = 'blangar539732';*/
