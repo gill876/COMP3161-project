@@ -17,5 +17,5 @@ class RegisterForm(FlaskForm):
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
     username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
-    # profile_photo = FileField('Image', validators=[FileAllowed(['jpg', 'jpeg','png'], 'Images only!')])
+    
 

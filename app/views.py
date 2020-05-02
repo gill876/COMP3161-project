@@ -5,18 +5,28 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
-from app import app, db, login_manager
+import os
+from flask_mysqldb import MySQL
+from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm
-from app.models import UserProfile
-from flask_bootstrap import Bootstrap
-
-
-
+from app.forms import LoginForm,RegisterForm
+# from app.models import UserProfile
+# from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
 ###
+
+
+mysql = MySQL(app)
+
+# @app.route('/')
+# def index():
+#     cur = mysql.connection.cursor()
+
+#     cur.execute('''CREATE TABLE example (id INTEGER,name VARCHAR(20))''')
+#     return 'Done'
+
 
 @app.route('/')
 def home():
@@ -24,24 +34,30 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/register/')
-def about():
-    """Render the website's about page."""
-    return render_template('about.html')
 
+# @app.route('/register/')
+# def register():
+#     """Render the website's about page."""
+#     return render_template('register.html')
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    form = RegisterForm()
+    
+    return render_template('register.html', form=form)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    if request.method == "POST":
+    if request.method == "POST" and form.validate_on_submit():
         # change this to actually validate the entire form submission
         # and not just one field
-        if form.validate_on_submit():
+    
             username = form.username.data
             password = form.password.data
             # Get the username and password values from the form.
             
-            user = UserProfile.query.filter_by(username=username).first()
+            # user = UserProfile.query.filter_by(username=username).first()
 
             if user is not None and check_password_hash(user.password, password ):
                 login_user(user)
@@ -52,9 +68,9 @@ def login():
     return render_template("login.html", form=form)
 
 
-@app.route("/register")
-def register():
-    return render_template ('register.html')
+# @app.route("/register")
+# def register():
+#     return render_template ('register.html')
 
 
 # user_loader callback. This callback is used to reload the user object from
