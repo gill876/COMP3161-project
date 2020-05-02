@@ -9,13 +9,14 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired()])
 
 class RegisterForm(FlaskForm):
-    fname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
-    lname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
+    firstname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
+    lastname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
     gender=SelectField('Gender', choices=[('Male','Male'),('Female','Female')])
     dob=DateField('Date of Birth',format='%m/%d/%Y')
+    username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
     email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])   
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
-    username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
+   
     
 

@@ -40,11 +40,26 @@ def home():
 #     """Render the website's about page."""
 #     return render_template('register.html')
 
-@app.route('/register', methods=['GET','POST'])
+@app.route("/register", methods=["GET","POST"])
 def register():
     form = RegisterForm()
-    
+    if request.method == "POST" and form.validate_on_submit():
+
+        username = form.username.data
+        firstname = form.firstname.data 
+        lastname = form.lastname.data 
+        gender = form.gender.data 
+        dob = form.dob.data   
+        email = form.email.data   
+        password = form.password.data   
+        confirmpassword = form.confirmpassword.data   
+
+        return redirect(url_for("profile"))
+    else: 
+        flash("Profile Not Created! Please Try again!")
+
     return render_template('register.html', form=form)
+    
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -83,7 +98,7 @@ def load_user(id):
 # The functions below should be applicable to all Flask apps.
 ###
 
-@app.route('/secure_page')
+@app.route("/secure_page")
 @login_required
 def secure_page():
     """Render a secure page on our website that only logged in users can access."""
