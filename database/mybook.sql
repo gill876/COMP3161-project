@@ -1,6 +1,6 @@
 /*COMP3161 PROJECT*/
 DROP TABLE IF EXISTS contains;
-/*DROP TABLE IF EXISTS create_post;*/
+DROP TABLE IF EXISTS create_post;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
 DROP TABLE IF EXISTS profile;
@@ -90,16 +90,18 @@ CREATE TABLE create_group(
 CREATE TABLE join_group(
     user_id INT NOT NULL,
     group_id INT NOT NULL,
-    PRIMARY KEY(user_id, group_id)
+    PRIMARY KEY(user_id, group_id),
+    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-/*CREATE TABLE create_post(
+CREATE TABLE create_post(
     user_id INT NOT NULL,
     post_id INT NOT NULL,
     PRIMARY KEY(user_id, post_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE
-);*/
+);
 
 CREATE TABLE contains(
     post_id INT NOT NULL,
