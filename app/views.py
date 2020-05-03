@@ -7,7 +7,7 @@ This file creates your application.
 
 import os
 import datetime 
-from flask_mysqldb import MySQL
+# from flask_mysqldb import MySQL
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
@@ -20,7 +20,7 @@ from werkzeug.utils import secure_filename
 ###
 
 
-mysql = MySQL(app)
+# mysql = MySQL(app)
 
 # @app.route('/')
 # def index():
