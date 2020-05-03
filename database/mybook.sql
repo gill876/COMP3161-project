@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS csv_users;
 DROP TRIGGER IF EXISTS Load_User_Profile; /*add trigger*/
 /*SHOW WARNINGS;*/
 DROP PROCEDURE IF EXISTS loginUser;
+DROP PROCEDURE IF EXISTS postCreator;
+DROP PROCEDURE IF EXISTS commentCreator;
 
 CREATE TABLE csv_users(
     id INT NOT NULL,
@@ -163,12 +165,6 @@ DELIMITER //
     END IF;
     END //
 DELIMITER ;
-/*DROP PROCEDURE loginUser;
-donagor50@quarantine.com
-donagor50
-CALL loginUser('donagor50', 'kd');
-*/
-
 
 DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
