@@ -17,3 +17,6 @@ venv/
 
 #Environments
 .env
+
+#All generated csv's
+*.csv
