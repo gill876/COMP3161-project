@@ -21,6 +21,10 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
+#adding images to respective folders
+
+PROFILEPHOTO_FOLDER= './app/static/profileimages'
+
 
 # Flask-Login login manager
 login_manager = LoginManager()

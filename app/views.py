@@ -6,11 +6,13 @@ This file creates your application.
 """
 
 import os
+import datetime 
 from flask_mysqldb import MySQL
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm,RegisterForm
+from werkzeug.utils import secure_filename 
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
@@ -52,14 +54,26 @@ def register():
         dob = form.dob.data   
         email = form.email.data   
         password = form.password.data   
-        confirmpassword = form.confirmpassword.data   
+        confirmpassword = form.confirmpassword.data 
+        profile_photo = form.profile_photo.data  
+
+        #saviing profile images tothe profilephoto_folder
+
+        filename = secure_filename(profile_photo)
+        profile_photo.save(os.path.join(app.config['PROFILEPHOTO_FOLDER', filename]))
+
+        #code for db goes here
+
+
+
+        flash('Your Profile Has Been Created')
 
         return redirect(url_for("profile"))
     else: 
         flash("Profile Not Created! Please Try again!")
 
     return render_template('register.html', form=form)
-    
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
