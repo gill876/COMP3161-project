@@ -19,3 +19,18 @@ body {
 .loginform h1{
     font-family: sans-serif;
 }
+
+.signup_container{
+    padding-left: 15%;
+    display: flex;
+    background-color: #f4eed7;
+    align-items: center;
+    border: 5px  solid;
+    border-radius: 2%;
+    border-color: #9ad0e0;
+}
+
+.signup{
+    padding: 10%;
+}
+
