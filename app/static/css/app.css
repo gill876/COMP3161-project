@@ -20,6 +20,7 @@
     font-family: sans-serif;
 }
 
+<<<<<<< HEAD
 .card-inner{
     margin-left: 4rem;
 }
@@ -87,3 +88,19 @@ overflow: hidden;
 body {
     background-color: #e8e8e8;
 }
+=======
+.signup_container{
+    padding-left: 15%;
+    display: flex;
+    background-color: #f4eed7;
+    align-items: center;
+    border: 5px  solid;
+    border-radius: 2%;
+    border-color: #9ad0e0;
+}
+
+.signup{
+    padding: 10%;
+}
+
+>>>>>>> 21e619538fb37e470ba8724040d96be429556eb2
