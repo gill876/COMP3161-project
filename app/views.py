@@ -28,7 +28,9 @@ from werkzeug.utils import secure_filename
 
 #     cur.execute('''CREATE TABLE example (id INTEGER,name VARCHAR(20))''')
 #     return 'Done'
-
+@app.route('/profile/<username>')
+def profile(username):
+    return render_template('userprofile.html',name=username)
 
 @app.route('/')
 def home():
