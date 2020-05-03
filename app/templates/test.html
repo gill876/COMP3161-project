@@ -10,9 +10,6 @@
 <h1>Admin User Profile</h1><br/>
 {% include "admin/admin_user_profile.html" %}
 
-<h1>Admin Search Result</h1><br/>
-{% include "components_templates/admin_search_result.html" %}
-
 <h1>Admin Stat</h1><br/>
 {% include "components_templates/admin_stat.html" %}
 
@@ -23,7 +20,9 @@
 {% include "components_templates/comment.html" %}
 
 <h1>Admin Menu Button</h1><br/>
-{% include "components_templates/menu_button.html" %}
+{% with text="Test Button" %}
+    {% include "components_templates/admin_menu_button.html"  %}
+{% endwith %}
 
 <h1>Admin Post</h1><br/>
 {%  include "components_templates/post.html" %}
