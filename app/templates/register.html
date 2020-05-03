@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
 {% block main %}
-<div class="container">
+<div class="signup_container">
   <!-- component matched by the route will render here -->
+
+   <div class ="signupimage">
+    <img src = "{{ url_for('static', filename='./appimages/loginphoto.png', alt="app image")}}">
+  </div>
  
-  <div class="shadow jumbotron homedisplay col-md-5 col-sm-10">
+  <div class="signup">
     <h1>WELCOME TO MyBOOK</h1>
-    <h2>SIGN UP !</h2>
+    <h2>SIGN UP TODAY !</h2>
     {% include 'flash_messages.html' %}
 
 

@@ -13,7 +13,7 @@
     <h1>WELCOME TO MyBOOK</h1>
 
     {% include 'flash_messages.html' %}
-    <form action="{{ url_for('login') }}" method="post">
+    <form action="{{ url_for('login') }}"  enctype="multipart/form-data" method="POST">
       {{ form.csrf_token }}
       <div class="form-group">
         {{ form.username.label }}
