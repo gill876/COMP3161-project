@@ -149,9 +149,6 @@ DELIMITER $$
     END $$
 DELIMITER ;
 
-
-/*SELECT user_id FROM user WHERE user_password = SHA2('blangar539732>', 256) AND username = 'blangar539732';*/
-
 DELIMITER //
     CREATE PROCEDURE loginUser(IN user_name VARCHAR(100), IN pass_word VARCHAR(256))
     BEGIN
