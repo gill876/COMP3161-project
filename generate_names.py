@@ -1,5 +1,6 @@
 import mysql.connector
 import names, csv
+import random
 
 def generate_fullnames(amount):
     """accepts amount of fullnames to be generated and outputs the fullnames in a list: ['Mary Brown', 'John Brown']"""
@@ -66,8 +67,20 @@ def lst_to_csv(lst, column, filename='mycsv', prefix=[], suffix=[]):
         csv_writer.writerow(column)
 
         for count, item in enumerate(lst):
+            ##################DATABASE SPECIFIC. ADD USERNAME AND EMAIL ADDRESS##################
+            username = item[0] + item[1]
+            username = username.lower()
+            username = username[:4] + username[6:9] + str(count)
+            spec_char = ['`','~','!','@','#','$','%','^','&','*','(',')','_','-','+','=','{','[','}','}','|',':',';','<','>','.','?','/']
+            password = username + spec_char[random.randint(0,27)]
+            email_addresses = ['@coach.net', '@quarantine.com', '@stayin.com', '@tiktok.com']
+            email_addr = username + email_addresses[random.randint(0,3)]
+            prefix = [count + 1, (username), (email_addr), password]
+            #####################################################################################
             if prefix != []:
-                item = prefix[count]+item
+                #item = prefix[count]+item #for different prefixes
+                #all prefixes are the same so:
+                item = prefix+item
             if suffix != []:
                 item += suffix[count]
             csv_writer.writerow(item)
@@ -148,7 +161,7 @@ def main(column_names, filename, amount):
 
     
 
-main(['fname', 'lname', 'gender'], 'users', 520)
+main(["id", 'username', 'email', 'password','fname', 'lname', 'gender'], 'csv_users', 520)
 
 #################TEST GROUNDS#####################
 #print(generate_gender_fullnames(3, 'female', 'dict'))
