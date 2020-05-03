@@ -1,17 +1,7 @@
-{% extends "base.html" %}
-
-{% block main %}
-<div id="app">
-    <app-header></app-header>
-    <flash-message></flash-message>
-    
-    <main>
-        <div class="container">
-            <!-- component matched by the route will render here -->
-            <router-view></router-view>
-        </div>
-    </main>
-
-    <app-footer></app-footer>
-</div>
-{% endblock %}
+<form method="POST" action="">
+    Name <input type="text" name="name" />
+    <br>
+    Email <input type="email" name="email" />
+    <br>
+    <input type="submit">
+  </form>

@@ -1,23 +1,35 @@
 from flask import Flask
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_script import Manager
 from flask_mysqldb import MySQL
-import yaml 
+# from flask_bootstrap import Bootstrap
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "change this to be a more random key"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://pro:mantis101@localhost/lab5"
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True # added just to suppress a warning
+# bootstrap = Bootstrap(app)
+manager = Manager(app)
 
-
-# Configure dnb
-db = yaml.load(open('db.yaml'))
-app.config['MYSQL_HOST'] = db['mysql_host']
-app.config['MYSQL_USER'] = db['mysql_user']
-app.config['MYSQL_PASSWORD'] = db['mysql_password']
-app.config['MYSQL_DB'] = db['mysql_db']
+app.config['MYSQL_USER'] = 'sql9337116'
+app.config['MYSQL_PASSWORD'] = 'DuUMhQcqSI'
+app.config['MYSQL_HOST'] = 'http://sql9.freemysqlhosting.net/'
+app.config['MYSQL_DB'] = 'sql9337116'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
+#adding images to respective folders
+
+PROFILEPHOTO_FOLDER= './app/static/profileimages'
 
 
-csrf = CSRFProtect(app)
+# Flask-Login login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
+app.config.from_object(__name__)
+from app import views
