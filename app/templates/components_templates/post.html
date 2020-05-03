@@ -8,18 +8,18 @@
     </div>
     <div class="post-content">
 
-        <!--{{% if details.text %}}
+        <!--{% if details.text %}
             <div>{{details.text}}</div>
-        {{% endif %}}-->
+        {% endif %}-->
         <div> I love my life </div>
 
-        <!--{{% if details.image %}}
-            <div>{{details.image %}}</div>
-        {{% endif %}}-->
+        <!--{% if details.image %}
+            <div>{{details.image}}</div>
+        {% endif %}-->
         
         <button class="btn-primary">Comment</button>
     </div>
     <hr/>
-    {{% extends "comment_input.html %}
+    {% extends "components_templates/comment_input.html" %}
     <!-- To do - add loop for comments-->
 </div>

@@ -1,28 +1,31 @@
-{{%extends "base.html" %}}
+{% extends "base.html" %}
 
+{% block main %}
 <h1>Admin Dashboard</h1><br/>
-{{% extends "admin_dashboard.html" %}}
+{% include "admin/admin_dashboard.html" %}
 
 <h1>Admin Search</h1><br/>
-{{% extneds "admin_search.html" %}}
+{% include "admin/admin_search.html" %}
 
 <h1>Admin User Profile</h1><br/>
-{{% extends "admin_user_profile.html" %}}
+{% include "admin/admin_user_profile.html" %}
 
 <h1>Admin Search Result</h1><br/>
-{{% extends "admin_search_result.html" %}}
+{% include "components_templates/admin_search_result.html" %}
 
 <h1>Admin Stat</h1><br/>
-{{% extends "admin_stat.html" %}}
+{% include "components_templates/admin_stat.html" %}
 
 <h1>Admin Comment Input</h1><br/>
-{{% extends "comment_input.html" %}}
+{% include "components_templates/comment_input.html" %}
 
 <h1>Admin Comment</h1><br/>
-{{% extends "comment.html" %}}
+{% include "components_templates/comment.html" %}
 
 <h1>Admin Menu Button</h1><br/>
-{{% extends "menu_button.html" %}}
+{% include "components_templates/menu_button.html" %}
 
 <h1>Admin Post</h1><br/>
-{{%  extends "post.html" %}}
+{%  include "components_templates/post.html" %}
+
+{% endblock %}
