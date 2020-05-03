@@ -70,7 +70,7 @@ CREATE TABLE user_group( /*change in data dictionary*/
 CREATE TABLE comment(
     comment_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     post_id INT NOT NULL,
-    comment VARCHAR(300),
+    comm_text VARCHAR(300),
     time_stamp DATETIME NOT NULL,
     c_location VARCHAR(70) NOT NULL,
     PRIMARY KEY(comment_id, post_id),
