@@ -1,6 +1,7 @@
 /*COMP3161 PROJECT*/
 DROP TABLE IF EXISTS contains;
 DROP TABLE IF EXISTS create_post;
+DROP TABLE IF EXISTS create_comment;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
 DROP TABLE IF EXISTS profile;
@@ -12,8 +13,9 @@ DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS csv_users;
 /*SHOW WARNINGS;*/
-DROP trigger IF EXISTS Load_User_Profile; /*add trigger*/
+DROP TRIGGER IF EXISTS Load_User_Profile; /*add trigger*/
 /*SHOW WARNINGS;*/
+DROP PROCEDURE IF EXISTS loginUser;
 
 CREATE TABLE csv_users(
     id INT NOT NULL,
@@ -116,6 +118,14 @@ CREATE TABLE create_post(
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE create_comment(
+    user_id INT NOT NULL,
+    comment_id INT NOT NULL,
+    PRIMARY KEY(user_id, comment_id),
+    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE contains(
     post_id INT NOT NULL,
     image_id INT NOT NULL,
@@ -141,3 +151,39 @@ DELIMITER ;
 
 
 /*SELECT user_id FROM user WHERE user_password = SHA2('blangar539732>', 256) AND username = 'blangar539732';*/
+
+DELIMITER //
+    CREATE PROCEDURE loginUser(IN user_name VARCHAR(100), IN pass_word VARCHAR(256))
+    BEGIN
+    IF EXISTS(SELECT * FROM user WHERE username = user_name OR email_address = user_name) THEN
+        IF EXISTS(SELECT user_id FROM user WHERE user_password = SHA2(pass_word, 256) AND (username = user_name OR email_address = user_name)) THEN
+            SELECT 'Login successful';
+        ELSE
+            SELECT 'Password incorrect';
+        END IF;
+    ELSE
+        SELECT 'User does not exist';
+    END IF;
+    END //
+DELIMITER ;
+/*DROP PROCEDURE loginUser;
+donagor50@quarantine.com
+donagor50
+CALL loginUser('donagor50', 'kd');
+*/
+
+
+DELIMITER //
+    CREATE PROCEDURE postCreator(IN postID INT)
+    BEGIN
+    SELECT user_id FROM create_post WHERE post_id = postID;
+    END //
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE commentCreator(IN commID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
