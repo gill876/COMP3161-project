@@ -15,10 +15,22 @@ class RegisterForm(FlaskForm):
     gender=SelectField('Gender', choices=[('Male','Male'),('Female','Female')])
     dob=DateField('Date of Birth',format='%m/%d/%Y')
     username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
-    email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])   
+    email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])  
+    profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ]) 
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
+    
+
+class UpdateForm(FlaskForm):
+    firstname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
+    lastname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
+    username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
+    email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])
     profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ])
+    password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
+    confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
+    
+
    
     
 

@@ -7,11 +7,12 @@ This file creates your application.
 
 import os
 import datetime 
+import psycopg2
 # from flask_mysqldb import MySQL
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm
+from app.forms import LoginForm,RegisterForm,UpdateForm
 from werkzeug.utils import secure_filename 
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
@@ -28,21 +29,36 @@ from werkzeug.utils import secure_filename
 
 #     cur.execute('''CREATE TABLE example (id INTEGER,name VARCHAR(20))''')
 #     return 'Done'
-@app.route('/profile/<username>')
-def profile(username):
-    return render_template('userprofile.html',name=username)
+
+# def connect_db():
+#     return psycopg2.connect(host="localhost",database="userz",user="conrodsmith",password="mantis101")
+# @app.route('/', methods=['POST', 'GET'])
+# def add_user():
+#     if request.method == "POST":
+#         db = connect_db()
+#         cur = db.cursor()
+#         cur.execute('insert into userz (name, email) values (%s, %s)')
+#         db.commit() 
+#         flash('New user was successfully added') 
+        
+#     return render_template('home.html')
+
 
 @app.route('/')
 def home():
     """Render website's home page."""
     return render_template('home.html')
 
+# @app.route('/profile/<username>')
+# def profile(username):
+#     return render_template('profile.html',name=username)
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 
-# @app.route('/register/')
-# def register():
-#     """Render the website's about page."""
-#     return render_template('register.html')
+
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -90,14 +106,48 @@ def login():
             
             # user = UserProfile.query.filter_by(username=username).first()
 
-            if user is not None and check_password_hash(user.password, password ):
+            if user is not None and check_password_hash(user.confirmpassword, confirmpassword ):
                 login_user(user)
                 flash("Login Successful", "Successful")
-                return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+                return redirect(url_for("profile"))  # they should be redirected to a secure-page route instead
             else:
                 flash("Unsuccessful Login", "Unsuccesful")
     return render_template("login.html", form=form)
 
+
+# @app.route('/updateprofile'/'<userid>')
+@app.route('/updateprofile')
+# @login_required
+def updateprofile():
+    form = UpdateForm()
+
+    if request.method and form.validate_on_submit():
+
+        firstname = form.firstname.data  
+        lastname = form.lastname.data
+        username = form.username.data
+        email = form.email.data
+        profile_photo = form.profile_photo.data
+        password = form.password.data 
+        confirmpassword = form.confirmpassword.data 
+
+        filename = secure_filename(profile_photo)
+        profile_photo.save(os.path.join(app.config['PROFILEPHOTO_FOLDER', filename]))
+
+        #checking if the user is actually the user and checking the 
+        #password hash
+        #check the logic for this please, somebody
+        if (user == user):
+            check_password_hash(user.confirmpassword, confirmpassword)
+            flash("Profile Updated!")
+            redirect(url_for('profile'))
+        else: 
+            page_not_found(error)
+
+
+
+    
+    return render_template('updateprofile.html', form=form)
 
 # @app.route("/register")
 # def register():
@@ -108,7 +158,8 @@ def login():
 # the user ID stored in the session
 @login_manager.user_loader
 def load_user(id):
-    return UserProfile.query.get(int(id))
+    # return UserProfile.query.get(int(id))
+    pass
 
 ###
 # The functions below should be applicable to all Flask apps.
