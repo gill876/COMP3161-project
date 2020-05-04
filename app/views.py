@@ -54,6 +54,7 @@ def home():
 #     return render_template('profile.html',name=username)
 
 @app.route('/profile')
+# @login_required
 def profile():
     return render_template('profile.html')
 
@@ -106,7 +107,7 @@ def login():
             
             # user = UserProfile.query.filter_by(username=username).first()
 
-            if user is not None and check_password_hash(user.confirmpassword, confirmpassword ):
+            if user is not None and check_password_hash(user.password, password ):
                 login_user(user)
                 flash("Login Successful", "Successful")
                 return redirect(url_for("profile"))  # they should be redirected to a secure-page route instead
@@ -117,7 +118,7 @@ def login():
 
 # @app.route('/updateprofile'/'<userid>')
 @app.route('/updateprofile')
-# @login_required
+# @login_required (was sure if this was overkill or not)
 def updateprofile():
     form = UpdateForm()
 
@@ -138,14 +139,11 @@ def updateprofile():
         #password hash
         #check the logic for this please, somebody
         if (user == user):
-            check_password_hash(user.confirmpassword, confirmpassword)
+            check_password_hash(user.password, password)
             flash("Profile Updated!")
             redirect(url_for('profile'))
-        else: 
-            page_not_found(error)
-
-
-
+        else:
+            flash("Profile Not Updated. Please Try Again!")
     
     return render_template('updateprofile.html', form=form)
 
