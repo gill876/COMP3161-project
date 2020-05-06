@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm 
-from wtforms import StringField, PasswordField,FileField,SelectField
+from wtforms import StringField, PasswordField,FileField,SelectField,TextAreaField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired,DataRequired,Email
 from wtforms.fields.html5 import DateField
@@ -33,4 +33,11 @@ class UpdateForm(FlaskForm):
 
    
     
+class postForm(FlaskForm):
+    content = TextAreaField('content',validators=[InputRequired(message='Need content to post')])
+    postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
+
+class ImageForm(FlaskForm):
+    images=FileField('Images',validators=[FileRequired('Please add an Image'),FileAllowed(['jpg','jpeg','png'],'Images Only')])
+    
