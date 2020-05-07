@@ -16,9 +16,13 @@ DROP TABLE IF EXISTS csv_users;
 DROP TRIGGER IF EXISTS Load_User_Profile; /*add trigger*/
 /*SHOW WARNINGS;*/
 DROP PROCEDURE IF EXISTS loginUser;
+DROP PROCEDURE IF EXISTS getUserID;
+DROP PROCEDURE IF EXISTS createPost;
+DROP PROCEDURE IF EXISTS createImagePost;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
 
+/*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
     id INT NOT NULL,
     username VARCHAR(100) NOT NULL,
@@ -90,9 +94,9 @@ CREATE TABLE friends(
 CREATE TABLE images(
     image_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     post_id INT NOT NULL,
-    caption VARCHAR(30),
+    /*caption VARCHAR(30),*/
     file_name VARCHAR(256) NOT NULL, /*change in data dictionary*/
-    time_stamp DATETIME NOT NULL, /*change in data dictionary*/
+    /*time_stamp DATETIME NOT NULL,*/ /*change in data dictionary*/
     PRIMARY KEY(image_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
@@ -167,15 +171,95 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
+    CREATE PROCEDURE getUserID(IN in_username VARCHAR(100), IN in_email_address VARCHAR(70))
+    BEGIN
+    SELECT user_id FROM user WHERE username = in_username OR email_address = in_email_address;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE createPost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70))
+    BEGIN
+    INSERT INTO post(content, time_stamp, post_location) 
+    VALUES (in_content, SYSDATE(), in_post_location);
+    
+    INSERT INTO create_post 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE createImagePost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_file_name VARCHAR(256))
+    BEGIN
+    CALL createPost(in_user_id, in_content, in_post_location);
+    
+    INSERT INTO images(post_id, file_name)
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
+    VALUES ((SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1), in_file_name);
+
+    INSERT INTO contains
+    VALUES
+    /*IMMEDIATELY BELOW SELECTS THE LAST CREATED POST ID*/       /*IMMEDIATELY BELOW SELECTS THE LAST CREATEd IMAGE ID*/
+    ((SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1), (SELECT image_id FROM images ORDER BY image_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
     BEGIN
     SELECT user_id FROM create_post WHERE post_id = postID;
     END //
 DELIMITER ;
 
-
 DELIMITER //
     CREATE PROCEDURE commentCreator(IN commID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE numFriends(IN userID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+/*DELIMITER //
+    CREATE PROCEDURE numTypeFriends(IN userID INT, IN friendType VARCHAR(30))
+    BEGIN
+    IF (friendType = 'WORK') THEN
+        SELECT count(friend_id) FROM friends WHERE user_id = userID and friends_type = 'WORK';
+    END //
+DELIMITER ;*/
+
+DELIMITER //
+    CREATE PROCEDURE numWorkFriends(IN commID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE numSchoolFriends(IN commID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE numRelativeFriends(IN commID INT)
+    BEGIN
+    SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE numOtherFriends(IN commID INT)
     BEGIN
     SELECT user_id FROM create_comment WHERE comment_id = commID;
     END //
