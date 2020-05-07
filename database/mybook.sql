@@ -20,7 +20,9 @@ DROP PROCEDURE IF EXISTS getUserID;
 DROP PROCEDURE IF EXISTS createPost;
 DROP PROCEDURE IF EXISTS createImagePost;
 DROP PROCEDURE IF EXISTS showUserPosts;
-DROP PROCEDURE IF EXISTS showUserImages
+DROP PROCEDURE IF EXISTS showUserImages;
+DROP PROCEDURE IF EXISTS addFriend;
+DROP PROCEDURE IF EXISTS showUserFriends;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
 
@@ -86,11 +88,12 @@ CREATE TABLE comment(
 );
 
 CREATE TABLE friends(
-    friend_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     user_id INT NOT NULL,
+    friend_id INT NOT NULL,
     friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'OTHER') NOT NULL,/*change in data dictionary*/
-    PRIMARY KEY(friend_id),
-    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY(user_id, friend_id),
+    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(friend_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE images(
@@ -233,6 +236,23 @@ DELIMITER //
     JOIN images 
     ON images.image_id = contains.image_id
     WHERE user.user_id = in_user_id;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE addFriend(IN in_user_id INT, IN in_friend_id INT, IN in_friend_type VARCHAR(15))
+    BEGIN
+    INSERT INTO friends(user_id, friend_id, friend_type)
+    VALUES
+    (in_user_id, in_friend_id, in_friend_type);
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserFriends(IN in_user_id INT)
+    BEGIN
+    SELECT friend_id, friend_type FROM friends
+    WHERE user_id = in_user_id;
     END //
 DELIMITER ;
 
