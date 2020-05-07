@@ -19,6 +19,8 @@ DROP PROCEDURE IF EXISTS loginUser;
 DROP PROCEDURE IF EXISTS getUserID;
 DROP PROCEDURE IF EXISTS createPost;
 DROP PROCEDURE IF EXISTS createImagePost;
+DROP PROCEDURE IF EXISTS showUserPosts;
+DROP PROCEDURE IF EXISTS showUserImages
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
 
@@ -203,6 +205,34 @@ DELIMITER //
     VALUES
     /*IMMEDIATELY BELOW SELECTS THE LAST CREATED POST ID*/       /*IMMEDIATELY BELOW SELECTS THE LAST CREATEd IMAGE ID*/
     ((SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1), (SELECT image_id FROM images ORDER BY image_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserPosts(IN in_user_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, post.time_stamp, post.post_location FROM post 
+    JOIN create_post 
+    ON post.post_id = create_post.post_id 
+    JOIN user 
+    ON user.user_id = create_post.user_id
+    WHERE user.user_id = in_user_id;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserImages(IN in_user_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, images.file_name, post.time_stamp, post.post_location FROM post 
+    JOIN create_post 
+    ON post.post_id = create_post.post_id 
+    JOIN user 
+    ON user.user_id = create_post.user_id
+    JOIN contains
+    ON contains.post_id = post.post_id
+    JOIN images 
+    ON images.image_id = contains.image_id
+    WHERE user.user_id = in_user_id;
     END //
 DELIMITER ;
 
