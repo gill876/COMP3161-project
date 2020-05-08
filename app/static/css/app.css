@@ -117,7 +117,7 @@ body {
     display:grid;
     grid-template-columns: 25% 25% 25% 25%;
     grid-auto-rows: 200px;
-    grid-gap: 50px;
+    grid-gap: 25px;
 }
 .layout img{
     width: 100%;
@@ -126,8 +126,9 @@ body {
 
 .everything_img{
     background-color: #f4eed7;
-    padding-left: 10%;
-    padding-right: 10%;
+    padding-left: 2%;
+    padding-right: 8%;
+    padding-bottom: 2%;
 }
 
 .userimage_header{
