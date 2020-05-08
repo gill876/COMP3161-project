@@ -21,6 +21,7 @@ DROP PROCEDURE IF EXISTS createPost;
 DROP PROCEDURE IF EXISTS createImagePost;
 DROP PROCEDURE IF EXISTS showUserPosts;
 DROP PROCEDURE IF EXISTS showUserImages;
+DROP PROCEDURE IF EXISTS showUserComments;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
 DROP PROCEDURE IF EXISTS numFriends;
@@ -67,7 +68,7 @@ CREATE TABLE post(
     /*user_id INT NOT NULL,*/
     content VARCHAR(300) NOT NULL, /*change in data dictionary*/
     time_stamp DATETIME NOT NULL,
-    post_location VARCHAR(70) NOT NULL,
+    post_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
     PRIMARY KEY(post_id)/*,
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE*/
 );
@@ -84,7 +85,7 @@ CREATE TABLE comment(
     post_id INT NOT NULL,
     comm_text VARCHAR(300),
     time_stamp DATETIME NOT NULL,
-    c_location VARCHAR(70) NOT NULL,
+    c_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
     PRIMARY KEY(comment_id, post_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -237,6 +238,18 @@ DELIMITER //
     ON contains.post_id = post.post_id
     JOIN images 
     ON images.image_id = contains.image_id
+    WHERE user.user_id = in_user_id;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserComments(IN in_user_id INT)
+    BEGIN
+    SELECT comment.comment_id, comment.comm_text, comment.time_stamp, comment.c_location FROM comment 
+    JOIN create_comment 
+    ON comment.comment_id = create_comment.comment_id 
+    JOIN user 
+    ON user.user_id = create_comment.user_id
     WHERE user.user_id = in_user_id;
     END //
 DELIMITER ;
