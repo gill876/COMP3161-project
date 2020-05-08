@@ -2,8 +2,12 @@
 
 {% block main %}
 
-    <h1 class="userimage_header">Photos/Images</h1>
+    <div class="everything_img">
 
+        <div class="imageheader">
+
+            <h1 class="userimage_header">Photos/Images</h1>
+        </div>
     <div class="imageupload_form">
         <form action "{{ url_for('images') }}" method="POST" enctype="mutlipart/form-data">
 
@@ -12,15 +16,17 @@
             <div class="form-up">
                 {{ form.images.label }}
                 {{ form.images(class="form-control")}}
+
             </div>
 
             <div class="post_img_button">
-                <button type="submit" name="submit" class="btn btn-primary">Post</button>
+             <button type="submit" name="submit" class="btn btn-primary">Post</button>
             </div>
 
+          
         </form>
     </div>
-    <div> <h2>List</h2>
+    <div class="img_layout_container">
         {% for img in images %}
         <div class = "layout">
             <img src="{{url_for('static',filename ='images/'+ img ) }}" />
@@ -32,5 +38,5 @@
             <img src="{{ url_for('static', filename="userprofileimages/"+ file) }}" alt="uploaded_photos"> 
         {% endfor %}
     </div> -->
-
+    </div>
 {% endblock %}
