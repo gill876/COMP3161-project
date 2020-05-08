@@ -13,6 +13,11 @@ app.config['SECRET_KEY'] = "change this to be a more random key"
 # bootstrap = Bootstrap(app)
 manager = Manager(app)
 
+#Config Values
+
+USERNAME ="admin"
+PASSWORD = "password123"
+
 app.config['MYSQL_USER'] = 'sql9337116'
 app.config['MYSQL_PASSWORD'] = 'DuUMhQcqSI'
 app.config['MYSQL_HOST'] = 'http://sql9.freemysqlhosting.net/'
@@ -24,6 +29,8 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 #adding images to respective folders
 
 PROFILEPHOTO_FOLDER= './app/static/profileimages'
+
+IMAGE_UPLOAD_FOLDER= './app/static/userprofileimages'
 
 
 # Flask-Login login manager

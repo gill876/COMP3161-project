@@ -29,15 +29,13 @@ class UpdateForm(FlaskForm):
     profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ])
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
+      
     
-
-   
-    
-class postForm(FlaskForm):
+class PostForm(FlaskForm):
     content = TextAreaField('content',validators=[InputRequired(message='Need content to post')])
     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
 
 class ImageForm(FlaskForm):
-    images=FileField('Images',validators=[FileRequired('Please add an Image'),FileAllowed(['jpg','jpeg','png'],'Images Only')])
+    images=FileField('Images',validators=[FileRequired('Please add an Image'),FileAllowed(['jpg','jpeg','png'],'Images Only!')])
     

@@ -12,7 +12,7 @@ import psycopg2
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm,UpdateForm
+from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm
 from werkzeug.utils import secure_filename 
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
@@ -93,14 +93,16 @@ def register():
 
     return render_template('register.html', form=form)
 
-
+#reminder for neisha
+#add the stuff you forgot..
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         # change this to actually validate the entire form submission
         # and not just one field
-    
+            error = None
+
             username = form.username.data
             password = form.password.data
             # Get the username and password values from the form.
@@ -146,6 +148,42 @@ def updateprofile():
             flash("Profile Not Updated. Please Try Again!")
     
     return render_template('updateprofile.html', form=form)
+
+
+#should render the page for 
+#the images
+@app.route("/images", methods=['POST', 'GET'])
+def images():
+    imagesform = ImageForm()
+
+    if request.method == "POST" and images.validate_on_submit():
+        image = imagesform.images.data 
+
+        filename= secure_filename(image.filename)
+        image.save(os.path.join(app.config['IMAGE_UPLOAD_FOLDER', filename]))
+
+        flash("Your images as been successfully posted!", 'success')
+        return redirect(url_for('profile'))
+
+
+    return render_template('images.html', form=imagesform)
+
+def get_uploaded_images():
+    rootdir = os.getcwd()
+    pictures = []
+    print (rootdir)
+
+    for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
+        print(dirs)
+
+        for file in pictures:
+            print (os.path.join(subdir, files))
+            files.append("userprofileimages/" + file)
+
+            return files
+
+    return render_template("profile.html"  )
+
 
 # @app.route("/register")
 # def register():

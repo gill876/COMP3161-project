@@ -1,0 +1,30 @@
+{% extends 'base.html'%} 
+
+{% block main %}
+
+    <h1 class="userimage_header">Photos/Images</h1>
+
+    <div class="imageupload_form">
+        <form action "{{ url_for('images') }}" method="POST" enctype="mutlipart/form-data">
+
+            {{ form.csrf_token }}
+
+            <div class="form-up">
+                {{ form.images.label }}
+                {{ form.images(class="form-control")}}
+            </div>
+
+            <div class="post_img_button">
+                <button type="submit" name="submit" class="btn btn-primary">Post</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="grid_container1">
+         {% for file in pictures %}
+            <img src="{{ url_for('static', filename="userprofileimages/"+ file) }}" alt="uploaded_photos"> 
+        {% endfor %}
+    </div>
+
+{% endblock %}
