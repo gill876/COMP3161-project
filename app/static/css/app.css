@@ -126,6 +126,13 @@ body {
 
 .everything_img{
     background-color: #f4eed7;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.userimage_header{
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 
