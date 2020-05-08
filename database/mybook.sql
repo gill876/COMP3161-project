@@ -16,9 +16,19 @@ DROP TABLE IF EXISTS csv_users;
 DROP TRIGGER IF EXISTS Load_User_Profile; /*add trigger*/
 /*SHOW WARNINGS;*/
 DROP PROCEDURE IF EXISTS loginUser;
+DROP PROCEDURE IF EXISTS getUserID;
+DROP PROCEDURE IF EXISTS createPost;
+DROP PROCEDURE IF EXISTS createImagePost;
+DROP PROCEDURE IF EXISTS showUserPosts;
+DROP PROCEDURE IF EXISTS showUserImages;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
+DROP PROCEDURE IF EXISTS numFriends;
+DROP PROCEDURE IF EXISTS numTypeFriends;
+DROP PROCEDURE IF EXISTS listFriendIds;
+DROP PROCEDURE IF EXISTS listTypeFriendIDs;
 
+/*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
     id INT NOT NULL,
     username VARCHAR(100) NOT NULL,
@@ -80,19 +90,20 @@ CREATE TABLE comment(
 );
 
 CREATE TABLE friends(
-    friend_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     user_id INT NOT NULL,
+    friend_id INT NOT NULL,
     friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'OTHER') NOT NULL,/*change in data dictionary*/
-    PRIMARY KEY(friend_id),
-    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY(user_id, friend_id),
+    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(friend_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE images(
     image_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     post_id INT NOT NULL,
-    caption VARCHAR(30),
+    /*caption VARCHAR(30),*/
     file_name VARCHAR(256) NOT NULL, /*change in data dictionary*/
-    time_stamp DATETIME NOT NULL, /*change in data dictionary*/
+    /*time_stamp DATETIME NOT NULL,*/ /*change in data dictionary*/
     PRIMARY KEY(image_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
@@ -167,16 +178,139 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
+    CREATE PROCEDURE getUserID(IN in_username VARCHAR(100), IN in_email_address VARCHAR(70))
+    BEGIN
+    SELECT user_id FROM user WHERE username = in_username OR email_address = in_email_address;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE createPost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70))
+    BEGIN
+    INSERT INTO post(content, time_stamp, post_location) 
+    VALUES (in_content, SYSDATE(), in_post_location);
+    
+    INSERT INTO create_post 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE createImagePost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_file_name VARCHAR(256))
+    BEGIN
+    CALL createPost(in_user_id, in_content, in_post_location);
+    
+    INSERT INTO images(post_id, file_name)
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
+    VALUES ((SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1), in_file_name);
+
+    INSERT INTO contains
+    VALUES
+    /*IMMEDIATELY BELOW SELECTS THE LAST CREATED POST ID*/       /*IMMEDIATELY BELOW SELECTS THE LAST CREATEd IMAGE ID*/
+    ((SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1), (SELECT image_id FROM images ORDER BY image_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserPosts(IN in_user_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, post.time_stamp, post.post_location FROM post 
+    JOIN create_post 
+    ON post.post_id = create_post.post_id 
+    JOIN user 
+    ON user.user_id = create_post.user_id
+    WHERE user.user_id = in_user_id;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserImages(IN in_user_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, images.file_name, post.time_stamp, post.post_location FROM post 
+    JOIN create_post 
+    ON post.post_id = create_post.post_id 
+    JOIN user 
+    ON user.user_id = create_post.user_id
+    JOIN contains
+    ON contains.post_id = post.post_id
+    JOIN images 
+    ON images.image_id = contains.image_id
+    WHERE user.user_id = in_user_id;
+    END //
+DELIMITER ;
+
+/*DELIMITER //
+    CREATE PROCEDURE addFriend(IN in_user_id INT, IN in_friend_id INT, IN in_friend_type VARCHAR(30))
+    BEGIN
+    INSERT INTO friends values (in_user_id, in_friend_id, in_friend_type);
+    END //
+DELIMITER ;*/
+
+DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
     BEGIN
     SELECT user_id FROM create_post WHERE post_id = postID;
     END //
 DELIMITER ;
 
-
 DELIMITER //
     CREATE PROCEDURE commentCreator(IN commID INT)
     BEGIN
     SELECT user_id FROM create_comment WHERE comment_id = commID;
+    END //
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE numFriends(IN userID INT)
+    BEGIN
+    SELECT count(friend_id) FROM friends WHERE user_id = userID;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE numTypeFriends(IN userID INT, IN friendType VARCHAR(30))
+    BEGIN
+    IF (friendType = "WORK") THEN
+        SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "WORK";
+    ELSE 
+        IF (friendType = "SCHOOL") THEN
+            SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "SCHOOL";
+        ELSE
+            IF (friendType = "RELATIVE") THEN
+                SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "RELATIVE";
+            ELSE
+                SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "OTHER";
+            END IF;
+        END IF;
+    END IF;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE listFriendIDs(IN userID INT)
+    BEGIN
+    SELECT friend_id FROM friends WHERE user_id = userID;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE listTypeFriendIDs(IN userID INT, IN friendType VARCHAR(30))
+    BEGIN
+    IF (friendType = "WORK") THEN
+        SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "WORK";
+    ELSE 
+        IF (friendType = "SCHOOL") THEN
+            SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "SCHOOL";
+        ELSE
+            IF (friendType = "RELATIVE") THEN
+                SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "RELATIVE";
+            ELSE
+                SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "OTHER";
+            END IF;
+        END IF;
+    END IF;
     END //
 DELIMITER ;
