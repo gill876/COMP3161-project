@@ -22,6 +22,8 @@ DROP PROCEDURE IF EXISTS createImagePost;
 DROP PROCEDURE IF EXISTS showUserPosts;
 DROP PROCEDURE IF EXISTS showUserImages;
 DROP PROCEDURE IF EXISTS showUserComments;
+DROP PROCEDURE IF EXISTS addFriend;
+DROP PROCEDURE IF EXISTS showUserFriends;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
 DROP PROCEDURE IF EXISTS numFriends;
@@ -254,12 +256,22 @@ DELIMITER //
     END //
 DELIMITER ;
 
-/*DELIMITER //
-    CREATE PROCEDURE addFriend(IN in_user_id INT, IN in_friend_id INT, IN in_friend_type VARCHAR(30))
+DELIMITER //
+    CREATE PROCEDURE addFriend(IN in_user_id INT, IN in_friend_id INT, IN in_friend_type VARCHAR(15))
     BEGIN
-    INSERT INTO friends values (in_user_id, in_friend_id, in_friend_type);
+    INSERT INTO friends(user_id, friend_id, friend_type)
+    VALUES
+    (in_user_id, in_friend_id, in_friend_type);
     END //
-DELIMITER ;*/
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserFriends(IN in_user_id INT)
+    BEGIN
+    SELECT friend_id, friend_type FROM friends
+    WHERE user_id = in_user_id;
+    END //
+DELIMITER ;
 
 DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
