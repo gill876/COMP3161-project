@@ -7,7 +7,7 @@ This file creates your application.
 
 import os
 import datetime 
-import psycopg2
+# import psycopg2
 # from flask_mysqldb import MySQL
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash
@@ -48,6 +48,15 @@ from werkzeug.utils import secure_filename
 def home():
     """Render website's home page."""
     return render_template('home.html')
+
+def get_images():
+    plst=[]
+    rootdir = os.getcwd()
+    for subdir, dirs, files in os.walk (rootdir + '/app/static/images'):
+        for file in files:
+            plst = plst+[os.path.join(file)]
+    return plst
+
 
 # @app.route('/profile/<username>')
 # def profile(username):
@@ -165,8 +174,12 @@ def images():
         flash("Your images as been successfully posted!", 'success')
         return redirect(url_for('profile'))
 
+    photos = get_images()
+    if photos ==[]:
+        flash ('No Images')
+        return redirect(url_for('home'))
 
-    return render_template('images.html', form=imagesform)
+    return render_template('images.html', form=imagesform,images=photos)
 
 def get_uploaded_images():
     rootdir = os.getcwd()

@@ -1,4 +1,4 @@
-{% extends 'base.html'%} 
+{% extends 'base.html' %} 
 
 {% block main %}
 
@@ -20,11 +20,17 @@
 
         </form>
     </div>
-
-    <div class="grid_container1">
+    <div> <h2>List</h2>
+        {% for img in images %}
+        <div class = "layout">
+            <img src="{{url_for('static',filename ='images/'+ img ) }}" />
+        </div>
+        {% endfor %}
+    </div>
+    <!-- <div class="grid_container1">
          {% for file in pictures %}
             <img src="{{ url_for('static', filename="userprofileimages/"+ file) }}" alt="uploaded_photos"> 
         {% endfor %}
-    </div>
+    </div> -->
 
 {% endblock %}
