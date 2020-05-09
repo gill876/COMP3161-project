@@ -25,10 +25,13 @@ DROP PROCEDURE IF EXISTS joinGroup;
 DROP PROCEDURE IF EXISTS showUserPosts;
 DROP PROCEDURE IF EXISTS showUserImages;
 DROP PROCEDURE IF EXISTS showUserComments;
+DROP PROCEDURE IF EXISTS showUserGroups;
 DROP PROCEDURE IF EXISTS addFriend;
 DROP PROCEDURE IF EXISTS showUserFriends;
 DROP PROCEDURE IF EXISTS postCreator;
 DROP PROCEDURE IF EXISTS commentCreator;
+DROP PROCEDURE IF EXISTS groupCreator;
+DROP PROCEDURE IF EXISTS getPostComments;
 DROP PROCEDURE IF EXISTS numFriends;
 DROP PROCEDURE IF EXISTS numTypeFriends;
 DROP PROCEDURE IF EXISTS listFriendIds;
@@ -320,12 +323,27 @@ DELIMITER ;
 DELIMITER //
     CREATE PROCEDURE showUserGroups(IN in_user_id INT)
     BEGIN
-    SELECT group_id, mem_role FROM join_group
-    WHERE user_id = in_user_id;
+    
+    SET @CreatorStr = 'CREATOR'; /*User-created variable to store string to be used in subquery below - to avoid string syntax issues*/
 
-    SELECT group_id, 'CREATOR' FROM create_group 
-    WHERE user_id = in_user_id;
+    /*using dynamic SQL to create views*/
+    /*add views to data dictionary*/
+    EXEC(' 
+        CREATE VIEW composite_creator_group AS 
+            (SELECT user_id, group_id, @CreatorStr AS mem_role 
+                FROM create_group);
+    ');
 
+    EXEC('
+        CREATE VIEW all_group_entries AS
+            (SELECT * FROM join_group
+                UNION
+                    SELECT * FROM composite_creator_group
+            );
+    ');
+
+    SELECT * FROM all_group_entries WHERE user_id = in_user_id;
+    
     END //
 DELIMITER ;
 
@@ -344,6 +362,20 @@ DELIMITER //
     END //
 DELIMITER ;
 
+DELIMITER //
+    CREATE PROCEDURE groupCreator(IN groupID INT)
+    BEGIN
+    SELECT user_id FROM create_group WHERE group_id = groupID;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getPostComments(IN in_post_id INT)
+    BEGIN
+    SELECT comment_id, comm_text, time_stamp, c_location FROM comment
+    WHERE post_id = in_post_id;
+    END //
+DELIMITER ;
 
 DELIMITER //
     CREATE PROCEDURE numFriends(IN userID INT)
