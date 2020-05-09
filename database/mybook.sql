@@ -19,6 +19,8 @@ DROP PROCEDURE IF EXISTS loginUser;
 DROP PROCEDURE IF EXISTS getUserID;
 DROP PROCEDURE IF EXISTS createPost;
 DROP PROCEDURE IF EXISTS createImagePost;
+DROP PROCEDURE IF EXISTS createComment;
+DROP PROCEDURE IF EXISTS createGroup;
 DROP PROCEDURE IF EXISTS showUserPosts;
 DROP PROCEDURE IF EXISTS showUserImages;
 DROP PROCEDURE IF EXISTS showUserComments;
@@ -121,6 +123,7 @@ CREATE TABLE create_group(
 CREATE TABLE join_group(
     user_id INT NOT NULL,
     group_id INT NOT NULL,
+    mem_role ENUM('MEMBER','CONTENT EDITOR') NOT NULL,/*change in data dictionary */
     PRIMARY KEY(user_id, group_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -217,6 +220,46 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
+    CREATE PROCEDURE createComment(IN in_user_id INT, IN in_post_id INT, IN in_comm_text VARCHAR(300), IN in_c_location VARCHAR(70))
+    BEGIN
+    INSERT INTO comment(post_id, comm_text, time_stamp, c_location) 
+    VALUES (in_post_id, in_comm_text, SYSDATE(), in_c_location);
+    
+    INSERT INTO create_comment
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST COMMENT ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT comment_id FROM comment ORDER BY comment_id DESC LIMIT 1));
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE createGroup (IN in_user_id INT, IN in_group_name VARCHAR(90), IN in_group_description VARCHAR(300))
+    BEGIN
+    INSERT INTO user_group(group_name, group_description) 
+    VALUES (in_group_name, in_group_description);
+    
+    INSERT INTO create_group 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
+    ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id);
+
+    INSERT INTO join_group 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), 'CONTENT EDITOR');
+    END //
+DELIMITER ;
+
+/*DELIMITER //
+    CREATE PROCEDURE joinGroup (IN in_user_id INT, IN in_group_id INT, in_mem_role VARCHAR(20))
+    BEGIN
+    INSERT INTO join_group 
+    VALUES
+    (in_user_id, in_group_id, in_mem_role);
+    END //
+DELIMITER ;*/
+
+DELIMITER //
     CREATE PROCEDURE showUserPosts(IN in_user_id INT)
     BEGIN
     SELECT post.post_id, post.content, post.time_stamp, post.post_location FROM post 
@@ -272,6 +315,17 @@ DELIMITER //
     WHERE user_id = in_user_id;
     END //
 DELIMITER ;
+
+/*DELIMITER //
+    CREATE PROCEDURE showUserGroups(IN in_user_id INT)
+    BEGIN
+    CREATE VIEW userGroups AS 
+        SELECT group_id, mem_role FROM join_group
+            WHERE user_id = in_user_id;
+    
+    END //
+DELIMITER ;*/
+
 
 DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
