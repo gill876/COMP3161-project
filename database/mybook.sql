@@ -95,7 +95,7 @@ CREATE TABLE comment(
 CREATE TABLE friends(
     user_id INT NOT NULL,
     friend_id INT NOT NULL,
-    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'OTHER') NOT NULL,/*change in data dictionary*/
+    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'FRIEND', 'ACQUAINTANCE', 'OTHER') NOT NULL,/*change in data dictionary*/
     PRIMARY KEY(user_id, friend_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(friend_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
