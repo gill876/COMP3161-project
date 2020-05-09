@@ -21,7 +21,7 @@ DROP PROCEDURE IF EXISTS createPost;
 DROP PROCEDURE IF EXISTS createImagePost;
 DROP PROCEDURE IF EXISTS createComment;
 DROP PROCEDURE IF EXISTS createGroup;
-/*DROP PROCEDURE IF EXISTS joinGroup;*/
+DROP PROCEDURE IF EXISTS joinGroup;
 DROP PROCEDURE IF EXISTS showUserPosts;
 DROP PROCEDURE IF EXISTS showUserImages;
 DROP PROCEDURE IF EXISTS showUserComments;
@@ -244,21 +244,21 @@ DELIMITER //
     /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
     ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id);
 
-    INSERT INTO join_group 
-    VALUES
+    /*INSERT INTO join_group 
+    VALUES*/
     /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
-    (in_user_id, (SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), 'CONTENT EDITOR');
+    /*(in_user_id, (SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), 'CONTENT EDITOR');*/
     END //
 DELIMITER ;
 
-/*DELIMITER //
+DELIMITER //
     CREATE PROCEDURE joinGroup (IN in_user_id INT, IN in_group_id INT, in_mem_role VARCHAR(20))
     BEGIN
     INSERT INTO join_group 
     VALUES
     (in_user_id, in_group_id, in_mem_role);
     END //
-DELIMITER ;*/
+DELIMITER ;
 
 DELIMITER //
     CREATE PROCEDURE showUserPosts(IN in_user_id INT)
@@ -317,15 +317,17 @@ DELIMITER //
     END //
 DELIMITER ;
 
-/*DELIMITER //
+DELIMITER //
     CREATE PROCEDURE showUserGroups(IN in_user_id INT)
     BEGIN
-    CREATE VIEW userGroups AS 
-        SELECT group_id, mem_role FROM join_group
-            WHERE user_id = in_user_id;
-    
+    SELECT group_id, mem_role FROM join_group
+    WHERE user_id = in_user_id;
+
+    SELECT group_id, 'CREATOR' FROM create_group 
+    WHERE user_id = in_user_id;
+
     END //
-DELIMITER ;*/
+DELIMITER ;
 
 
 DELIMITER //
