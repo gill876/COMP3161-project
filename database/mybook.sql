@@ -15,27 +15,27 @@ DROP TABLE IF EXISTS csv_users; /*TABLE USED TO STORE INFORMATION FOR USER AND P
 /*SHOW WARNINGS;*/
 DROP TRIGGER IF EXISTS Load_User_Profile; /*TRIGGER USED TO POPULATE USER AND PROFILE TABLES FROM CSV TABLE*/
 /*SHOW WARNINGS;*/
-DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{} INPUT:{username OR email address, password in plain text} OUTPUT:{'Login successful' OR 'Password incorrect' OR 'User does not exist'}*/
-DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{} INPUT:{username, email address} OUTPUT:{userID}*/
-DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS joinGroup; /*PURPOSE:{} INPUT:{userID, groupID, member role['MEMBER' OR 'CONTENT EDITOR']} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS showUserPosts; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, date and time, location}*/
-DROP PROCEDURE IF EXISTS showUserImages; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, image name with path, date and time, location}*/
-DROP PROCEDURE IF EXISTS showUserComments; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: commentID, comment, date and time, location}*/
-DROP PROCEDURE IF EXISTS showUserGroups; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: userID, groupID, member_role}*/
-DROP PROCEDURE IF EXISTS addFriend; /*PURPOSE:{} INPUT:{userID, friendID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS showUserFriends; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: friendID, friend_type}*/
-DROP PROCEDURE IF EXISTS postCreator; /*PURPOSE:{} INPUT{postID}} OUTPUT:{userID}*/
-DROP PROCEDURE IF EXISTS commentCreator; /*PURPOSE:{} INPUT:{commentID} OUTPUT:{userID}*/
-DROP PROCEDURE IF EXISTS groupCreator; /*PURPOSE:{} INPUT:{groupID} OUTPUT:{userID}*/
-DROP PROCEDURE IF EXISTS getPostComments; /*PURPOSE:{} INPUT:{postID} OUTPUT:{commentID, comment, location}*/
-DROP PROCEDURE IF EXISTS numFriends; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: # of friends}*/
-DROP PROCEDURE IF EXISTS numTypeFriends; /*PURPOSE:{} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: # of friends of entered type}*/
-DROP PROCEDURE IF EXISTS listFriendIDs; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: all friendID for entered user}*/
-DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: all friendID of friend_type for entered userID}*/
+DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{LOGS A USER IN USING USERNAME OR EMAIL AND PASSWORD} INPUT:{username OR email address, password in plain text} OUTPUT:{'Login successful' OR 'Password incorrect' OR 'User does not exist'}*/
+DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{RETRIEVES USER ID FROM USERNAME OR EMAIL} INPUT:{username, email address} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{CREATE POST} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{CREATE IMAGE POST} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{CREATE COMMENT FOR A POST} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{CREATE A GROUP} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS joinGroup; /*PURPOSE:{JOIN A GROUP} INPUT:{userID, groupID, member role['MEMBER' OR 'CONTENT EDITOR']} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS showUserPosts; /*PURPOSE:{SHOWS POSTS OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserImages; /*PURPOSE:{SHOWS IMAGE POSTS OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, image name with path, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserComments; /*PURPOSE:{SHOWS ALL COMMENTS CREATED BY A USER} INPUT:{userID} OUTPUT:{TABLE WITH: commentID, comment, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserGroups; /*PURPOSE:{SHOWS GROUPS A USER IS ASSOCIATED WITH} INPUT:{userID} OUTPUT:{TABLE WITH: userID, groupID, member_role}*/
+DROP PROCEDURE IF EXISTS addFriend; /*PURPOSE:{ADD A FRIEND TO A USER} INPUT:{userID, friendID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS showUserFriends; /*PURPOSE:{SHOWS FRIENDS OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: friendID, friend_type}*/
+DROP PROCEDURE IF EXISTS postCreator; /*PURPOSE:{DISPLAYS USER ID OF A POST} INPUT{postID}} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS commentCreator; /*PURPOSE:{DISPLAYS USER ID OF A COMMENT} INPUT:{commentID} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS groupCreator; /*PURPOSE:{DISPLAYS USER ID OF A GROUP} INPUT:{groupID} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS getPostComments; /*PURPOSE:{GET COMMENTS FOR A POST} INPUT:{postID} OUTPUT:{commentID, comment, location}*/
+DROP PROCEDURE IF EXISTS numFriends; /*PURPOSE:{DISPLAYS NUMBER OF FRIENDS FOR A USER} INPUT:{userID} OUTPUT:{TABLE WITH: # of friends}*/
+DROP PROCEDURE IF EXISTS numTypeFriends; /*PURPOSE:{DISPLAYS THE NUMBER OF FRIENDS OF A TYPE FOR A USER} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: # of friends of entered type}*/
+DROP PROCEDURE IF EXISTS listFriendIDs; /*PURPOSE:{DISPLAYS ALL FRIEND ID'S OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: all friendID for entered user}*/
+DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{DISPLAYS FRIEND ID'S OF A TYPE FOR A USER} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: all friendID of friend_type for entered userID}*/
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
