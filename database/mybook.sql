@@ -11,31 +11,31 @@ DROP TABLE IF EXISTS friends;
 DROP TABLE IF EXISTS images;
 DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS csv_users;
+DROP TABLE IF EXISTS csv_users; /*TABLE USED TO STORE INFORMATION FOR USER AND PROFILE TABLES FROM CSV FILE*/
 /*SHOW WARNINGS;*/
-DROP TRIGGER IF EXISTS Load_User_Profile; /*add trigger*/
+DROP TRIGGER IF EXISTS Load_User_Profile; /*TRIGGER USED TO POPULATE USER AND PROFILE TABLES FROM CSV TABLE*/
 /*SHOW WARNINGS;*/
-DROP PROCEDURE IF EXISTS loginUser;
-DROP PROCEDURE IF EXISTS getUserID;
-DROP PROCEDURE IF EXISTS createPost;
-DROP PROCEDURE IF EXISTS createImagePost;
-DROP PROCEDURE IF EXISTS createComment;
-DROP PROCEDURE IF EXISTS createGroup;
-DROP PROCEDURE IF EXISTS joinGroup;
-DROP PROCEDURE IF EXISTS showUserPosts;
-DROP PROCEDURE IF EXISTS showUserImages;
-DROP PROCEDURE IF EXISTS showUserComments;
-DROP PROCEDURE IF EXISTS showUserGroups;
-DROP PROCEDURE IF EXISTS addFriend;
-DROP PROCEDURE IF EXISTS showUserFriends;
-DROP PROCEDURE IF EXISTS postCreator;
-DROP PROCEDURE IF EXISTS commentCreator;
-DROP PROCEDURE IF EXISTS groupCreator;
-DROP PROCEDURE IF EXISTS getPostComments;
-DROP PROCEDURE IF EXISTS numFriends;
-DROP PROCEDURE IF EXISTS numTypeFriends;
-DROP PROCEDURE IF EXISTS listFriendIds;
-DROP PROCEDURE IF EXISTS listTypeFriendIDs;
+DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{} INPUT:{username OR email address, password in plain text} OUTPUT:{'Login successful' OR 'Password incorrect' OR 'User does not exist'}*/
+DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{} INPUT:{username, email address} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS joinGroup; /*PURPOSE:{} INPUT:{userID, groupID, member role['MEMBER' OR 'CONTENT EDITOR']} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS showUserPosts; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserImages; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: postID, content, image name with path, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserComments; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: commentID, comment, date and time, location}*/
+DROP PROCEDURE IF EXISTS showUserGroups; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: userID, groupID, member_role}*/
+DROP PROCEDURE IF EXISTS addFriend; /*PURPOSE:{} INPUT:{userID, friendID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS showUserFriends; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: friendID, friend_type}*/
+DROP PROCEDURE IF EXISTS postCreator; /*PURPOSE:{} INPUT{postID}} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS commentCreator; /*PURPOSE:{} INPUT:{commentID} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS groupCreator; /*PURPOSE:{} INPUT:{groupID} OUTPUT:{userID}*/
+DROP PROCEDURE IF EXISTS getPostComments; /*PURPOSE:{} INPUT:{postID} OUTPUT:{commentID, comment, location}*/
+DROP PROCEDURE IF EXISTS numFriends; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: # of friends}*/
+DROP PROCEDURE IF EXISTS numTypeFriends; /*PURPOSE:{} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: # of friends of entered type}*/
+DROP PROCEDURE IF EXISTS listFriendIDs; /*PURPOSE:{} INPUT:{userID} OUTPUT:{TABLE WITH: all friendID for entered user}*/
+DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: all friendID of friend_type for entered userID}*/
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -324,10 +324,10 @@ DELIMITER //
     CREATE PROCEDURE showUserGroups(IN in_user_id INT)
     BEGIN
     
-    SET @CreatorStr = 'CREATOR'; /*User-created variable to store string to be used in subquery below - to avoid string syntax issues*/
+    /*SET @CreatorStr = 'CREATOR'; /*User-created variable to store string to be used in subquery below - to avoid string syntax issues*/
 
-    /*using dynamic SQL to create views*/
-    /*add views to data dictionary*/
+    /*using dynamic SQL to create views
+    /*add views to data dictionary
     EXEC(' 
         CREATE VIEW composite_creator_group AS 
             (SELECT user_id, group_id, @CreatorStr AS mem_role 
@@ -342,8 +342,13 @@ DELIMITER //
             );
     ');
 
-    SELECT * FROM all_group_entries WHERE user_id = in_user_id;
-    
+    SELECT * FROM all_group_entries WHERE user_id = in_user_id;*/ /*ANOTHER APPROACH BELOW*/
+    SELECT * FROM join_group
+    WHERE join_group.user_id = in_user_id
+    UNION
+    SELECT user_id, group_id, 'CREATOR' AS mem_role FROM create_group
+    WHERE create_group.user_id = in_user_id;
+
     END //
 DELIMITER ;
 
@@ -396,7 +401,15 @@ DELIMITER //
             IF (friendType = "RELATIVE") THEN
                 SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "RELATIVE";
             ELSE
-                SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "OTHER";
+                IF (friendType = "FRIEND") THEN
+                    SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "FRIEND";
+                ELSE
+                    IF (friendType = "ACQUAINTANCE") THEN
+                        SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "ACQUAINTANCE";
+                    ELSE
+                        SELECT count(friend_id) FROM friends WHERE user_id = userID and friend_type = "OTHER";
+                    END IF;
+                END IF;
             END IF;
         END IF;
     END IF;
@@ -422,7 +435,15 @@ DELIMITER //
             IF (friendType = "RELATIVE") THEN
                 SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "RELATIVE";
             ELSE
-                SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "OTHER";
+                IF (friendType = "FRIEND") THEN
+                    SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "FRIEND";
+                ELSE
+                    IF (friendType = "ACQUAINTANCE") THEN
+                        SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "ACQUAINTANCE";
+                    ELSE
+                        SELECT friend_id FROM friends WHERE user_id = userID and friend_type = "OTHER";
+                    END IF;
+                END IF;
             END IF;
         END IF;
     END IF;
