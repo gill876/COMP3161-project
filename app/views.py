@@ -49,13 +49,7 @@ def home():
     """Render website's home page."""
     return render_template('home.html')
 
-def get_images():
-    plst=[]
-    rootdir = os.getcwd()
-    for subdir, dirs, files in os.walk (rootdir + '/app/static/images'):
-        for file in files:
-            plst = plst+[os.path.join(file)]
-    return plst
+
 
 
 # @app.route('/profile/<username>')
@@ -181,26 +175,35 @@ def images():
 
     return render_template('images.html', form=imagesform,images=photos)
 
-def get_uploaded_images():
+def get_images():
+    plst=[]
     rootdir = os.getcwd()
-    pictures = []
-    print (rootdir)
+    for subdir, dirs, files in os.walk (rootdir + '/app/static/images'):
+        for file in files:
+            plst = plst+[os.path.join(file)]
+    return plst
 
-    for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
-        print(dirs)
+# def get_uploaded_images():
+#     rootdir = os.getcwd()
+#     pictures = []
+#     print (rootdir)
 
-        for file in pictures:
-            print (os.path.join(subdir, files))
-            files.append("userprofileimages/" + file)
+#     for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
+#         print(dirs)
 
-            return files
+#         for file in pictures:
+#             print (os.path.join(subdir, files))
+#             files.append("userprofileimages/" + file)
 
-    return render_template("profile.html"  )
+#             return files
+
+#     return render_template("profile.html"  )
 
 
-# @app.route("/register")
-# def register():
-#     return render_template ('register.html')
+@app.route('/groups')
+def groups():
+    
+    return render_template('groups.html')
 
 
 # user_loader callback. This callback is used to reload the user object from
