@@ -3,7 +3,33 @@
 {% block main %}
 
 <div class="container main-page-area">
-    
+    <div class="stats-container flex-row d-flex align-items-center justify-content-even flex-wrap">
+        {% with stat_value="3456", stat_label="Total Users" %}
+            {% include "components/admin_stat.html" %}
+        {% endwith %}
+
+        {% with stat_value="45", stat_label="Total Groups" %}
+            {% include "components/admin_stat.html" %}
+        {% endwith %}
+    </div>
+    <div class="menu-options-container">
+        {% with text = "View Users"%}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "Search Users"%}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "View Groups"%}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "Search Groups" %}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+        
+    </div>
 </div>
 
 {% endblock %}
