@@ -39,6 +39,7 @@ DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{DISPLAYS FRIEND ID'S OF A
 DROP PROCEDURE IF EXISTS signUp;
 DROP PROCEDURE IF EXISTS userDetails;
 DROP PROCEDURE IF EXISTS updateProfilePicture;
+DROP PROCEDURE IF EXISTS updateBiography;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -492,7 +493,9 @@ DELIMITER ;
 DELIMITER //
     CREATE PROCEDURE updateBiography(IN in_user_id INT, IN in_biography VARCHAR(300))
     BEGIN
-    
+    UPDATE profile
+    SET biography = in_biography
+    WHERE profile.user_id = in_user_id;
     END //
 DELIMITER ;
 
