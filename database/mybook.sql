@@ -36,6 +36,7 @@ DROP PROCEDURE IF EXISTS numFriends; /*PURPOSE:{DISPLAYS NUMBER OF FRIENDS FOR A
 DROP PROCEDURE IF EXISTS numTypeFriends; /*PURPOSE:{DISPLAYS THE NUMBER OF FRIENDS OF A TYPE FOR A USER} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: # of friends of entered type}*/
 DROP PROCEDURE IF EXISTS listFriendIDs; /*PURPOSE:{DISPLAYS ALL FRIEND ID'S OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: all friendID for entered user}*/
 DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{DISPLAYS FRIEND ID'S OF A TYPE FOR A USER} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: all friendID of friend_type for entered userID}*/
+DROP PROCEDURE IF EXISTS signUp;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -448,4 +449,61 @@ DELIMITER //
         END IF;
     END IF;
     END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE signUp(IN in_username VARCHAR(100), IN in_email_address VARCHAR(70), IN in_password VARCHAR(256), IN in_first_name VARCHAR(75), IN in_last_name VARCHAR(75), IN in_profile_img VARCHAR(100), IN in_gender VARCHAR(10))
+    BEGIN
+    INSERT INTO user(username, email_address, user_password, datejoined)
+    VALUES
+    (in_username, in_email_address, SHA2(in_password, 256), CURDATE());
+
+    INSERT INTO profile(user_id, firstname, lastname, gender, profile_img)
+    VALUES
+    /*THE SELECT STATEMENT BELOW SELECTS THE USER ID OF THE LAST CREATED USER*/
+    ((SELECT user_id FROM user ORDER BY user_id DESC LIMIT 1), in_first_name, in_last_name, in_gender, in_profile_img);
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE userDetails(IN userID INT)
+    BEGIN
+    
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE updateProfilePicture(IN userID INT)
+    BEGIN
+    
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE updateBiography(IN in_user_id INT, IN in_biography VARCHAR(300))
+    BEGIN
+    
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE changePassword(IN userID INT)
+    BEGIN
+    
+    END //
+DELIMITER ;
+
+DELIMITER $$
+    CREATE TRIGGER updateFriendsAmount
+    AFTER INSERT ON friends
+    FOR EACH ROW
+    BEGIN
+    INSERT INTO user(username, email_address, user_password, datejoined)
+    VALUES
+    (NEW.username, NEW.email, SHA2(NEW.password, 256), CURDATE());
+
+    INSERT INTO profile(user_id, firstname, lastname, gender)
+    VALUES
+    (NEW.id, NEW.firstname, NEW.lastname, NEW.gender);
+    END $$
 DELIMITER ;
