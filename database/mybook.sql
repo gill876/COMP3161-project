@@ -40,6 +40,7 @@ DROP PROCEDURE IF EXISTS signUp;
 DROP PROCEDURE IF EXISTS userDetails;
 DROP PROCEDURE IF EXISTS updateProfilePicture;
 DROP PROCEDURE IF EXISTS updateBiography;
+DROP PROCEDURE IF EXISTS changePassword;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -500,9 +501,11 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
-    CREATE PROCEDURE changePassword(IN userID INT)
+    CREATE PROCEDURE changePassword(IN in_user_id INT, IN in_password VARCHAR(256))
     BEGIN
-    
+    UPDATE user
+    SET user_password = SHA2(in_password, 256)
+    WHERE user.user_id = in_user_id;
     END //
 DELIMITER ;
 
