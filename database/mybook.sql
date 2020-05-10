@@ -37,6 +37,8 @@ DROP PROCEDURE IF EXISTS numTypeFriends; /*PURPOSE:{DISPLAYS THE NUMBER OF FRIEN
 DROP PROCEDURE IF EXISTS listFriendIDs; /*PURPOSE:{DISPLAYS ALL FRIEND ID'S OF A USER} INPUT:{userID} OUTPUT:{TABLE WITH: all friendID for entered user}*/
 DROP PROCEDURE IF EXISTS listTypeFriendIDs; /*PURPOSE:{DISPLAYS FRIEND ID'S OF A TYPE FOR A USER} INPUT:{userID, friend_type['WORK' OR 'SCHOOL' OR 'RELATIVE' OR 'FRIEND' OR 'ACQUAINTANCE' OR 'OTHER']} OUTPUT:{TABLE WITH: all friendID of friend_type for entered userID}*/
 DROP PROCEDURE IF EXISTS signUp;
+DROP PROCEDURE IF EXISTS userDetails;
+DROP PROCEDURE IF EXISTS updateProfilePicture;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -466,16 +468,24 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
-    CREATE PROCEDURE userDetails(IN userID INT)
+    CREATE PROCEDURE userDetails(IN in_user_id INT)
     BEGIN
-    
+
+    SELECT user.username, user.email_address, user.datejoined, profile.firstname, profile.lastname, profile.profile_img, profile.friends, profile.biography, profile.gender
+    FROM user 
+    JOIN profile
+    ON user.user_id = profile.user_id
+    WHERE user.user_id = in_user_id;
+
     END //
 DELIMITER ;
 
 DELIMITER //
-    CREATE PROCEDURE updateProfilePicture(IN userID INT)
+    CREATE PROCEDURE updateProfilePicture(IN in_user_id INT, IN in_profile_img VARCHAR(100))
     BEGIN
-    
+    UPDATE profile
+    SET profile_img = in_profile_img
+    WHERE profile.user_id = in_user_id;
     END //
 DELIMITER ;
 
@@ -497,13 +507,13 @@ DELIMITER $$
     CREATE TRIGGER updateFriendsAmount
     AFTER INSERT ON friends
     FOR EACH ROW
-    BEGIN
-    INSERT INTO user(username, email_address, user_password, datejoined)
-    VALUES
-    (NEW.username, NEW.email, SHA2(NEW.password, 256), CURDATE());
 
-    INSERT INTO profile(user_id, firstname, lastname, gender)
-    VALUES
-    (NEW.id, NEW.firstname, NEW.lastname, NEW.gender);
+    UPDATE profile 
+    SET profile.friends = (
+        SELECT COUNT(friends.friend_id) FROM friends
+        WHERE friends.user_id = NEW.user_id
+        )
+    WHERE profile.user_id = NEW.user_id;
+
     END $$
 DELIMITER ;
