@@ -87,6 +87,7 @@ def register():
 #add the stuff you forgot..
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    msg=''
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         #Recreate the error lemme see. I think I want to try to connect the database 
@@ -98,25 +99,29 @@ def login():
         #     session['logged_in'] = True
         username = form.username.data
         password = form.password.data
-
-         flash("Login Successful", "Successful")
+        #flash("Login Successful", "Successful")
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password,))
-
-          return redirect(url_for("profile")) 
-        # change this to actually validate the entire form submission
-        # and not just one field
-
-            
-            if user is not None and check_password_hash(user.password, password ):
-                login_user(user)
-               
-               # they should be redirected to a secure-page route instead
-            else:
-                flash("Unsuccessful Login", "Unsuccesful")
-    return render_template("login.html", form=form)
-
+        cursor.execute('CALL loginUser(%s, %s)', (username, password,))
+        rv = cursor.fetchall()
+        if rv == ({'Login successful': 'Login successful'},):
+            cursor.execute('CALL getUserID(%s, %s)', (username, username,))
+            rv = cursor.fetchall()
+            session['loggedin'] = True 
+            session['id'] = int(rv[0]['user_id'])
+            session['username'] = username
+            return 'Logged in Successfully '
+        #else:
+        #    msg='Incorrect username or password'
+            #pass
+        elif rv == ({'Password incorrect': 'Password incorrect'},):
+            pass
+        elif rv == ({'User does not exist': 'User does not exist'},):
+            pass
+            #return "fatal error"
+        else:
+            return "fatal error"
+    return render_template("home.html", form=form)
 
 # @app.route('/updateprofile'/'<userid>')
 @app.route('/updateprofile')
@@ -220,12 +225,7 @@ def secure_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('secure_page.html')
     
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out.', 'danger')
-    return redirect(url_for('home'))
+
 
 
 @app.route('/<file_name>.txt')

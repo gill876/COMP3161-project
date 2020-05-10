@@ -1,6 +1,7 @@
 import mysql.connector
 import names, csv
 import random
+import timeit
 
 def generate_fullnames(amount):
     """accepts amount of fullnames to be generated and outputs the fullnames in a list: ['Mary Brown', 'John Brown']"""
@@ -160,8 +161,10 @@ def main(column_names, filename, amount):
     print("done")
 
     
-
+start = timeit.default_timer()
 main(["id", 'username', 'email', 'password','fname', 'lname', 'gender'], 'csv_users', 520)
+stop = timeit.default_timer()
+print('Time: %.2f seconds' %(stop - start))
 
 #################TEST GROUNDS#####################
 #print(generate_gender_fullnames(3, 'female', 'dict'))

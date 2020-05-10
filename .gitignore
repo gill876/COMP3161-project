@@ -20,3 +20,4 @@ venv/
 
 #All generated csv's
 *.csv
+csv/
