@@ -7,44 +7,31 @@ This file creates your application.
 
 import os
 import datetime 
-# import psycopg2
-# from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
 from app import app, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm
 from werkzeug.utils import secure_filename 
+from flask_mysqldb import MySQL
+
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
 ###
 
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'mybook'
+app.config['MYSQL_PASSWORD'] = 'password'
+app.config['MYSQL_DB'] = 'mybook'
 
-# mysql = MySQL(app)
-
-# @app.route('/')
-# def index():
-#     cur = mysql.connection.cursor()
-
-#     cur.execute('''CREATE TABLE example (id INTEGER,name VARCHAR(20))''')
-#     return 'Done'
-
-# def connect_db():
-#     return psycopg2.connect(host="localhost",database="userz",user="conrodsmith",password="mantis101")
-# @app.route('/', methods=['POST', 'GET'])
-# def add_user():
-#     if request.method == "POST":
-#         db = connect_db()
-#         cur = db.cursor()
-#         cur.execute('insert into userz (name, email) values (%s, %s)')
-#         db.commit() 
-#         flash('New user was successfully added') 
-        
-#     return render_template('home.html')
+mysql = MySQL(app)
 
 
-@app.route('/')
+
+@app.route('/home')
 def home():
     """Render website's home page."""
     return render_template('home.html')
@@ -102,20 +89,30 @@ def register():
 def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
+        #Recreate the error lemme see. I think I want to try to connect the database 
+        #the one i highlighted
+        
+        # if request.form['username'] != app.config['username'] or request.form['password'] != app.config['passowrd']:
+        #     error = "Incorrect username or password!"
+        # else: 
+        #     session['logged_in'] = True
+        username = form.username.data
+        password = form.password.data
+
+         flash("Login Successful", "Successful")
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password,))
+
+          return redirect(url_for("profile")) 
         # change this to actually validate the entire form submission
         # and not just one field
-            error = None
 
-            username = form.username.data
-            password = form.password.data
-            # Get the username and password values from the form.
             
-            # user = UserProfile.query.filter_by(username=username).first()
-
             if user is not None and check_password_hash(user.password, password ):
                 login_user(user)
-                flash("Login Successful", "Successful")
-                return redirect(url_for("profile"))  # they should be redirected to a secure-page route instead
+               
+               # they should be redirected to a secure-page route instead
             else:
                 flash("Unsuccessful Login", "Unsuccesful")
     return render_template("login.html", form=form)
