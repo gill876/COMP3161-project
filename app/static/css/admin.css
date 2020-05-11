@@ -183,3 +183,8 @@
 .admin-search-results-table.truncate {
     max-width: 300px;
 }
+
+.admin-profile-header {
+    width: 200px;
+    height: 200px;
+}

@@ -1,1 +1,24 @@
-<!--look at how to implement bootstrap tables first-->
+<div class="admin-search-results-container">
+    {% if table_details %}
+    <div class="admin-search-results-container">
+        <table class="table table-hover table-responsive-xl admin-search-results-table">
+            <thead>
+              <tr>
+                  {% for heading in table_details.headings %}
+                    <th scope="col">{{heading}}</th>
+                  {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+                {% for row in table_details.rows %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{item}}</td>
+                    {% endfor %}
+               </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </div>
+    {% endif %}
+</div>
