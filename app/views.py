@@ -272,6 +272,7 @@ def admin_dashboard():
 def admin_users():
     users = [
         {
+            "id": "3ed",
             "firstname": "Lateefah",
             "lastname": "Smellie",
             "num_posts": 50,
@@ -320,6 +321,7 @@ def admin_search_users():
         search_value = form.searchTerm.data
         results = [
             {
+                "id": "3ed",
                 "firstname": "Lateefah",
                 "lastname": "Smellie",
                 "num_posts": 50,

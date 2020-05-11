@@ -184,7 +184,74 @@
     max-width: 300px;
 }
 
+
 .admin-profile-header {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-profile-header-pic {
     width: 200px;
     height: 200px;
+}
+
+.admin-profile-user-details {
+    margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+    color: #161613;
+}
+
+.admin-profile-user-detail {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-profile-user-detail-label {
+    font-weight: bold;
+    text-align: right;
+    margin-right: 2px;
+}
+
+.admin-profile-user-detail-value {
+    text-align: left;
+    margin-left: 3px;
+}
+
+.admin-profile-btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-profile-boxes-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.post-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 45%;
+    overflow-y: scroll;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comment-stream {
+    margin: 10px 0;
+}
+
+.admin-profile-friend-table {
+
+}
+
+.admin-profile-group-table {
+
 }
