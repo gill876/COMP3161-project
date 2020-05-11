@@ -262,15 +262,9 @@ def get_images():
 #     return render_template("profile.html"  )
 
 
-@app.route("/groups", methods=['POST', 'GET'])
+@app.route("/groups", methods=['GET', 'POST'])
 def groups():
-
-    # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
-    # if (request.method == "POST"):
-    #     return render_template('usergroup.html')
-    # return redirect (url_for('usergroup.html'))
-    return render_template('usergroup.html')
+    return render_template('groups.html')
 
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
@@ -283,7 +277,6 @@ def usergroup():
         #connect to db 
     
     return render_template('usergroup.html',form=form)
-
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

@@ -31,7 +31,7 @@ class UpdateForm(FlaskForm):
       
     
 class PostForm(FlaskForm):
-    content = TextAreaField('content',validators=[InputRequired(message='Need content to post')])
+    content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
 
