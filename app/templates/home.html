@@ -1,7 +1,12 @@
-{% extends "base.html" %}
+{% extends 'layout.html' %}
 
-{% block main %}
-<h1 class="page-header">Welcome to Mybook</h1>
-<p class="lead">Make Memory<br/>
-Lorem ipsum</p>
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Welcome Back: {{ session.username }}</h2>
+<p>Welcome back, {{ session['username'] }}!</p>
+<p>Welcome back, {{ session['id'] }}!</p>
+<p>Welcome back, {{ session.username }}!</p>
+
+
 {% endblock %}

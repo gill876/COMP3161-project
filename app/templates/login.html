@@ -1,18 +1,16 @@
-{% extends "base.html" %}
 
-{% block main %}
 
 <div class ="logdiv"> 
 
   <div class ="loginimage">
-    <img src = "{{ url_for('static', filename='./appimages/loginphoto.png', alt="app image")}}">
+    <img src = "{{ url_for('static', filename='./appimages/loginphoto.png', alt="app image" )}}">
   </div>
 
   
   <div class="loginform">
     <h1>WELCOME TO MyBOOK</h1>
 
-    {% include 'flash_messages.html' %}
+    
     <form action="{{ url_for('login') }}"  enctype="multipart/form-data" method="POST">
       {{ form.csrf_token }}
       <div class="form-group">
@@ -23,8 +21,8 @@
         {{ form.password.label }}
         {{ form.password(class='form-control', placeholder="Enter your password") }}
       </div>
+      <a href="{{url_for('profile')}}"></a>
       <button type="submit" name="submit" class="btn btn-primary btn-block">Log in</button>
     </form>
   </div>
 </div>
-{% endblock %}

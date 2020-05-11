@@ -5,8 +5,11 @@ body {
     height: 100%;
 } 
 
-.menu-options-container {
-    width: 50%;
+.grid {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    grid-gap: 10px;
+
 }
 
 .logdiv{
@@ -26,3 +29,116 @@ body {
 .loginform h1{
     font-family: sans-serif;
 }
+
+.card-inner{
+    margin-left: 4rem;
+}
+
+.mainbody {
+    background:#f0f0f0;
+}
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+
+
+/* Flip around the padding for proper display in narrow viewports */
+.navbar-wrapper .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+.navbar-wrapper .navbar {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.navbar-content
+{
+    width:320px;
+    padding: 15px;
+    padding-bottom:0px;
+}
+.navbar-content:before, .navbar-content:after
+{
+    display: table;
+    content: "";
+    line-height: 0;
+}
+.navbar-nav.navbar-right:last-child {
+    margin-right: 15px !important;
+}
+.navbar-footer 
+{
+    background-color:#DDD;
+}
+.navbar-footer-content { padding:15px 15px 15px 15px; }
+.dropdown-menu {
+padding: 0px;
+overflow: hidden;
+}
+
+.brand_network {
+    color: #9D9D9D;
+    float: left;
+    position: absolute;
+    left: 70px;
+    top: 30px;
+    font-size: smaller;
+}
+
+.post-content {
+    margin-left:58px;
+}
+
+.badge-important {
+    margin-top: 3px;
+    margin-left: 25px;
+    position: absolute;
+}
+
+body {
+    background-color: #e8e8e8;
+}
+.signup_container{
+    padding-left: 15%;
+    display: flex;
+    background-color: #f4eed7;
+    align-items: center;
+    border: 5px  solid;
+    border-radius: 2%;
+    border-color: #9ad0e0;
+}
+
+.signup{
+    padding: 10%;
+}
+
+.imageupload_form{
+    padding-bottom: 8%;
+}
+
+
+
+.img_layout_container {
+    display:grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-auto-rows: 200px;
+    grid-gap: 25px;
+}
+.layout img{
+    width: 100%;
+    height: 100%;
+}
+
+.everything_img{
+    background-color: #f4eed7;
+    padding-left: 2%;
+    padding-right: 8%;
+    padding-bottom: 2%;
+}
+
+.userimage_header{
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
+
