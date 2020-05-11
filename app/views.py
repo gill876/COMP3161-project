@@ -6,44 +6,94 @@ This file creates your application.
 """
 
 import os
+import uuid
 import datetime 
-from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
 from app import app, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm
+from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm
 from werkzeug.utils import secure_filename 
+from flask_mysqldb import MySQL
+
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
 ###
-
-
 mysql = MySQL(app)
 
-# @app.route('/')
-# def index():
-#     cur = mysql.connection.cursor()
 
-#     cur.execute('''CREATE TABLE example (id INTEGER,name VARCHAR(20))''')
-#     return 'Done'
-
-
-@app.route('/')
+@app.route('/home')
 def home():
-    """Render website's home page."""
-    return render_template('home.html')
+    if 'loggedin' in session:
+        return render_template('home.html',username=['username'])
+    return redirect(url_for('login'))
+
+
+#reminder for neisha
+#add the stuff you forgot..
+@app.route("/", methods=["GET", "POST"])
+def login():
+    msg=''
+    form = LoginForm()
+    if request.method == "POST" and form.validate_on_submit():
+        #Recreate the error lemme see. I think I want to try to connect the database 
+        #the one i highlighted
+        
+        # if request.form['username'] != app.config['username'] or request.form['password'] != app.config['passowrd']:
+        #     error = "Incorrect username or password!"
+        # else: 
+        #     session['logged_in'] = True
+        username = form.username.data
+        password = form.password.data
+        #flash("Login Successful", "Successful")
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('CALL loginUser(%s, %s)', (username, password,))
+        rv = cursor.fetchall()
+        if rv == ({'Login successful': 'Login successful'},):
+            cursor.execute('CALL getUserID(%s, %s)', (username, username,))
+            rv = cursor.fetchall()
+            session['loggedin'] = True 
+            session['id'] = int(rv[0]['user_id'])
+            session['username'] = username
+            return redirect(url_for('home'))
+        #else:
+        #    msg='Incorrect username or password'
+            #pass
+        elif rv == ({'Password incorrect': 'Password incorrect'},):
+            pass
+        elif rv == ({'User does not exist': 'User does not exist'},):
+            pass
+            #return "fatal error"
+        else:
+            msg ='Incorrect Username/Password'
+    return render_template("index.html", form=form,msg=msg)
+
+
+@app.route('/logout')
+def logout():
+    # Remove session data, this will log the user out
+   session.pop('loggedin', None)
+   session.pop('id', None)
+   session.pop('username', None)
+   # Redirect to login page
+   return redirect(url_for('login'))
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 
 
-# @app.route('/register/')
-# def register():
-#     """Render the website's about page."""
-#     return render_template('register.html')
+
+
 
 @app.route("/register", methods=["GET","POST"])
 def register():
+    msg=''
     form = RegisterForm()
     if request.method == "POST" and form.validate_on_submit():
 
@@ -51,62 +101,131 @@ def register():
         firstname = form.firstname.data 
         lastname = form.lastname.data 
         gender = form.gender.data 
-        dob = form.dob.data   
         email = form.email.data   
         password = form.password.data   
         confirmpassword = form.confirmpassword.data 
         profile_photo = form.profile_photo.data  
 
-        #saviing profile images tothe profilephoto_folder
+        if password != confirmpassword:
+            flash('Passwords do not match')
+            return render_template('register.html', form=form)
 
-        filename = secure_filename(profile_photo)
-        profile_photo.save(os.path.join(app.config['PROFILEPHOTO_FOLDER', filename]))
-
-        #code for db goes here
-
-
-
-        flash('Your Profile Has Been Created')
-
-        return redirect(url_for("profile"))
-    else: 
-        flash("Profile Not Created! Please Try again!")
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        #query/procedure to check db for username if account exist
+        cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+        
+        user = cursor.fetchone()
+        #if account exist show error and validate checks
+    
+        if user == None: 
+            
+            filename = str(uuid.uuid4())
+            old_filename = profile_photo.filename
+            ext = old_filename.split(".")
+            ext = ext[1]
+            new_filename = filename + "." + ext
+            new_filename = new_filename.replace('-', '_')
+            profile_photo.save(os.path.join(app.config["PROFILEPHOTO_FOLDER"], new_filename))
+            cursor.execute('CALL signUp(%s, %s, %s, %s, %s, %s, %s)', (username, email, password, new_filename, lastname, filename, gender,))
+            mysql.connection.commit()
+        else:
+            print("The account already exits")
 
     return render_template('register.html', form=form)
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    form = LoginForm()
-    if request.method == "POST" and form.validate_on_submit():
-        # change this to actually validate the entire form submission
-        # and not just one field
+
+# @app.route('/updateprofile'/'<userid>')
+@app.route('/updateprofile')
+# @login_required (was sure if this was overkill or not)
+def updateprofile():
+    form = UpdateForm()
+
+    if request.method and form.validate_on_submit():
+
+        firstname = form.firstname.data  
+        lastname = form.lastname.data
+        username = form.username.data
+        email = form.email.data
+        profile_photo = form.profile_photo.data
+        password = form.password.data 
+        confirmpassword = form.confirmpassword.data 
+
+        filename = secure_filename(profile_photo)
+        profile_photo.save(os.path.join(app.config['PROFILEPHOTO_FOLDER', filename]))
+
+        #checking if the user is actually the user and checking the 
+        #password hash
+        #check the logic for this please, somebody
+        if (user == user):
+            check_password_hash(user.password, password)
+            flash("Profile Updated!")
+            redirect(url_for('profile'))
+        else:
+            flash("Profile Not Updated. Please Try Again!")
     
-            username = form.username.data
-            password = form.password.data
-            # Get the username and password values from the form.
-            
-            # user = UserProfile.query.filter_by(username=username).first()
-
-            if user is not None and check_password_hash(user.password, password ):
-                login_user(user)
-                flash("Login Successful", "Successful")
-                return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
-            else:
-                flash("Unsuccessful Login", "Unsuccesful")
-    return render_template("login.html", form=form)
+    return render_template('updateprofile.html', form=form)
 
 
-# @app.route("/register")
-# def register():
-#     return render_template ('register.html')
+#should render the page for 
+#the images
+@app.route("/images", methods=['POST', 'GET'])
+def images():
+    imagesform = ImageForm()
+
+    if request.method == "POST" and images.validate_on_submit():
+        image = imagesform.images.data 
+
+        filename= secure_filename(image.filename)
+        image.save(os.path.join(app.config['IMAGE_UPLOAD_FOLDER', filename]))
+
+        flash("Your images as been successfully posted!", 'success')
+        return redirect(url_for('profile'))
+
+    photos = get_images()
+    if photos ==[]:
+        flash ('No Images')
+        return redirect(url_for('home'))
+
+    return render_template('images.html', form=imagesform,images=photos)
+
+def get_images():
+    plst=[]
+    rootdir = os.getcwd()
+    for subdir, dirs, files in os.walk (rootdir + '/app/static/images'):
+        for file in files:
+            plst = plst+[os.path.join(file)]
+    return plst
+
+# def get_uploaded_images():
+#     rootdir = os.getcwd()
+#     pictures = []
+#     print (rootdir)
+
+#     for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
+#         print(dirs)
+
+#         for file in pictures:
+#             print (os.path.join(subdir, files))
+#             files.append("userprofileimages/" + file)
+
+#             return files
+
+#     return render_template("profile.html"  )
+
+
+@app.route('/groups')
+def groups():
+    
+    return render_template('groups.html')
 
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
 def load_user(id):
-    return UserProfile.query.get(int(id))
+    # return UserProfile.query.get(int(id))
+    pass
 
 ###
 # The functions below should be applicable to all Flask apps.
@@ -118,12 +237,7 @@ def secure_page():
     """Render a secure page on our website that only logged in users can access."""
     return render_template('secure_page.html')
     
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out.', 'danger')
-    return redirect(url_for('home'))
+
 
 
 @app.route('/<file_name>.txt')

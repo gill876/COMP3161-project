@@ -9,6 +9,9 @@ https://treyhunner.com/2013/02/random-name-generator/
 https://www.youtube.com/watch?v=s1XiCh-mGCA
 https://tableplus.com/blog/2018/08/mysql-how-to-import-data-from-a-csv-file.html
 https://www.programiz.com/python-programming/methods/built-in/enumerate
+https://www.tutorialspoint.com/mysql-trigger-to-insert-row-into-another-table
+https://dba.stackexchange.com/questions/80843/returning-true-or-false-in-a-custom-function
+https://stackoverflow.com/questions/5622976/how-do-you-calculate-program-run-time-in-python
 
 
 #############DEPRECATED MAIN FUNCTION################
