@@ -16,9 +16,9 @@ from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm
+from app.admin_forms import AdminSearchForm
 from werkzeug.utils import secure_filename 
 from flask_mysqldb import MySQL
-
 
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
@@ -314,7 +314,153 @@ def send_text_file(file_name):
 @app.route("/lateefah")
 def lateefah():
     props = {}
-    return render_template("test.html", details = props)
+    return render_template("test.html", details=props)
+    
+#Admin Pages
+
+@app.route("/admin/dashboard", methods=["GET", "POST"])
+def admin_dashboard():
+    stat_object = {
+        "stat_users": {
+            "label": "Total Users",
+            "value": 23456
+        },
+        "stat_groups": {
+            "label": "Total Groups",
+            "value": 50
+        }
+    }
+    
+    return render_template("admin/admin_dashboard.html", stats=stat_object)
+
+@app.route("/admin/view/users")
+def admin_users():
+    users = [
+        {
+            "id": "3ed",
+            "firstname": "Lateefah",
+            "lastname": "Smellie",
+            "num_posts": 50,
+            "num_comments": 50,
+            "num_friends": 360,
+            "num_groups": 30
+        }
+    ]
+
+    stats = [
+        {
+            "value": 23456,
+            "label": "Total Users"
+        },
+        {
+            "value": 234,
+            "label": "Total Female Users"
+        },
+        {
+            "value": 22356,
+            "label": "Total Male Users"
+        },
+    ]
+    
+    '''if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)'''
+        
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)
+
+@app.route("/admin/search/users", methods=["GET", "POST"])
+def admin_search_users():
+    form = AdminSearchForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "id": "3ed",
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+
+        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results) 
+
+    return render_template("admin/admin_search.html", form=form)
+
+@app.route("/admin/view/groups")
+def admin_groups():
+    groups = [
+        {
+            "name": "Oberlin High School Past Students Association",
+            "creator": "Mary Brown",
+            "create_date": "30-05-2019",
+            "num_posts": 360,
+            "num_members": 30
+        }
+    ]
+
+    stats = [
+        {
+            "value": 23456,
+            "label": "Total Groups"
+        },
+        {
+            "value": 234,
+            "label": "Total Group Posts"
+        },
+    ]
+    
+    '''if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+        return render_template("admin/admin_search.html", 
+total_users="23456", form=form, results=results)'''
+        
+    return render_template("admin/admin_group_report.html", stats=stats, 
+groups=groups)
+
+
+@app.route("/admin/search/groups", methods=["GET", "POST"])
+def admin_search_groups():
+    form = AdminSearchForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "name": "Oberlin High School Past Students Association",
+                "creator": "Mary Brown",
+                "create_date": "30-05-2019",
+                "num_posts": 360,
+                "num_members": 30
+            }
+        ]
+
+        return render_template("admin/admin_search_groups.html", form=form, results=results) 
+
+    return render_template("admin/admin_search_groups.html", form=form)
 
 @app.after_request
 def add_header(response):

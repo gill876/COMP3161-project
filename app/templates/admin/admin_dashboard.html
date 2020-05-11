@@ -2,8 +2,35 @@
 
 {% block main %}
 
-<div class="container main-page-area">
-    
+<div class="container admin-main-page-area justify-content-center">
+    <div class="admin-stats-container container-lg d-flex flex-row align-items-center justify-content-around flex-wrap">
+        {% with stat_value=stats.stat_users.value, stat_label=stats.stat_users.label %}
+            {% include "components/admin_stat.html" %}
+        {% endwith %}
+
+        {% with stat_value=stats.stat_groups.value, stat_label=stats.stat_groups.label %}
+            {% include "components/admin_stat.html" %}
+        {% endwith %}
+    </div>
+    <hr class="divider"/>
+    <div class="admin-menu-options-container">
+        {% with text = "View Users", target_route = "admin_users" %}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "Search Users", target_route = "admin_search_users" %}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "View Groups", target_route = "admin_groups" %}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}
+
+        {% with text = "Search Groups", target_route = "admin_search_groups" %}
+            {% include "components/admin_menu_button.html" %}
+        {%  endwith %}  
+        <div class="filler"></div>
 </div>
+
 
 {% endblock %}
