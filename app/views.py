@@ -270,7 +270,47 @@ def admin_dashboard():
 
 @app.route("/admin/view/users")
 def admin_users():
-    return render_template("admin/admin_user_report.html")
+    users = [
+        {
+            "firstname": "Lateefah",
+            "lastname": "Smellie",
+            "num_posts": 50,
+            "num_comments": 50,
+            "num_friends": 360,
+            "num_groups": 30
+        }
+    ]
+
+    stats = [
+        {
+            "value": 23456,
+            "label": "Total Users"
+        },
+        {
+            "value": 234,
+            "label": "Total Female Users"
+        },
+        {
+            "value": 22356,
+            "label": "Total Male Users"
+        },
+    ]
+    
+    '''if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)'''
+        
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)
 
 @app.route("/admin/search/users", methods=["GET", "POST"])
 def admin_search_users():

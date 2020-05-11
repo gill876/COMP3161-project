@@ -3,17 +3,27 @@
 {% block main %}
 
 <div class="container main-page-area">
-    <h2 class="admin-header">View Users</h2>
-    <div class="admin-user-stat-container">
-        {% for stat in stats %}
-            {% with stat_value=stat.value, stat_label=statt.label %}
-                {% include "components/admin_stat.html" %}
-            {% endwith %}
-        {% endfor %}
+    <h2 class="admin-header">Search Users</h2>
+    <div class="admin-instructions text-justify">There are {{total_users}} in the system. All users are listed below. Enter a name to search for a specific user or click on a listed user to see their posts and comments.</div>
+    <div class="admin-search-container">
+        <form method="POST" action="{{ url_for('admin_search_users') }}" class="admin-search-form">
+            {{ form.csrf_token }}
+            <div class="form-row">
+                <div class="col">
+                    {{form.searchTerm.label(class="admin-search-label")}}
+                </div>
+                <div class="col">
+                    {{form.searchTerm(class="form-control", placeholder="Enter name here")}}
+                </div>
+                <div class="col">
+                    {{form.submitBtn(class="admin-search-btn")}}
+                </div>
+            </div>
+        </form>
     </div>
     <hr class="divider"/>
     <div class="admin-search-results-container">
-        {% if users %}
+        {% if results %}
         <div class="admin-search-results-container">
             <table class="table table-hover table-responsive-xl admin-search-results-table">
                 <thead>
@@ -27,7 +37,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                    {% for person in users %}
+                    {% for person in results %}
                     <tr>
                         <td>{{person.firstname}}</td>
                         <td>{{person.lastname}}</td>
@@ -40,8 +50,6 @@
                 </tbody>
               </table>
         </div>
-        {% else %}
-        <div> We're sorry, there are no users to show </div>
         {% endif %}
     </div>
 </div>

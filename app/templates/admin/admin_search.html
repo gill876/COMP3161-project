@@ -4,13 +4,12 @@
 
 <div class="container main-page-area">
     <h2 class="admin-header">Search Users</h2>
-    <div class="admin-instructions text-justify">There are {{total_users}} in the system. All users are listed below. Enter a name to search for a specific user or click on a listed user to see their posts and comments.</div>
-    <div class="admin-search-container row">
-        <form method="POST" action="{{ url_for('admin_search_users') }}">
+    <div class="admin-search-container">
+        <form method="POST" action="{{ url_for('admin_search_users') }}" class="admin-search-form">
             {{ form.csrf_token }}
             <div class="form-row">
                 <div class="col">
-                    {{form.searchTerm.label}}
+                    {{form.searchTerm.label(class="admin-search-label")}}
                 </div>
                 <div class="col">
                     {{form.searchTerm(class="form-control", placeholder="Enter name here")}}
@@ -20,10 +19,13 @@
                 </div>
             </div>
         </form>
-        <hr class="divider"/>
+    </div>
+    <hr class="divider"/>
+    <div class="admin-search-results-container">
+        <div class="admin-instructions text-justify">Search results are listed below. Enter a name to search for a specific user or click on a listed user to see their posts and comments.</div>
         {% if results %}
         <div class="admin-search-results-container">
-            <table class="table admin-search-results-table">
+            <table class="table table-hover table-responsive-xl admin-search-results-table">
                 <thead>
                   <tr>
                     <th scope="col">Firstname</th>
