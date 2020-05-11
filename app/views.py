@@ -6,6 +6,7 @@ This file creates your application.
 """
 
 import os
+import uuid
 import datetime 
 import MySQLdb.cursors
 import re
@@ -21,71 +22,19 @@ from flask_mysqldb import MySQL
 ###
 # Routing for your application.
 ###
-
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'mybook'
-app.config['MYSQL_PASSWORD'] = 'password'
-app.config['MYSQL_DB'] = 'mybook'
-
 mysql = MySQL(app)
-
 
 
 @app.route('/home')
 def home():
-    """Render website's home page."""
-    return render_template('home.html')
+    if 'loggedin' in session:
+        return render_template('home.html',username=['username'])
+    return redirect(url_for('login'))
 
-
-
-
-# @app.route('/profile/<username>')
-# def profile(username):
-#     return render_template('profile.html',name=username)
-
-@app.route('/profile')
-# @login_required
-def profile():
-    return render_template('profile.html')
-
-
-
-
-@app.route("/register", methods=["GET","POST"])
-def register():
-    form = RegisterForm()
-    if request.method == "POST" and form.validate_on_submit():
-
-        username = form.username.data
-        firstname = form.firstname.data 
-        lastname = form.lastname.data 
-        gender = form.gender.data 
-        dob = form.dob.data   
-        email = form.email.data   
-        password = form.password.data   
-        confirmpassword = form.confirmpassword.data 
-        profile_photo = form.profile_photo.data  
-
-        #saviing profile images tothe profilephoto_folder
-
-        filename = secure_filename(profile_photo)
-        profile_photo.save(os.path.join(app.config['PROFILEPHOTO_FOLDER', filename]))
-
-        #code for db goes here
-
-
-
-        flash('Your Profile Has Been Created')
-
-        return redirect(url_for("profile"))
-    else: 
-        flash("Profile Not Created! Please Try again!")
-
-    return render_template('register.html', form=form)
 
 #reminder for neisha
 #add the stuff you forgot..
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     msg=''
     form = LoginForm()
@@ -110,7 +59,7 @@ def login():
             session['loggedin'] = True 
             session['id'] = int(rv[0]['user_id'])
             session['username'] = username
-            return 'Logged in Successfully '
+            return redirect(url_for('home'))
         #else:
         #    msg='Incorrect username or password'
             #pass
@@ -120,8 +69,71 @@ def login():
             pass
             #return "fatal error"
         else:
-            return "fatal error"
-    return render_template("home.html", form=form)
+            msg ='Incorrect Username/Password'
+    return render_template("index.html", form=form,msg=msg)
+
+
+@app.route('/logout')
+def logout():
+    # Remove session data, this will log the user out
+   session.pop('loggedin', None)
+   session.pop('id', None)
+   session.pop('username', None)
+   # Redirect to login page
+   return redirect(url_for('login'))
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+
+
+
+
+
+@app.route("/register", methods=["GET","POST"])
+def register():
+    msg=''
+    form = RegisterForm()
+    if request.method == "POST" and form.validate_on_submit():
+
+        username = form.username.data
+        firstname = form.firstname.data 
+        lastname = form.lastname.data 
+        gender = form.gender.data 
+        email = form.email.data   
+        password = form.password.data   
+        confirmpassword = form.confirmpassword.data 
+        profile_photo = form.profile_photo.data  
+
+        if password != confirmpassword:
+            flash('Passwords do not match')
+            return render_template('register.html', form=form)
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        #query/procedure to check db for username if account exist
+        cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+        
+        user = cursor.fetchone()
+        #if account exist show error and validate checks
+    
+        if user == None: 
+            
+            filename = str(uuid.uuid4())
+            old_filename = profile_photo.filename
+            ext = old_filename.split(".")
+            ext = ext[1]
+            new_filename = filename + "." + ext
+            new_filename = new_filename.replace('-', '_')
+            profile_photo.save(os.path.join(app.config["PROFILEPHOTO_FOLDER"], new_filename))
+            cursor.execute('CALL signUp(%s, %s, %s, %s, %s, %s, %s)', (username, email, password, new_filename, lastname, filename, gender,))
+            mysql.connection.commit()
+        else:
+            print("The account already exits")
+
+    return render_template('register.html', form=form)
+
+
 
 # @app.route('/updateprofile'/'<userid>')
 @app.route('/updateprofile')

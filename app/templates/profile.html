@@ -1,13 +1,20 @@
-{% extends "base.html" %}
+{% extends 'layout.html' %}
 
-{% block main %}
+{% block content%}
 <!-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> -->
 
 <!------ Include the above in your HEAD tag ---------->
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
-<div class="mainbody container-fluid">
+<div class="mainbody container-fluid" style="
+margin-top: 0px;
+margin-bottom: 0px;
+padding-right: 0px;
+padding-left: 0px;
+padding-top: 10px;
+padding-bottom: 10px;
+" >
    
         
       
@@ -36,7 +43,7 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <span>
-                        <h1 class="panel-title pull-left" style="font-size:30px;">{{ name }} <small>example@pods.tld</small> 
+                        <h1 class="panel-title pull-left" style="font-size:30px;">{{ session.username }} <small>example@pods.tld</small> 
                               </h1>
                     
                     </span>
@@ -67,7 +74,7 @@
                             <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;">
                         </a>
                     </div>
-                    <h4><a href="#" style="text-decoration:none;"><strong>{{ name }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
+                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
                     <span>
                   
                     </span>
@@ -111,7 +118,7 @@
                             <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;">
                         </a>
                     </div>
-                    <h4><a href="#" style="text-decoration:none;"><strong>{{ name }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
+                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
                     <span>
                   
                     </span>
@@ -156,7 +163,7 @@
                             <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;">
                         </a>
                     </div>
-                    <h4><a href="#" style="text-decoration:none;"><strong>{{ name }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
+                    <h4><a href="#" style="text-decoration:none;"><strong>{{session.username }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
                     <span>
                        
                     </span>

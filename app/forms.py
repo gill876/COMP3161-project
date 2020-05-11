@@ -12,11 +12,10 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     firstname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
     lastname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
-    gender=SelectField('Gender', choices=[('Male','Male'),('Female','Female')])
-    dob=DateField('Date of Birth',format='%m/%d/%Y')
+    gender=SelectField('Gender', choices=[('MALE','Male'),('FEMALE','Female'),('NON-BINARY','Non-Binary'), ('OTHER','Other')])
     username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
     email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])  
-    profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ]) 
+    profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'jpeg', 'IMAGES ONLY!']) ]) 
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
     
