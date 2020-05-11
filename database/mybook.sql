@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS create_comment;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
 DROP TABLE IF EXISTS profile;
+DROP TABLE IF EXISTS userProfile;
 DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS user_group;
 DROP TABLE IF EXISTS friends;
@@ -67,7 +68,6 @@ CREATE TABLE user(
 
 CREATE TABLE profile(
     profile_id INT NOT NULL AUTO_INCREMENT,
-    user_id INT DEFAULT 0 NOT NULL,
     firstname VARCHAR(75) NOT NULL,
     lastname VARCHAR(75) NOT NULL,
     /*username VARCHAR(100) NOT NULL UNIQUE,*/
@@ -76,6 +76,14 @@ CREATE TABLE profile(
     biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
     gender VARCHAR(10) NOT NULL,
     PRIMARY KEY(profile_id),
+    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE userProfile(
+    profile_id INT NOT NULL,
+    user_id INT DEFAULT 0 NOT NULL,
+    PRIMARY KEY(profile_id, user_id),
+    FOREIGN KEY(profile_id) REFERENCES profile(profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -102,7 +110,7 @@ CREATE TABLE comment(
     comm_text VARCHAR(300),
     time_stamp DATETIME NOT NULL,
     c_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
-    PRIMARY KEY(comment_id, post_id),
+    PRIMARY KEY(comment_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -174,9 +182,14 @@ DELIMITER $$
     VALUES
     (NEW.username, NEW.email, SHA2(NEW.password, 256), CURDATE());
 
-    INSERT INTO profile(user_id, firstname, lastname, gender)
+    INSERT INTO profile(firstname, lastname, gender)
     VALUES
-    (NEW.id, NEW.firstname, NEW.lastname, NEW.gender);
+    (NEW.firstname, NEW.lastname, NEW.gender);
+
+    INSERT INTO userProfile(profile_id, user_id)
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
+    ((SELECT profile_id FROM profile ORDER BY profile_id DESC LIMIT 1), NEW.id);
     END $$
 DELIMITER ;
 
@@ -465,10 +478,15 @@ DELIMITER //
     VALUES
     (in_username, in_email_address, SHA2(in_password, 256), CURDATE());
 
-    INSERT INTO profile(user_id, firstname, lastname, gender, profile_img)
+    INSERT INTO profile(firstname, lastname, gender, profile_img)
     VALUES
     /*THE SELECT STATEMENT BELOW SELECTS THE USER ID OF THE LAST CREATED USER*/
-    ((SELECT user_id FROM user ORDER BY user_id DESC LIMIT 1), in_first_name, in_last_name, in_gender, in_profile_img);
+    (in_first_name, in_last_name, in_gender, in_profile_img);
+
+    INSERT INTO userProfile(profile_id, user_id)
+    VALUES
+    /*THE SELECT STATEMENTS BELOW FIND THE LAST POST ID AND USER ID CREATED AND INSERT THEM INTO THE RESPECTIVE PARAMETERS*/
+    ((SELECT profile_id FROM profile ORDER BY profile_id DESC LIMIT 1), (SELECT user_id FROM user ORDER BY user_id DESC LIMIT 1));
     END //
 DELIMITER ;
 
@@ -479,7 +497,9 @@ DELIMITER //
     SELECT user.username, user.email_address, user.datejoined, profile.firstname, profile.lastname, profile.profile_img, profile.friends, profile.biography, profile.gender
     FROM user 
     JOIN profile
-    ON user.user_id = profile.user_id
+    JOIN userProfile
+    ON user.user_id = userProfile.user_id
+    AND profile.profile_id = userProfile.profile_id
     WHERE user.user_id = in_user_id;
 
     END //
@@ -490,7 +510,7 @@ DELIMITER //
     BEGIN
     UPDATE profile
     SET profile_img = in_profile_img
-    WHERE profile.user_id = in_user_id;
+    WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = in_user_id);
     END //
 DELIMITER ;
 
@@ -499,7 +519,7 @@ DELIMITER //
     BEGIN
     UPDATE profile
     SET biography = in_biography
-    WHERE profile.user_id = in_user_id;
+    WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = in_user_id);
     END //
 DELIMITER ;
 
@@ -522,7 +542,7 @@ DELIMITER $$
         SELECT COUNT(friends.friend_id) FROM friends
         WHERE friends.user_id = NEW.user_id
         )
-    WHERE profile.user_id = NEW.user_id;
+    WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = NEW.user_id);
 
     END $$
 DELIMITER ;
