@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS create_post;
 DROP TABLE IF EXISTS create_comment;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
-DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS userProfile;
+DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS user_group;
 DROP TABLE IF EXISTS friends;
@@ -75,8 +75,8 @@ CREATE TABLE profile(
     friends INT DEFAULT 0 NOT NULL,
     biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
     gender VARCHAR(10) NOT NULL,
-    PRIMARY KEY(profile_id),
-    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY(profile_id)
+    /*FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE*/
 );
 
 CREATE TABLE userProfile(
