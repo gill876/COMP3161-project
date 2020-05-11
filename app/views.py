@@ -10,13 +10,16 @@ import uuid
 import datetime 
 import MySQLdb.cursors
 import re
+import mysql.connector
+from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm
+from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm
 from app.admin_forms import AdminSearchForm
 from werkzeug.utils import secure_filename 
 from flask_mysqldb import MySQL
+
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
@@ -28,7 +31,7 @@ mysql = MySQL(app)
 @app.route('/home')
 def home():
     if 'loggedin' in session:
-        return render_template('home.html',username=['username'])
+        return render_template('home.html',username=session['username'])
     return redirect(url_for('login'))
 
 
@@ -53,9 +56,11 @@ def login():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('CALL loginUser(%s, %s)', (username, password,))
         rv = cursor.fetchall()
+        
         if rv == ({'Login successful': 'Login successful'},):
             cursor.execute('CALL getUserID(%s, %s)', (username, username,))
             rv = cursor.fetchall()
+            cursor.close()
             session['loggedin'] = True 
             session['id'] = int(rv[0]['user_id'])
             session['username'] = username
@@ -84,20 +89,64 @@ def logout():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    
+    if 'loggedin' in session:
+        #print(session['id'])
+        #print(session['username'])
+        
+        #print(details)
+        username = None
+        email_address = None
+        datejoined = None
+        firstname = None
+        lastname = None
+        profile_img = None
+        friends = None
+        biography = None
+        gender = None
 
+        year = None
+        month = None
+        day = None
 
+        try:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+            details = cursor.fetchone()
+            cursor.close()
 
+            username = details['username']
+            email_address = details['email_address']
+            datejoined = details['datejoined']
+            firstname = details['firstname']
+            lastname = details['lastname']
+            profile_img = details['profile_img']
+            friends = details['friends']
+            biography = details['biography']
+            gender = details['gender']
+
+            year = datejoined.year
+            month = datejoined.strftime("%B")
+            day = datejoined.day
+        
+        except: 
+            print("Something went wrong connecting with the database")
+
+        #print("*******************")
+        print(username, "**", email_address, "**", datejoined, "**", firstname, "**",lastname, "**", profile_img, "**",friends, "**",biography, "**", gender, "**", year, "**", month, "**", day)
+        #print(datejoined.year)
+        return render_template('profile.html', username=username, email_address=email_address, year=year, month=month, day=day, firstname=firstname, lastname=lastname, profile_img=profile_img, friends=friends, biography=biography, gender=gender)
+        #return render_template('profile.html')
+    return redirect(url_for('login'))
 
 
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-    msg=''
     form = RegisterForm()
     if request.method == "POST" and form.validate_on_submit():
-
         username = form.username.data
+        email = form.email.data   
         firstname = form.firstname.data 
         lastname = form.lastname.data 
         gender = form.gender.data 
@@ -105,6 +154,7 @@ def register():
         password = form.password.data   
         confirmpassword = form.confirmpassword.data 
         profile_photo = form.profile_photo.data  
+        
 
         if password != confirmpassword:
             flash('Passwords do not match')
@@ -113,12 +163,9 @@ def register():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         #query/procedure to check db for username if account exist
         cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        
         user = cursor.fetchone()
         #if account exist show error and validate checks
-    
-        if user == None: 
-            
+        if user == None:      
             filename = str(uuid.uuid4())
             old_filename = profile_photo.filename
             ext = old_filename.split(".")
@@ -126,11 +173,12 @@ def register():
             new_filename = filename + "." + ext
             new_filename = new_filename.replace('-', '_')
             profile_photo.save(os.path.join(app.config["PROFILEPHOTO_FOLDER"], new_filename))
-            cursor.execute('CALL signUp(%s, %s, %s, %s, %s, %s, %s)', (username, email, password, new_filename, lastname, filename, gender,))
+            cursor.execute('CALL signUp(%s, %s, %s, %s, %s, %s, %s)', (username, email, password, firstname, lastname, new_filename, gender,))
             mysql.connection.commit()
+            cursor.close()
+            
         else:
             print("The account already exits")
-
     return render_template('register.html', form=form)
 
 
@@ -214,10 +262,27 @@ def get_images():
 #     return render_template("profile.html"  )
 
 
-@app.route('/groups')
+@app.route("/groups", methods=['POST', 'GET'])
 def groups():
+
+    # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     
-    return render_template('groups.html')
+    # if (request.method == "POST"):
+    #     return render_template('usergroup.html')
+    # return redirect (url_for('usergroup.html'))
+    return render_template('usergroup.html')
+
+@app.route('/usergroup', methods=["GET", "POST"])
+def usergroup():
+
+    form = PostForm()
+    if request.method and form.validate_on_submit():
+        content = form.content.data
+        postphoto = form.postphoto.data 
+
+        #connect to db 
+    
+    return render_template('usergroup.html',form=form)
 
 
 # user_loader callback. This callback is used to reload the user object from
