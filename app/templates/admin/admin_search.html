@@ -3,7 +3,53 @@
 {% block main %}
 
 <div class="container main-page-area">
-    This is the search page
+    <h2 class="admin-header">Search Users</h2>
+    <div class="admin-instructions text-justify">There are {{total_users}} in the system. All users are listed below. Enter a name to search for a specific user or click on a listed user to see their posts and comments.</div>
+    <div class="admin-search-container row">
+        <form method="POST" action="{{ url_for('admin_search_users') }}">
+            {{ form.csrf_token }}
+            <div class="form-row">
+                <div class="col">
+                    {{form.searchTerm.label}}
+                </div>
+                <div class="col">
+                    {{form.searchTerm(class="form-control", placeholder="Enter name here")}}
+                </div>
+                <div class="col">
+                    {{form.submitBtn(class="admin-search-btn")}}
+                </div>
+            </div>
+        </form>
+        <hr class="divider"/>
+        {% if results %}
+        <div class="admin-search-results-container">
+            <table class="table admin-search-results-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Firstname</th>
+                    <th scope="col">Lastname</th>
+                    <th scope="col">Post</th>
+                    <th scope="col">Comments</th>
+                    <th scope="col">Friends</th>
+                    <th scope="col">Groups</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for person in results %}
+                    <tr>
+                        <td>{{person.firstname}}</td>
+                        <td>{{person.lastname}}</td>
+                        <td>{{person.num_posts}}</td>
+                        <td>{{person.num_comments}}</td>
+                        <td>{{person.num_friends}}</td>
+                        <td>{{person.num_groups}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}

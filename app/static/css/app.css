@@ -1,6 +1,8 @@
 body {
     padding-top: 5rem;
     background-color: #FAFAF7;
+    font-family: 'Roboto', san-serif;
+    height: 100%;
 } 
 
 .menu-options-container {
