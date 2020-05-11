@@ -26,8 +26,6 @@ class UpdateForm(FlaskForm):
     username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
     email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])
     profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ])
-<<<<<<< HEAD
-=======
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
     confirmpassword=PasswordField('Confirm Password',validators=[InputRequired(message='Retype password')])
       
@@ -40,4 +38,3 @@ class PostForm(FlaskForm):
 class ImageForm(FlaskForm):
     images=FileField('Images',validators=[FileRequired('Please add an Image'),FileAllowed(['jpg','jpeg','png'],'Images Only!')])
     
->>>>>>> templates

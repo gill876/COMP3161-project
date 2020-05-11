@@ -11,20 +11,12 @@ import datetime
 import MySQLdb.cursors
 import re
 from app import app, login_manager
-<<<<<<< HEAD
-from flask import render_template, request, redirect, url_for, flash, jsonify
-from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm
-from werkzeug.utils import secure_filename
-from app.admin_forms import AdminSearchForm
-=======
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm
+from app.admin_forms import AdminSearchForm
 from werkzeug.utils import secure_filename 
 from flask_mysqldb import MySQL
-
->>>>>>> templates
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
