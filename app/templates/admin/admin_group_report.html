@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="container main-page-area">
+    <h2 class="admin-header">View Groups</h2>
+    <div class="admin-user-stat-container container-lg d-flex flex-row 
+    align-items-center 
+    justify-content-around flex-wrap">
+        {% for stat in stats %}
+            {% with stat_value=stat.value, stat_label=stat.label %}
+                {% include "components/admin_stat.html" %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+    <hr class="divider"/>
+    <div class="admin-search-results-container">
+        {% if groups %}
+        <div class="admin-search-results-container">
+            <table class="table table-hover table-responsive-xl admin-search-results-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Group Name</th>
+                    <th scope="col">Creator</th>
+                    <th scope="col">Create Date</th>
+                    <th scope="col">Total Posts</th>
+                    <th scope="col">Total Members</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td class="truncate">{{group.name}}</td>
+                        <td class="truncate">{{group.creator}}</td>
+                        <td class="">{{group.create_date}}</td>
+                        <td class="">{{group.
+                            num_posts}}</td>
+                        <td class="">{{group.num_members}}</td>
+                   </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="filler"></div>
+
+{% endblock %}
