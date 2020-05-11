@@ -331,15 +331,69 @@ def admin_search_users():
 
         return render_template("admin/admin_search.html", total_users="23456", form=form, results=results) 
 
-    return render_template("admin/admin_search.html", total_users="23456", form=form)
+    return render_template("admin/admin_search.html", form=form)
 
 @app.route("/admin/view/groups")
 def admin_groups():
-    return render_template("admin/admin_group_report.html")
+    groups = [
+        {
+            "name": "Oberlin High School Past Students Association",
+            "creator": "Mary Brown",
+            "create_date": "30-05-2019",
+            "num_posts": 360,
+            "num_members": 30
+        }
+    ]
 
-@app.route("/admin/searh/groups")
+    stats = [
+        {
+            "value": 23456,
+            "label": "Total Groups"
+        },
+        {
+            "value": 234,
+            "label": "Total Group Posts"
+        },
+    ]
+    
+    '''if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+        return render_template("admin/admin_search.html", 
+total_users="23456", form=form, results=results)'''
+        
+    return render_template("admin/admin_group_report.html", stats=stats, 
+groups=groups)
+
+
+@app.route("/admin/search/groups", methods=["GET", "POST"])
 def admin_search_groups():
-    return render_template("admin/admin_search.html")
+    form = AdminSearchForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "name": "Oberlin High School Past Students Association",
+                "creator": "Mary Brown",
+                "create_date": "30-05-2019",
+                "num_posts": 360,
+                "num_members": 30
+            }
+        ]
+
+        return render_template("admin/admin_search_groups.html", form=form, results=results) 
+
+    return render_template("admin/admin_search_groups.html", form=form)
 
 @app.after_request
 def add_header(response):

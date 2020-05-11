@@ -3,10 +3,9 @@
 {% block main %}
 
 <div class="container main-page-area">
-    <h2 class="admin-header">Search Users</h2>
-    <div class="admin-instructions text-justify">There are {{total_users}} in the system. All users are listed below. Enter a name to search for a specific user or click on a listed user to see their posts and comments.</div>
+    <h2 class="admin-header">Search Groups</h2>
     <div class="admin-search-container">
-        <form method="POST" action="{{ url_for('admin_search_users') }}" class="admin-search-form">
+        <form method="POST" action="{{ url_for('admin_search_groups') }}" class="admin-search-form">
             {{ form.csrf_token }}
             <div class="form-row">
                 <div class="col">
@@ -28,24 +27,23 @@
             <table class="table table-hover table-responsive-xl admin-search-results-table">
                 <thead>
                   <tr>
-                    <th scope="col">Firstname</th>
-                    <th scope="col">Lastname</th>
-                    <th scope="col">Post</th>
-                    <th scope="col">Comments</th>
-                    <th scope="col">Friends</th>
-                    <th scope="col">Groups</th>
+                    <th scope="col">Group Name</th>
+                    <th scope="col">Creator</th>
+                    <th scope="col">Create Date</th>
+                    <th scope="col">Total Posts</th>
+                    <th scope="col">Total Members</th>
                   </tr>
                 </thead>
                 <tbody>
-                    {% for person in results %}
+                    {% for group in results %}
                     <tr>
-                        <td>{{person.firstname}}</td>
-                        <td>{{person.lastname}}</td>
-                        <td>{{person.num_posts}}</td>
-                        <td>{{person.num_comments}}</td>
-                        <td>{{person.num_friends}}</td>
-                        <td>{{person.num_groups}}</td>
-                    </tr>
+                        <td class="truncate">{{group.name}}</td>
+                        <td class="truncate">{{group.creator}}</td>
+                        <td class="">{{group.create_date}}</td>
+                        <td class="">{{group.
+                            num_posts}}</td>
+                        <td class="">{{group.num_members}}</td>
+                   </tr>
                     {% endfor %}
                 </tbody>
               </table>

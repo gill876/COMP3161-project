@@ -96,7 +96,7 @@
 
 .admin-instructions {
     color: #043443;
-    margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .admin-search-btn {
@@ -175,6 +175,11 @@
 
 .admin-search-results-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.admin-search-results-table.truncate {
+    max-width: 300px;
 }
