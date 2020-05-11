@@ -51,6 +51,7 @@
     -moz-border-radius: 15px;
     -ms-border-radius: 15px;
     -o-border-radius: 15px;
+    margin: 0 10px;
 }
 
 .admin-stat-card-value {
@@ -161,4 +162,19 @@
 
 .admin-search-results-table {
     margin-top: 30px;
+    align-self: center;
+}
+
+.admin-user-stat-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.admin-search-results-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

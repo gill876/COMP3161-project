@@ -4,9 +4,11 @@
 
 <div class="container main-page-area">
     <h2 class="admin-header">View Users</h2>
-    <div class="admin-user-stat-container">
+    <div class="admin-user-stat-container container-lg d-flex flex-row 
+    align-items-center 
+    justify-content-around flex-wrap">
         {% for stat in stats %}
-            {% with stat_value=stat.value, stat_label=statt.label %}
+            {% with stat_value=stat.value, stat_label=stat.label %}
                 {% include "components/admin_stat.html" %}
             {% endwith %}
         {% endfor %}
@@ -45,5 +47,6 @@
         {% endif %}
     </div>
 </div>
+<div class="filler"></div>
 
 {% endblock %}
