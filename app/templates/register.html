@@ -75,11 +75,13 @@
         {{ form.confirmpassword.label }}
         {{ form.confirmpassword(class='form-control', placeholder="confirm password") }}
       </div>
+      
      
  
 
     
       <button type="submit" name="submit" class="btn btn-primary btn-block">Register</button>
+      <div><p>{{msg}} </p></div>
       <a href="{{ url_for('login') }}">Login </a>
     </form>
   </div>
