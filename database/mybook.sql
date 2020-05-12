@@ -519,4 +519,21 @@ DELIMITER $$
         )
     WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = NEW.user_id);
     END $$
+DELIMITER ;*/
+
+DELIMITER //
+    CREATE PROCEDURE adminUserDetails()
+    BEGIN
+
+    SELECT user.username, profile.firstname, profile.lastname, 
+    (SELECT SUM(user.user_id) FROM create_post),
+    (SELECT SUM(user.user_id) FROM friends),
+    (SELECT SUM(user.user_id) FROM join_group)
+    FROM user
+    JOIN profile
+    JOIN userProfile
+    ON user.user_id = userProfile.user_id
+    AND profile.profile_id = userProfile.profile_id;
+
+    END //
 DELIMITER ;

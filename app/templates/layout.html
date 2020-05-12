@@ -23,7 +23,6 @@
 				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
 				{% elif session['adminLoggedOut'] %}
 				<img class="nav-bar-logo" src=" {{ url_for('static', filename='images/mybook_logo_transparent.png') }} ">
-				<h1 class="admin-nav-title">Admin Panel</h1>
 				{% elif session['adminLoggedIn'] %}
 				<img class="nav-bar-logo" src=" {{ url_for('static', filename='images/mybook_logo_transparent.png') }} ">
 				<h1 class="admin-nav-title">Admin Panel</h1>

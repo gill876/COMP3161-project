@@ -401,77 +401,65 @@ def admin_dashboard():
     
     return redirect(url_for('admin'))
 
-''' Admin View User Page 
+''' Admin View User Page '''
 
 @app.route("/admin/users")
 def admin_users():
     conn = mysql.connect()
-    cursor =conn.cursor()
+    cursor = conn.cursor()
 
-    cursor.execute('CALL adminUserDetails()')
-    data = cursor.fetchall()
-    print(data)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    print(groups)
+    cursor.execute('CALL adminUserBio')
+    bioData = cursor.fetchall()
+
+    cursor.execute('CALL adminUserPostTotals')
+    postTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserFriendTotals')
+    friendTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserGroupTotals')
+    groupTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserCommentTotals')
+    commentTotals = cursor.fetchall()
+
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Female"')
+    females = cursor.fetchone()
+
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Male"')
+    males = cursor.fetchone()
+
+    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
+    totalUsers = cursor.fetchone()
+
     cursor.close()
     conn.close()
-    stats = {
-    "stat_users": {
-        "label": "Total Users",
-        "value": users[0]
-    },
-    "stat_groups": {
-        "label": "Total Groups",
-        "value": groups[0]
-    }
-}
-    users = [
-        {
-            "id": "3ed",
-            "firstname": "Lateefah",
-            "lastname": "Smellie",
-            "num_posts": 50,
-            "num_comments": 50,
-            "num_friends": 360,
-            "num_groups": 30
-        }
-    ]
+    
+    '''users = [(bioData[i][0], bioData[i][1], bioData[i][2], postTotals[i][0], friendTotals[i][0], groupTotals[i][0], commentTotals[i][0]) for i in range(len(bioData))]'''
+    
+    users = zip(bioData, postTotals, friendTotals, groupTotals, commentTotals)
+    print(users)
 
     stats = [
         {
-            "value": 23456,
+            "value": totalUsers[0],
             "label": "Total Users"
         },
         {
-            "value": 234,
+            "value": females[0],
             "label": "Total Female Users"
         },
         {
-            "value": 22356,
+            "value": males[0],
             "label": "Total Male Users"
         },
     ]
-    
-    if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
-        results = [
-            {
-                "firstname": "Lateefah",
-                "lastname": "Smellie",
-                "num_posts": 50,
-                "num_comments": 50,
-                "num_friends": 360,
-                "num_groups": 30
-            }
-        ]
-        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)
-        
-    return render_template("admin/admin_user_report.html", stats=stats, users=users)'''
-    
-@app.route('/admin/users')
+            
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)
+
+'''@app.route('/admin/users')
 def admin_users():
-    return render_template('test.html')
+    return render_template('test.html')'''
 
 @app.route('/admin/users/search')
 def admin_search_users():

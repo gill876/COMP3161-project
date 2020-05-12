@@ -96,6 +96,8 @@
     text-align: center;
     margin: 20px 0 40px;
     color: #043443;
+    font-weight: bold;
+    font-size: 3rem;
 }
 
 .admin-instructions {
@@ -167,6 +169,7 @@
 .admin-search-results-table {
     margin-top: 30px;
     align-self: center;
+    width: 100%;
 }
 
 .admin-user-stat-container {
@@ -323,7 +326,7 @@
 }
 
 .admin-login-form {
-    margin: 7rem 3rem;
+    margin: 6rem 3rem;
 }
 
 .admin-login-panel .admin-search-btn {
@@ -346,3 +349,18 @@
     margin-left: 200px !important;
     color: #ccc !important;
 }
+
+.admin-search-results-table td {
+    text-align: center !important;
+}
+
+.admin-users-page .admin-user-stat-container .admin-card {
+    max-width: 28%;
+}
+
+.admin-users-page .admin-header {
+    border-bottom: none;
+    margin-bottom: 1rem;
+    font-size: 3.2rem;
+}
+
