@@ -15,17 +15,19 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm
+from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm, AdminLoginForm
 from app.admin_forms import AdminSearchForm
 from werkzeug.utils import secure_filename 
-from flask_mysqldb import MySQL
+#from flask_mysqldb import MySQL
+from flaskext.mysql import MySQL
+from . import mysql
 
 # from app.models import UserProfile
 # from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
 ###
-mysql = MySQL(app)
+#mysql = MySQL(app)
 
 
 @app.route('/home')
@@ -34,6 +36,10 @@ def home():
         return render_template('home.html',username=session['username'])
     return redirect(url_for('login'))
 
+@app.route('/search')
+def friend_search():
+
+    return render_template('search.html')
 
 #reminder for neisha
 #add the stuff you forgot..
@@ -42,39 +48,29 @@ def login():
     msg=''
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        #Recreate the error lemme see. I think I want to try to connect the database 
-        #the one i highlighted
-        
-        # if request.form['username'] != app.config['username'] or request.form['password'] != app.config['passowrd']:
-        #     error = "Incorrect username or password!"
-        # else: 
-        #     session['logged_in'] = True
         username = form.username.data
         password = form.password.data
-        #flash("Login Successful", "Successful")
-        # Check if account exists using MySQL
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        conn = mysql.connect()
+        cursor =conn.cursor()
         cursor.execute('CALL loginUser(%s, %s)', (username, password,))
-        rv = cursor.fetchall()
-        
-        if rv == ({'Login successful': 'Login successful'},):
+        data = cursor.fetchone()
+        if data[0] == 'Login successful':
             cursor.execute('CALL getUserID(%s, %s)', (username, username,))
-            rv = cursor.fetchall()
-            cursor.close()
+            data = cursor.fetchone()
+            print(data)
             session['loggedin'] = True 
-            session['id'] = int(rv[0]['user_id'])
+            session['id'] = int(data[0])
             session['username'] = username
+            cursor.close()
+            conn.close()
             return redirect(url_for('home'))
-        #else:
-        #    msg='Incorrect username or password'
-            #pass
-        elif rv == ({'Password incorrect': 'Password incorrect'},):
+        elif data[0] == 'Password incorrect': #MODIFY
             pass
-        elif rv == ({'User does not exist': 'User does not exist'},):
+        elif data[0] == 'User does not exist': #MODIFY
             pass
-            #return "fatal error"
         else:
-            msg ='Incorrect Username/Password'
+            return "fatal error" #MODIFY
     return render_template("index.html", form=form,msg=msg)
 
 
@@ -94,7 +90,6 @@ def profile():
         #print(session['id'])
         #print(session['username'])
         
-        #print(details)
         username = None
         email_address = None
         datejoined = None
@@ -109,35 +104,32 @@ def profile():
         month = None
         day = None
 
-        try:
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-            details = cursor.fetchone()
-            cursor.close()
+        conn = mysql.connect()
+        cursor =conn.cursor()
 
-            username = details['username']
-            email_address = details['email_address']
-            datejoined = details['datejoined']
-            firstname = details['firstname']
-            lastname = details['lastname']
-            profile_img = details['profile_img']
-            friends = details['friends']
-            biography = details['biography']
-            gender = details['gender']
+        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+        data = cursor.fetchone()
+  
+        username = data[0]
+        email_address = data[1]
+        datejoined = data[2]
+        firstname = data[3]
+        lastname = data[4]
+        profile_img = data[5]
+        friends = data[6]
+        biography = data[7]
+        gender = data[8]
 
-            year = datejoined.year
-            month = datejoined.strftime("%B")
-            day = datejoined.day
-        
-        except: 
-            print("Something went wrong connecting with the database")
-
-        #print("*******************")
-        print(username, "**", email_address, "**", datejoined, "**", firstname, "**",lastname, "**", profile_img, "**",friends, "**",biography, "**", gender, "**", year, "**", month, "**", day)
-        #print(datejoined.year)
+        year = datejoined.year
+        month = datejoined.strftime("%B")
+        day = datejoined.day
+        cursor.close()
+        conn.close()
+        # print(username, "**", email_address, "**", datejoined, "**", firstname, "**",lastname, "**", profile_img, "**",friends, "**",biography, "**", gender, "**", year, "**", month, "**", day)
+        #return "pass"
         return render_template('profile.html', username=username, email_address=email_address, year=year, month=month, day=day, firstname=firstname, lastname=lastname, profile_img=profile_img, friends=friends, biography=biography, gender=gender)
-        #return render_template('profile.html')
-    return redirect(url_for('login'))
+
+    return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
 
 
@@ -157,15 +149,17 @@ def register():
         
 
         if password != confirmpassword:
-            flash('Passwords do not match')
+            flash('Passwords do not match')#MODIFY
             return render_template('register.html', form=form)
 
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        #query/procedure to check db for username if account exist
+        conn = mysql.connect()
+        cursor =conn.cursor()
+
         cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        user = cursor.fetchone()
-        #if account exist show error and validate checks
-        if user == None:      
+        data = cursor.fetchone()
+        print(data)
+
+        if data == None:      
             filename = str(uuid.uuid4())
             old_filename = profile_photo.filename
             ext = old_filename.split(".")
@@ -174,11 +168,12 @@ def register():
             new_filename = new_filename.replace('-', '_')
             profile_photo.save(os.path.join(app.config["PROFILEPHOTO_FOLDER"], new_filename))
             cursor.execute('CALL signUp(%s, %s, %s, %s, %s, %s, %s)', (username, email, password, firstname, lastname, new_filename, gender,))
-            mysql.connection.commit()
+            conn.commit()
             cursor.close()
-            
+            conn.close()
+            return redirect(url_for('home')) #MODIFY ADD REDIRECTION WITH FLASH MESSAGE
         else:
-            print("The account already exits")
+            print("The account already exits")#MODIFY ADD APPROPRIATE RESPONSE
     return render_template('register.html', form=form)
 
 
@@ -221,12 +216,27 @@ def updateprofile():
 def images():
     imagesform = ImageForm()
 
-    if request.method == "POST" and images.validate_on_submit():
+    #print("images upload: ", imagesform.validate_on_submit())
+    if request.method == "POST" and imagesform.validate_on_submit():
         image = imagesform.images.data 
 
-        filename= secure_filename(image.filename)
-        image.save(os.path.join(app.config['IMAGE_UPLOAD_FOLDER', filename]))
+        filename = str(uuid.uuid4())
+        old_filename = image.filename
+        ext = old_filename.split(".")
+        ext = ext[1]
+        new_filename = filename + "." + ext
+        new_filename = new_filename.replace('-', '_')
+        #print("filename: ", new_filename)
+        image.save(os.path.join(app.config["PROFILEPHOTO_FOLDER"], new_filename))
+        
+        conn = mysql.connect()
+        cursor =conn.cursor()
+        #print(session['id'])
+        cursor.execute('CALL updateProfilePicture(%s, %s)', (session['id'], new_filename,))
+        conn.commit()
 
+        cursor.close()
+        conn.close()
         flash("Your images as been successfully posted!", 'success')
         return redirect(url_for('profile'))
 
@@ -261,6 +271,18 @@ def get_images():
 
 #     return render_template("profile.html"  )
 
+@app.route('/post', methods=["GET","POST"])
+def new_post():
+    form = PostForm()
+    if request.method =='POST' and form.validate_on_submit():
+         content = form.content.data
+         postphoto = form.postphoto.data 
+
+    conn = mysql.connect()
+    cursor =conn.cursor()
+
+    return render_template('home.html',form=form)
+
 
 @app.route("/groups", methods=['GET', 'POST'])
 def groups():
@@ -278,6 +300,11 @@ def usergroup():
     
     return render_template('usergroup.html',form=form)
 
+@app.route('/userpost_comment', methods=["GET", "POST"])
+def userpost_comment():
+    return render_template('userpost_comment.html')
+
+
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
@@ -291,12 +318,9 @@ def load_user(id):
 
 @app.route("/secure_page")
 @login_required
-def secure_page():
-    """Render a secure page on our website that only logged in users can access."""
+def secure_page():    
     return render_template('secure_page.html')
     
-
-
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
@@ -304,173 +328,57 @@ def send_text_file(file_name):
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
 
-@app.route("/lateefah")
-def lateefah():
-    props = {}
-    return render_template("test.html", details=props)
-    
-#Admin Pages
 
-@app.route("/admin/dashboard", methods=["GET", "POST"])
+#Admin Routes
+
+''' Admin Login '''
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    form = AdminLoginForm()
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            uname = form.username.data
+            passw = form.password.data
+
+            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
+                redirect(url_for('admin_dashboard'))
+            flash('Username or password incorrect. Please try again.')          
+
+            
+    return render_template("admin/admin.html")
+
+
+''' Admin Dashboard '''
+@app.route("/admin/dashboard")
 def admin_dashboard():
-    stat_object = {
-        "stat_users": {
+    stats = {
+        "stats_users": {
             "label": "Total Users",
             "value": 23456
         },
-        "stat_groups": {
+        "stats_groups": {
             "label": "Total Groups",
             "value": 50
         }
     }
-    
-    return render_template("admin/admin_dashboard.html", stats=stat_object)
-
-@app.route("/admin/view/users")
-def admin_users():
-    users = [
-        {
-            "id": "3ed",
-            "firstname": "Lateefah",
-            "lastname": "Smellie",
-            "num_posts": 50,
-            "num_comments": 50,
-            "num_friends": 360,
-            "num_groups": 30
-        }
-    ]
-
-    stats = [
-        {
-            "value": 23456,
-            "label": "Total Users"
-        },
-        {
-            "value": 234,
-            "label": "Total Female Users"
-        },
-        {
-            "value": 22356,
-            "label": "Total Male Users"
-        },
-    ]
-    
-    '''if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
-        results = [
-            {
-                "firstname": "Lateefah",
-                "lastname": "Smellie",
-                "num_posts": 50,
-                "num_comments": 50,
-                "num_friends": 360,
-                "num_groups": 30
-            }
-        ]
-        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)'''
-        
-    return render_template("admin/admin_user_report.html", stats=stats, users=users)
-
-@app.route("/admin/search/users", methods=["GET", "POST"])
-def admin_search_users():
-    form = AdminSearchForm()
-    
-    if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
-        results = [
-            {
-                "id": "3ed",
-                "firstname": "Lateefah",
-                "lastname": "Smellie",
-                "num_posts": 50,
-                "num_comments": 50,
-                "num_friends": 360,
-                "num_groups": 30
-            }
-        ]
-
-        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results) 
-
-    return render_template("admin/admin_search.html", form=form)
-
-@app.route("/admin/view/groups")
-def admin_groups():
-    groups = [
-        {
-            "name": "Oberlin High School Past Students Association",
-            "creator": "Mary Brown",
-            "create_date": "30-05-2019",
-            "num_posts": 360,
-            "num_members": 30
-        }
-    ]
-
-    stats = [
-        {
-            "value": 23456,
-            "label": "Total Groups"
-        },
-        {
-            "value": 234,
-            "label": "Total Group Posts"
-        },
-    ]
-    
-    '''if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
-        results = [
-            {
-                "firstname": "Lateefah",
-                "lastname": "Smellie",
-                "num_posts": 50,
-                "num_comments": 50,
-                "num_friends": 360,
-                "num_groups": 30
-            }
-        ]
-        return render_template("admin/admin_search.html", 
-total_users="23456", form=form, results=results)'''
-        
-    return render_template("admin/admin_group_report.html", stats=stats, 
-groups=groups)
+    return render_template("admin/admin_dashboard.html", stats=stats)
 
 
-@app.route("/admin/search/groups", methods=["GET", "POST"])
-def admin_search_groups():
-    form = AdminSearchForm()
-    
-    if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
-        results = [
-            {
-                "name": "Oberlin High School Past Students Association",
-                "creator": "Mary Brown",
-                "create_date": "30-05-2019",
-                "num_posts": 360,
-                "num_members": 30
-            }
-        ]
-
-        return render_template("admin/admin_search_groups.html", form=form, results=results) 
-
-    return render_template("admin/admin_search_groups.html", form=form)
 
 @app.after_request
 def add_header(response):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    return response
+     """
+     Add headers to both force latest IE rendering engine or Chrome Frame,
+     and also to cache the rendered page for 10 minutes.
+     """
+     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+     response.headers['Cache-Control'] = 'public, max-age=0'
+     return response
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """Custom 404 page."""
-    return render_template('404.html'), 404
+     """Custom 404 page."""
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port="8181")

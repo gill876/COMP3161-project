@@ -5,21 +5,14 @@
 <h2>Welcome to (What)</h2>
     <div class="usergroup_post">
 
-        <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">
+        <form action= "{{ url_for('comment_group')}}" method="POST" enctype="multipart/form-data">
 
             <div class="form-group">
                 {{ form.content.label }}
-                {{ form.content(class='form-control', placeholder="What's on your mind?") }}
+                {{ form.content(class='form-control', placeholder="Whats your comment?") }}
             </div>
 
-            <div class="form-group">
-                {{ form.postphoto.label }}
-                {{ form.postphoto(class='form-control') }}
-            </div>
 
-            <div class="userpost_button">
-                <button type="submit" name="submit" class="btn btn-primary btn-block">Post</button>
-            </div>
 
         </form>
     </div>
@@ -31,9 +24,7 @@
             <hr>
             <p>
                 <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
-                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment
-                
-                </a>
+                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
                 <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
                 <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
             </p>

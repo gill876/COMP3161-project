@@ -14,14 +14,15 @@
 
     <link rel="stylesheet" href="/static/css/app.css">
     <link rel="stylesheet" href="/static/css/admin.css">
-<<<<<<< HEAD
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,
-wght@0,100;0,300;0,400;0,500;0,900;1,100;1,300;1,400;1,500;1,700;1,
-900&display=swap" rel="stylesheet">    
-=======
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">    
 
->>>>>>> origin/templates
+    {% block css %} {% endblock%}
+  </head>
+  <body>
+    <header>
+        {% include "header.html" %}
+    </header>
     {% block css %} {% endblock%}
   </head>
   <body>
