@@ -346,6 +346,7 @@ def send_text_file(file_name):
 ''' Admin Login '''
 @app.route('/admin', methods=["GET", "POST"])
 def admin():
+    session['adminLoggedOut'] = True
     form = AdminLoginForm()
 
     if request.method == "POST":
@@ -354,6 +355,7 @@ def admin():
             passw = form.password.data
 
             if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
+                session['adminLoggedOut'] = False
                 session['adminLoggedIn'] = True
                 return redirect(url_for('admin_dashboard'))
             else:

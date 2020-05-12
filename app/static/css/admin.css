@@ -331,6 +331,18 @@
     width: 100%;
 }
 
-.card {
+.admin-card {
     max-width: 40%;
+}
+
+.nav-bar-logo {
+    max-width: 20rem;
+    height: auto;
+}
+
+.navtop div h1 {
+    font-weight: 600 !important;
+    font-size: 2rem !important;
+    margin-left: 200px !important;
+    color: #ccc !important;
 }
