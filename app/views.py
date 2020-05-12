@@ -60,6 +60,12 @@ def friend_search():
 def login():
     msg=''
     form = LoginForm()
+
+    #Remove admin session data for regular user entry point
+    if 'adminLoggedIn' in session or 'adminLoggedOut' in session:
+        session.pop('adminLoggedIn')
+        session.pop('adminLoggedOut')
+
     if request.method == "POST" and form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -365,7 +371,7 @@ def admin():
     return render_template("admin/admin.html", form=form)
 
 
-''' Admin Dashboard '''
+''' Admin Dashboard 
 @app.route("/admin/dashboard")
 def admin_dashboard():
 
@@ -393,11 +399,75 @@ def admin_dashboard():
         }
         return render_template("admin/admin_dashboard.html", stats=stats)
     
-    return redirect(url_for('admin'))
+    return redirect(url_for('admin'))'''
 
-@app.route('/admin/users')
+''' Admin View User Page '''
+
+@app.route("/admin/users")
 def admin_users():
-    return render_template('test.html')
+    conn = mysql.connect()
+    cursor =conn.cursor()
+
+    cursor.execute('CALL adminUserDetails()')
+    data = cursor.fetchall()
+    print(data)
+    '''cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
+    groups = cursor.fetchone()
+    print(groups)'''
+    cursor.close()
+    conn.close()
+    stats = {
+    "stat_users": {
+        "label": "Total Users",
+        "value": users[0]
+    },
+    "stat_groups": {
+        "label": "Total Groups",
+        "value": groups[0]
+    }
+}
+    users = [
+        {
+            "id": "3ed",
+            "firstname": "Lateefah",
+            "lastname": "Smellie",
+            "num_posts": 50,
+            "num_comments": 50,
+            "num_friends": 360,
+            "num_groups": 30
+        }
+    ]
+
+    stats = [
+        {
+            "value": 23456,
+            "label": "Total Users"
+        },
+        {
+            "value": 234,
+            "label": "Total Female Users"
+        },
+        {
+            "value": 22356,
+            "label": "Total Male Users"
+        },
+    ]
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+        results = [
+            {
+                "firstname": "Lateefah",
+                "lastname": "Smellie",
+                "num_posts": 50,
+                "num_comments": 50,
+                "num_friends": 360,
+                "num_groups": 30
+            }
+        ]
+        return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)
+        
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)
 
 @app.route('/admin/users/search')
 def admin_search_users():
@@ -410,6 +480,13 @@ def admin_groups():
 @app.route('/admin/groups/search')
 def admin_search_groups():
     return render_template('test.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    if session['adminLoggedIn']:
+        session.pop('adminLoggedIn')
+        session['adminLoggedOut'] = True
+    return render_template(url_for('admin'))
 
 
 @app.route("/test")
