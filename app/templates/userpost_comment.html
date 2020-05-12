@@ -11,19 +11,18 @@
       </div>
     </div>
 
+  <div class="card mb-8">
+    <div class="card-body">
+      <form action="{{ url_for('userpost_comment')}}" method="POST" enctype="multipart/form-data">
 
+        <div class="form-group">
+          {{ form.content.label }}
+          {{ form.content(class='form-control', placeholder="Whats your comment?") }}
+        </div>
 
-  <!--Somebody gonna have to for loop this from thr db-->
-    <div class="card mb-8">
-      <div class="Card-body">
-          <p> Username</p>
-          
-      </div>
+      </form>
     </div>
+  </div>
 
- 
+{% endblock %}
 
-
-
-
-{% endblock%}

@@ -27,7 +27,7 @@ class RegisterForm(FlaskForm):
 class UpdateForm(FlaskForm):
     firstname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
     lastname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
-    username=StringField('User Name',validators=[InputRequired(message='User Name is required')])
+    username=StringField('User Name',validators=[InputRequired(message='Username is required')])
     email = StringField('Email', validators=[InputRequired(message='Email is required'), Email(message="Only Emails")])
     profile_photo = FileField('Profile Picture', validators=[FileRequired(), FileAllowed(['jpg', 'png', 'IMAGES ONLY!']) ])
     password=PasswordField('Password',validators=[InputRequired(message='Password is required')])
@@ -38,6 +38,9 @@ class PostForm(FlaskForm):
     content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
+class UserPost_CommentForm(FlaskForm):
+    content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
+
 
 class ImageForm(FlaskForm):
     images = FileField('images', validators=[
@@ -45,3 +48,7 @@ class ImageForm(FlaskForm):
         FileAllowed(['jpg', 'png', 'jpeg', 'Images only!'])
     ])
     
+class GroupForm(FlaskForm):
+    
+     groupname=StringField('Group Name',validators=[InputRequired(message='A Group Name is required')])
+     description = TextAreaField('Description',validators=[InputRequired(message='Need a description of Group')])
