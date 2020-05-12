@@ -2,21 +2,52 @@
 
 {% block content %}
 
-    <h2>New Post !</h2>
+<h2>Welcome to (What)</h2>
+    <div class="usergroup_post">
 
-    <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            {{ form.content.label }}
-            {{ form.content(class='form-control', placeholder="What's on your mind?") }}
-        </div>
-        <div class="form-group">
-            {{ form.postphoto.label }}
-            {{ form.postphoto(class='form-control') }}
-        </div>
-    </form>
+        <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">
 
-     </div>
+            <div class="form-group">
+                {{ form.content.label }}
+                {{ form.content(class='form-control', placeholder="What's on your mind?") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.postphoto.label }}
+                {{ form.postphoto(class='form-control') }}
+            </div>
+
+            <div class="userpost_button">
+                <button type="submit" name="submit" class="btn btn-primary btn-block">Post</button>
+            </div>
+
+        </form>
+    </div>
+    <!-- Some sort of for loop to get multiple post from users-->
+    <div class="card mb-8">
+        <div class="card-body">
+            <h3> Username </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium veniam exercitationem expedita laborum at voluptate. Labore, voluptates totam at aut nemo deserunt rem magni pariatur quos perspiciatis atque eveniet unde.</p>
+            <hr>
+            <p>
+                <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
+                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment
+                
+                </a>
+                <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
+                <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
+            </p>
+      </div>
+    </div>
+
+    <!--<div class="timeline">
+        <div class="card" id="content_post">
+        <p> Hello there !</p>
+        </div>
+    </div> -->
+
+
  
 
 
-{% endblock %}
+{% endblock %}n

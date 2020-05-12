@@ -9,7 +9,7 @@
             <h1 class="userimage_header">Photos/Images</h1>
         </div>
     <div class="imageupload_form">
-        <form action "{{ url_for('images') }}" method="POST" enctype="mutlipart/form-data">
+        <form action="{{ url_for('images') }}" method="POST" enctype="multipart/form-data">
 
             {{ form.csrf_token }}
 

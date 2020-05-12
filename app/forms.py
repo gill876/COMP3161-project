@@ -9,6 +9,10 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
 
+class AdminLoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired()])
+
 class RegisterForm(FlaskForm):
     firstname=StringField('First Name',validators=[InputRequired(message='First Name is required')])
     lastname=StringField('Last Name',validators=[InputRequired(message='Last Name is required')])
@@ -31,10 +35,13 @@ class UpdateForm(FlaskForm):
       
     
 class PostForm(FlaskForm):
-    content = TextAreaField('content',validators=[InputRequired(message='Need content to post')])
+    content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
 
 class ImageForm(FlaskForm):
-    images=FileField('Images',validators=[FileRequired('Please add an Image'),FileAllowed(['jpg','jpeg','png'],'Images Only!')])
+    images = FileField('images', validators=[
+        FileRequired(),
+        FileAllowed(['jpg', 'png', 'jpeg', 'Images only!'])
+    ])
     
