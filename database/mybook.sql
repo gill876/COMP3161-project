@@ -511,13 +511,12 @@ DELIMITER $$
     CREATE TRIGGER updateFriendsAmount
     AFTER INSERT ON friends
     FOR EACH ROW
-
+    BEGIN
     UPDATE profile 
     SET profile.friends = (
         SELECT COUNT(friends.friend_id) FROM friends
         WHERE friends.user_id = NEW.user_id
         )
     WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = NEW.user_id);
-
     END $$
 DELIMITER ;
