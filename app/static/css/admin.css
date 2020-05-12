@@ -255,3 +255,14 @@
 .admin-profile-group-table {
 
 }
+
+img {
+    width: 30px;
+    height: 30px;
+}
+    
+
+.comment-header{
+    display: flex;
+    flex-direction: column;
+}

@@ -462,6 +462,10 @@ def admin_search_groups():
 
     return render_template("admin/admin_search_groups.html", form=form)
 
+@app.route("/test")
+def test():
+    return render_template("test.html")
+
 @app.after_request
 def add_header(response):
     """

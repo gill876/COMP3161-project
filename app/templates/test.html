@@ -1,28 +1,15 @@
 {% extends "base.html" %}
 
 {% block main %}
-<h1>Admin Dashboard</h1><br/>
-{% include "admin/admin_dashboard.html" %}
-
-<h1>Admin Search</h1><br/>
-{% include "admin/admin_search.html" %}
-
-<h1>Admin User Profile</h1><br/>
-{% include "admin/admin_user_profile.html" %}
-
-<h1>Admin Stat</h1><br/>
-{% include "components/admin_stat.html" %}
-
 <h1>Admin Comment Input</h1><br/>
 {% include "components/comment_input.html" %}
 
 <h1>Admin Comment</h1><br/>
 {% include "components/comment.html" %}
 
-<h1>Admin Menu Button</h1><br/>
-{% with text="Test Button" %}
-    {% include "components/admin_menu_button.html"  %}
-{% endwith %}
+
+
+
 
 <h1>Admin Post</h1><br/>
 {%  include "components/post.html" %}
