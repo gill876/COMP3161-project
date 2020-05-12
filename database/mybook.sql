@@ -1,4 +1,4 @@
-/*COMP3161 PROJECT*/
+/*COMP3161 PROJECT*/ /*PLEASE VERIFY WITH DOCS*/
 DROP TABLE IF EXISTS contains;
 DROP TABLE IF EXISTS create_post;
 DROP TABLE IF EXISTS create_comment;
@@ -70,13 +70,11 @@ CREATE TABLE profile(
     profile_id INT NOT NULL AUTO_INCREMENT,
     firstname VARCHAR(75) NOT NULL,
     lastname VARCHAR(75) NOT NULL,
-    /*username VARCHAR(100) NOT NULL UNIQUE,*/
     profile_img VARCHAR(100) DEFAULT 'GENERIC' NOT NULL,
     friends INT DEFAULT 0 NOT NULL,
     biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
     gender VARCHAR(10) NOT NULL,
     PRIMARY KEY(profile_id)
-    /*FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE*/
 );
 
 CREATE TABLE userProfile(
@@ -89,12 +87,10 @@ CREATE TABLE userProfile(
 
 CREATE TABLE post(
     post_id INT NOT NULL AUTO_INCREMENT,
-    /*user_id INT NOT NULL,*/
     content VARCHAR(300) NOT NULL, /*change in data dictionary*/
     time_stamp DATETIME NOT NULL,
     post_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
-    PRIMARY KEY(post_id)/*,
-    FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE*/
+    PRIMARY KEY(post_id)
 );
 
 CREATE TABLE user_group( /*change in data dictionary*/
@@ -126,9 +122,7 @@ CREATE TABLE friends(
 CREATE TABLE images(
     image_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
     post_id INT NOT NULL,
-    /*caption VARCHAR(30),*/
     file_name VARCHAR(256) NOT NULL, /*change in data dictionary*/
-    /*time_stamp DATETIME NOT NULL,*/ /*change in data dictionary*/
     PRIMARY KEY(image_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
@@ -345,25 +339,6 @@ DELIMITER //
     CREATE PROCEDURE showUserGroups(IN in_user_id INT)
     BEGIN
     
-    /*SET @CreatorStr = 'CREATOR'; /*User-created variable to store string to be used in subquery below - to avoid string syntax issues*/
-
-    /*using dynamic SQL to create views
-    /*add views to data dictionary
-    EXEC(' 
-        CREATE VIEW composite_creator_group AS 
-            (SELECT user_id, group_id, @CreatorStr AS mem_role 
-                FROM create_group);
-    ');
-
-    EXEC('
-        CREATE VIEW all_group_entries AS
-            (SELECT * FROM join_group
-                UNION
-                    SELECT * FROM composite_creator_group
-            );
-    ');
-
-    SELECT * FROM all_group_entries WHERE user_id = in_user_id;*/ /*ANOTHER APPROACH BELOW*/
     SELECT * FROM join_group
     WHERE join_group.user_id = in_user_id
     UNION
@@ -536,13 +511,12 @@ DELIMITER $$
     CREATE TRIGGER updateFriendsAmount
     AFTER INSERT ON friends
     FOR EACH ROW
-
+    BEGIN
     UPDATE profile 
     SET profile.friends = (
         SELECT COUNT(friends.friend_id) FROM friends
         WHERE friends.user_id = NEW.user_id
         )
     WHERE profile.profile_id = (SELECT profile_id from userProfile where userProfile.user_id = NEW.user_id);
-
     END $$
 DELIMITER ;
