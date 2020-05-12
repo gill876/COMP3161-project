@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
-{% block main %}
+{% block content %}
 
 <div class="container main-page-area">
     <h2 class="admin-header">View Groups</h2>
@@ -22,7 +22,6 @@
                   <tr>
                     <th scope="col">Group Name</th>
                     <th scope="col">Creator</th>
-                    <th scope="col">Create Date</th>
                     <th scope="col">Total Posts</th>
                     <th scope="col">Total Members</th>
                   </tr>
@@ -30,20 +29,19 @@
                 <tbody>
                     {% for group in groups %}
                     <tr>
-                        <td class="truncate">{{group.name}}</td>
-                        <td class="truncate">{{group.creator}}</td>
-                        <td class="">{{group.create_date}}</td>
-                        <td class="">{{group.
-                            num_posts}}</td>
-                        <td class="">{{group.num_members}}</td>
+                        <td class="truncate">{{group[0][0]}}</td>
+                        <td class="truncate">{{group[1][0]}}</td>
+                        <td class="">0</td>
+                        <td class="">{{group[2][0]}}</td>
                    </tr>
                     {% endfor %}
                 </tbody>
               </table>
         </div>
+        {% else %}
+        <div> We're sorry, there are no groups to show at the moment</div>
         {% endif %}
     </div>
 </div>
-<div class="filler"></div>
 
 {% endblock %}

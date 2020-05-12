@@ -52,6 +52,9 @@ DROP PROCEDURE IF EXISTS adminUserPostTotals;
 DROP PROCEDURE IF EXISTS adminUserFriendTotals;
 DROP PROCEDURE IF EXISTS adminUserGroupTotals;
 DROP PROCEDURE IF EXISTS adminUserCommentTotals;
+DROP PROCEDURE IF EXISTS adminGroupName;
+DROP PROCEDURE IF EXISTS adminGroupCreatorByUserId;
+DROP PROCEDURE IF EXISTS getGrpTotalMembers;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -552,23 +555,6 @@ DELIMITER $$
     END $$
 DELIMITER ;*/
 
-DELIMITER //
-    CREATE PROCEDURE adminUserDetails()
-    BEGIN
-
-    SELECT user.username, profile.firstname, profile.lastname, 
-    (SELECT SUM(user.user_id) FROM create_post),
-    (SELECT SUM(user.user_id) FROM friends),
-    (SELECT SUM(user.user_id) FROM join_group)
-    FROM user
-    JOIN profile
-    JOIN userProfile
-    ON user.user_id = userProfile.user_id
-    AND profile.profile_id = userProfile.profile_id;
-
-    END //
-DELIMITER ;
-
 /* ADDITIONAL PROCEDURES */
 DELIMITER //
     CREATE PROCEDURE adminUserBio()
@@ -613,22 +599,6 @@ DELIMITER //
     END //
 DELIMITER ;
 
-/*DELIMITER //
-    CREATE PROCEDURE adminUserGroupPostTotals()
-    BEGIN
-
-        SELECT COUNT(create_post.user_id)
-    FROM create_post
-    RIGHT JOIN user 
-    ON create_post.user_id = user.user_id
-    GROUP BY user.user_id
-    ORDER BY user.user_id;
-
-    END //
-DELIMITER ;
-todo group post totals - not a priority
-*/
-
 DELIMITER //
     CREATE PROCEDURE adminUserGroupTotals()
     BEGIN
@@ -656,3 +626,44 @@ DELIMITER //
 
     END //
 DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGroupName()
+    BEGIN
+
+    SELECT user_group.group_name
+    FROM user_group
+    ORDER BY user_group.group_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGroupCreatorByUserId()
+    BEGIN
+
+    SELECT CONCAT(`firstname`, ' ', `lastname`)
+    FROM profile
+    JOIN userProfile
+    JOIN create_group
+    ON profile.profile_id = userProfile.profile_id
+    AND userProfile.user_id = create_group.user_id
+    ORDER BY create_group.group_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getGrpTotalMembers()
+    BEGIN
+
+    SELECT COUNT(join_group.group_id)
+    FROM (join_group)
+    GROUP BY join_group.group_id 
+    ORDER BY join_group.group_id;
+
+    END//
+DELIMITER ;
+
+
+

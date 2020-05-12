@@ -401,8 +401,8 @@ def admin_dashboard():
     
     return redirect(url_for('admin'))
 
-''' Admin View User Page '''
 
+''' Admin View User Page '''
 @app.route("/admin/users")
 def admin_users():
     conn = mysql.connect()
@@ -423,10 +423,10 @@ def admin_users():
     cursor.execute('CALL adminUserCommentTotals')
     commentTotals = cursor.fetchall()
 
-    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Female"')
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="FEMALE"')
     females = cursor.fetchone()
 
-    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Male"')
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="MALE"')
     males = cursor.fetchone()
 
     cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
@@ -435,10 +435,7 @@ def admin_users():
     cursor.close()
     conn.close()
     
-    '''users = [(bioData[i][0], bioData[i][1], bioData[i][2], postTotals[i][0], friendTotals[i][0], groupTotals[i][0], commentTotals[i][0]) for i in range(len(bioData))]'''
-    
     users = zip(bioData, postTotals, friendTotals, groupTotals, commentTotals)
-    print(users)
 
     stats = [
         {
@@ -457,16 +454,52 @@ def admin_users():
             
     return render_template("admin/admin_user_report.html", stats=stats, users=users)
 
-'''@app.route('/admin/users')
-def admin_users():
-    return render_template('test.html')'''
 
-@app.route('/admin/users/search')
-def admin_search_users():
-    return render_template('test.html')
-
-@app.route('/admin/groups')
+''' Admin View Groups Page '''
+@app.route("/admin/groups")
 def admin_groups():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminGroupName')
+    groupNames = cursor.fetchall()
+    #print(groupNames)
+
+    cursor.execute('CALL adminGroupCreatorByUserId')
+    creators = cursor.fetchall()
+    #print(creators)
+
+    cursor.execute('CALL getGrpTotalMembers')
+    grpTotals = cursor.fetchall()
+    #print(grpTotals)
+
+    cursor.execute('SELECT COUNT(group_id) FROM user_group')
+    grpTotal = cursor.fetchone()
+    #print(grpTotal)
+
+    '''cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Male"')
+    males = cursor.fetchone()'''
+
+    cursor.close()
+    conn.close()
+
+    groups = zip(groupNames, creators, grpTotals)
+
+    stats = [
+        {
+            "value": grpTotal[0],
+            "label": "Total Groups"
+        },
+        {
+            "value": 234,
+            "label": "Total Group Posts"
+        },
+    ]
+          
+    return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
+
+@app.route('/admin/groups/users')
+def admin_search_users():
     return render_template('test.html')
 
 @app.route('/admin/groups/search')
