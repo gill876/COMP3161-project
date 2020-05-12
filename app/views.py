@@ -36,8 +36,21 @@ def home():
         return render_template('home.html',username=session['username'])
     return redirect(url_for('login'))
 
-@app.route('/search')
+@app.route('/search',methods=['GET','POST'])
 def friend_search():
+    if request.method == "POST":
+        friend = request.form['friend']
+        conn = mysql.connect()
+        cursor =conn.cursor()
+        cursor.execute('SELECT * username, FROM user WHERE username =%s',(friend))
+        data = cursor.fetchall()
+
+        if len (data) == 0 and friend == 'all':
+            cursor.execute('SELECT * username FROM user')
+            data = cursor.fetchall()
+        return render_template('search.html',data=data)
+
+
 
     return render_template('search.html')
 
@@ -157,7 +170,7 @@ def register():
 
         cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
         data = cursor.fetchone()
-        print(data)
+        #print(data)
 
         if data == None:      
             filename = str(uuid.uuid4())
@@ -278,8 +291,8 @@ def new_post():
          content = form.content.data
          postphoto = form.postphoto.data 
 
-    conn = mysql.connect()
-    cursor =conn.cursor()
+    #conn = mysql.connect()
+    #cursor =conn.cursor()
 
     return render_template('home.html',form=form)
 
@@ -290,7 +303,6 @@ def groups():
 
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
-
     form = PostForm()
     if request.method and form.validate_on_submit():
         content = form.content.data
@@ -352,14 +364,25 @@ def admin():
 ''' Admin Dashboard '''
 @app.route("/admin/dashboard")
 def admin_dashboard():
+    conn = mysql.connect()
+    cursor =conn.cursor()
+    
+    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
+    users = cursor.fetchone()
+    #print(users)
+    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
+    groups = cursor.fetchone()
+    #print(groups)
+    cursor.close()
+    conn.close()
     stats = {
         "stats_users": {
             "label": "Total Users",
-            "value": 23456
+            "value": users[0]
         },
         "stats_groups": {
             "label": "Total Groups",
-            "value": 50
+            "value": groups[0]
         }
     }
     return render_template("admin/admin_dashboard.html", stats=stats)
