@@ -371,7 +371,7 @@ def admin():
     return render_template("admin/admin.html", form=form)
 
 
-''' Admin Dashboard 
+''' Admin Dashboard '''
 @app.route("/admin/dashboard")
 def admin_dashboard():
 
@@ -399,9 +399,9 @@ def admin_dashboard():
         }
         return render_template("admin/admin_dashboard.html", stats=stats)
     
-    return redirect(url_for('admin'))'''
+    return redirect(url_for('admin'))
 
-''' Admin View User Page '''
+''' Admin View User Page 
 
 @app.route("/admin/users")
 def admin_users():
@@ -411,9 +411,9 @@ def admin_users():
     cursor.execute('CALL adminUserDetails()')
     data = cursor.fetchall()
     print(data)
-    '''cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
+    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
     groups = cursor.fetchone()
-    print(groups)'''
+    print(groups)
     cursor.close()
     conn.close()
     stats = {
@@ -467,7 +467,11 @@ def admin_users():
         ]
         return render_template("admin/admin_search.html", total_users="23456", form=form, results=results)
         
-    return render_template("admin/admin_user_report.html", stats=stats, users=users)
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)'''
+    
+@app.route('/admin/users')
+def admin_users():
+    return render_template('test.html')
 
 @app.route('/admin/users/search')
 def admin_search_users():
