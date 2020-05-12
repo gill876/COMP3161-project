@@ -10,15 +10,26 @@
 
 		<link rel="stylesheet" href="/static/css/app.css">
 		<link rel="stylesheet" href="/static/css/style.css">
+		<link rel="stylesheet" href="/static/css/admin.css">
 	</head>
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
-				<h1>MyBook</h1>
+				{% if session['loggedin'] %}
+				<img class="nav-bar-logo" src=" {{ url_for('static', filename='images/mybook_logo_transparent.png') }} ">
                 <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
                 <a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
                 <a href="{{ url_for('groups') }}"><i class="fas fa-users"></i>Groups</a>
 				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+				{% elif session['adminLoggedOut'] %}
+				<img class="nav-bar-logo" src=" {{ url_for('static', filename='images/mybook_logo_transparent.png') }} ">
+				{% elif session['adminLoggedIn'] %}
+				<img class="nav-bar-logo" src=" {{ url_for('static', filename='images/mybook_logo_transparent.png') }} ">
+				<h1 class="admin-nav-title">Admin Panel</h1>
+				<a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i>Dashboard</a>
+				<a href="{{ url_for('admin_users') }}"><i class="fas fa-user-circle"></i>Users</a>
+				<a href="{{ url_for('admin_groups') }}"><i class="fas fa-users"></i>Groups</a>
+				{% endif %}
 			</div>
 		</nav>
 		<div class="content">

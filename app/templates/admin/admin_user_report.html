@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
-{% block main %}
+{% block content %}
 
-<div class="container main-page-area">
+<div class="container main-page-area admin-users-page">
     <h2 class="admin-header">View Users</h2>
     <div class="admin-user-stat-container container-lg d-flex flex-row 
     align-items-center 
@@ -13,6 +13,7 @@
             {% endwith %}
         {% endfor %}
     </div>
+    <div></div>
     <hr class="divider"/>
     <div class="admin-search-results-container">
         {% if users %}
@@ -20,6 +21,7 @@
             <table class="table table-hover table-responsive-xl admin-search-results-table">
                 <thead>
                   <tr>
+                    <th scope="col">Username</th>
                     <th scope="col">Firstname</th>
                     <th scope="col">Lastname</th>
                     <th scope="col">Post</th>
@@ -30,23 +32,23 @@
                 </thead>
                 <tbody>
                     {% for person in users %}
-                <tr onclick=''>
-                        <td>{{person.firstname}}</td>
-                        <td>{{person.lastname}}</td>
-                        <td>{{person.num_posts}}</td>
-                        <td>{{person.num_comments}}</td>
-                        <td>{{person.num_friends}}</td>
-                        <td>{{person.num_groups}}</td>
+                    <tr onclick=''>
+                        <td>{{person[0][0]}}</td>
+                        <td>{{person[0][1]}}</td>
+                        <td>{{person[0][2]}}</td>
+                        <td>{{person[1][0]}}</td>
+                        <td>{{person[2][0]}}</td>
+                        <td>{{person[3][0]}}</td>
+                        <td>{{person[4][0]}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
               </table>
         </div>
         {% else %}
-        <div> We're sorry, there are no users to show </div>
+        <div> We're sorry, there are no users to show at the moment</div>
         {% endif %}
     </div>
 </div>
-<div class="filler"></div>
 
 {% endblock %}

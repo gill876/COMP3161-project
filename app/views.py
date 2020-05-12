@@ -15,8 +15,8 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm, AdminLoginForm,GroupForm, UserPost_CommentForm
-from app.admin_forms import AdminSearchForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm
+from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
 #from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
@@ -60,6 +60,12 @@ def friend_search():
 def login():
     msg=''
     form = LoginForm()
+
+    #Remove admin session data for regular user entry point
+    if 'adminLoggedIn' in session or 'adminLoggedOut' in session:
+        session.pop('adminLoggedIn')
+        session.pop('adminLoggedOut')
+
     if request.method == "POST" and form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -370,8 +376,9 @@ def send_text_file(file_name):
 #Admin Routes
 
 ''' Admin Login '''
-@app.route("/admin", methods=["GET", "POST"])
+@app.route('/admin', methods=["GET", "POST"])
 def admin():
+    session['adminLoggedOut'] = True
     form = AdminLoginForm()
 
     if request.method == "POST":
@@ -380,298 +387,142 @@ def admin():
             passw = form.password.data
 
             if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
+                session['adminLoggedOut'] = False
+                session['adminLoggedIn'] = True
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash('Username or password incorrect. Please try again.')          
 
             
-    return render_template("admin/admin.html")
+    return render_template("admin/admin.html", form=form)
 
 
 ''' Admin Dashboard '''
 @app.route("/admin/dashboard")
 def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
+
+    if session['adminLoggedIn'] == True:
+        conn = mysql.connect()
+        cursor =conn.cursor()
+
+        cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
+        users = cursor.fetchone()
+        print(users)
+        cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
+        groups = cursor.fetchone()
+        print(groups)
+        cursor.close()
+        conn.close()
+        stats = {
+            "stat_users": {
+                "label": "Total Users",
+                "value": users[0]
+            },
+            "stat_groups": {
+                "label": "Total Groups",
+                "value": groups[0]
+            }
         }
-    }
-    if form.validate_on_submit():
-        uname = form.username.data
-        passw = form.password.data
-
-        if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-            redirect(url_for('admin_dashboard'))
-        else:
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
+        return render_template("admin/admin_dashboard.html", stats=stats)
     
+    return redirect(url_for('admin'))
+
+''' Admin View User Page '''
+
+@app.route("/admin/users")
+def admin_users():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminUserBio')
+    bioData = cursor.fetchall()
+
+    cursor.execute('CALL adminUserPostTotals')
+    postTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserFriendTotals')
+    friendTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserGroupTotals')
+    groupTotals = cursor.fetchall()
+
+    cursor.execute('CALL adminUserCommentTotals')
+    commentTotals = cursor.fetchall()
+
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Female"')
+    females = cursor.fetchone()
+
+    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Male"')
+    males = cursor.fetchone()
+
     cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
+    totalUsers = cursor.fetchone()
+
     cursor.close()
     conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        }
-    }
-    if form.validate_on_submit():
-        uname = form.username.data
-        passw = form.password.data
-
-        if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-            redirect(url_for('admin_dashboard'))
-        else:
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
     
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
+    '''users = [(bioData[i][0], bioData[i][1], bioData[i][2], postTotals[i][0], friendTotals[i][0], groupTotals[i][0], commentTotals[i][0]) for i in range(len(bioData))]'''
     
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
+    users = zip(bioData, postTotals, friendTotals, groupTotals, commentTotals)
+    print(users)
+
+    stats = [
+        {
+            "value": totalUsers[0],
+            "label": "Total Users"
         },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
-
+        {
+            "value": females[0],
+            "label": "Total Female Users"
+        },
+        {
+            "value": males[0],
+            "label": "Total Male Users"
+        },
+    ]
             
-    return render_template("admin/admin.html")
+    return render_template("admin/admin_user_report.html", stats=stats, users=users)
+
+'''@app.route('/admin/users')
+def admin_users():
+    return render_template('test.html')'''
+
+@app.route('/admin/users/search')
+def admin_search_users():
+    return render_template('test.html')
+
+@app.route('/admin/groups')
+def admin_groups():
+    return render_template('test.html')
+
+@app.route('/admin/groups/search')
+def admin_search_groups():
+    return render_template('test.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    if session['adminLoggedIn']:
+        session.pop('adminLoggedIn')
+        session['adminLoggedOut'] = True
+    return render_template(url_for('admin'))
 
 
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html")
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        }
-    }
-    return render_template("admin/admin_dashboard.html", stats=stats)
-
-
+@app.route("/test")
+def test():
+    return render_template("test.html")
 
 @app.after_request
 def add_header(response):
-     """
-     Add headers to both force latest IE rendering engine or Chrome Frame,
-     and also to cache the rendered page for 10 minutes.
-     """
-     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-     response.headers['Cache-Control'] = 'public, max-age=0'
-     return response
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-     """Custom 404 page."""
-
-
+    """Custom 404 page."""
+    return render_template('404.html'), 404

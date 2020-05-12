@@ -1,18 +1,18 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
+{% block content %}
 
 <h1>Admin Comment Input</h1><br/>
-{% include "components/comment_input.html" %}
+
 
 <h1>Admin Comment</h1><br/>
-{% include "components/comment.html" %}
 
-<h1>Admin Menu Button</h1><br/>
-{% with text="Test Button" %}
-    {% include "components/admin_menu_button.html"  %}
-{% endwith %}
+
+
+
+
 
 <h1>Admin Post</h1><br/>
-{%  include "components/post.html" %}
+
 
 {% endblock %}
