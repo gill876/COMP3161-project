@@ -6,9 +6,13 @@ from wtforms.fields.html5 import DateField
 from wtforms.csrf.session import SessionCSRF
 
 
-class LoginForm(FlaskForm):
+class AdminLoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
+    submitBtn = SubmitField('Log In')
+    csrf = True
+    csrf_class = SessionCSRF
+    csrf_secret = "5C2TJCKILM4I2Q5YZPZ2"
 
 class AdminSearchForm(FlaskForm):
     searchTerm = StringField('Enter search term', validators=[InputRequired()])

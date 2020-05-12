@@ -15,8 +15,8 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegisterForm,UpdateForm, ImageForm, PostForm, AdminLoginForm
-from app.admin_forms import AdminSearchForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm
+from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
 #from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
@@ -344,7 +344,7 @@ def send_text_file(file_name):
 #Admin Routes
 
 ''' Admin Login '''
-@app.route("/admin", methods=["GET", "POST"])
+@app.route('/admin', methods=["GET", "POST"])
 def admin():
     form = AdminLoginForm()
 
@@ -354,39 +354,60 @@ def admin():
             passw = form.password.data
 
             if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                redirect(url_for('admin_dashboard'))
-            flash('Username or password incorrect. Please try again.')          
+                session['adminLoggedIn'] = True
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash('Username or password incorrect. Please try again.')          
 
             
-    return render_template("admin/admin.html")
+    return render_template("admin/admin.html", form=form)
 
 
 ''' Admin Dashboard '''
 @app.route("/admin/dashboard")
 def admin_dashboard():
-    conn = mysql.connect()
-    cursor =conn.cursor()
-    
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    users = cursor.fetchone()
-    #print(users)
-    cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-    groups = cursor.fetchone()
-    #print(groups)
-    cursor.close()
-    conn.close()
-    stats = {
-        "stats_users": {
-            "label": "Total Users",
-            "value": users[0]
-        },
-        "stats_groups": {
-            "label": "Total Groups",
-            "value": groups[0]
-        }
-    }
-    return render_template("admin/admin_dashboard.html", stats=stats)
 
+    if session['adminLoggedIn'] == True:
+        conn = mysql.connect()
+        cursor =conn.cursor()
+
+        cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
+        users = cursor.fetchone()
+        print(users)
+        cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
+        groups = cursor.fetchone()
+        print(groups)
+        cursor.close()
+        conn.close()
+        stats = {
+            "stat_users": {
+                "label": "Total Users",
+                "value": users[0]
+            },
+            "stat_groups": {
+                "label": "Total Groups",
+                "value": groups[0]
+            }
+        }
+        return render_template("admin/admin_dashboard.html", stats=stats)
+    
+    return redirect(url_for('admin'))
+
+@app.route('/admin/users')
+def admin_users():
+    return render_template('test.html')
+
+@app.route('/admin/users/search')
+def admin_search_users():
+    return render_template('test.html')
+
+@app.route('/admin/groups')
+def admin_groups():
+    return render_template('test.html')
+
+@app.route('/admin/groups/search')
+def admin_search_groups():
+    return render_template('test.html')
 
 
 @app.route("/test")
@@ -395,17 +416,16 @@ def test():
 
 @app.after_request
 def add_header(response):
-     """
-     Add headers to both force latest IE rendering engine or Chrome Frame,
-     and also to cache the rendered page for 10 minutes.
-     """
-     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-     response.headers['Cache-Control'] = 'public, max-age=0'
-     return response
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-     """Custom 404 page."""
-
-
+    """Custom 404 page."""
+    return render_template('404.html'), 404

@@ -45,17 +45,20 @@
 .admin-card {
     background-color:  #279FC3;
     border: 2px solid #707070;
-    flex: 1 0 30%;
+    flex: 1 0 40%;
     border-radius: 15px;
     -webkit-border-radius: 15px;
     -moz-border-radius: 15px;
     -ms-border-radius: 15px;
     -o-border-radius: 15px;
-    margin: 0 10px;
+    margin: 0 2rem;
 }
 
 .admin-stat-card-value {
-    color: #F4EED7;
+    padding: 15px 0 !important;
+    font-size: 4rem !important;
+    font-weight: bold;
+    color: #F4EED7 !important;
     justify-content: center;
     display: flex !important;
 }
@@ -63,7 +66,8 @@
 .admin-stat-card-label {
     color: #F4EED7;
     justify-content: center;
-    display: flex !important
+    display: flex !important;
+    font-size: 2rem !important;
 }
 
 .divider {
@@ -120,7 +124,7 @@
 }
 
 .form-control {
-    background-color: #c1dfe8;
+    background-color: #F6FAFC;
     border: #ABAFB0 1px solid;
 }
 
@@ -255,14 +259,78 @@
 .admin-profile-group-table {
 
 }
-
-img {
-    width: 30px;
-    height: 30px;
-}
     
 
 .comment-header{
     display: flex;
     flex-direction: column;
+}
+
+.admin-login-panel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-login-left {
+    flex: 1 0 47%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-login-right {
+    flex: 1 0 47%;
+    display: flex;
+    flex-direction: column;
+    align-items: space-evenly;
+    justify-content: center;
+    flex-flow: column;
+    border-left: 2px solid #f6fafc;
+    padding: 2rem;
+}
+
+.admin-login-image {
+    width: 100%;
+    height: 80%;;
+}
+
+.admin-form-label {
+    color: #043443;
+}
+
+.admin-main {
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+}
+
+.admin-login-header {
+    font-weight: 700;
+    font-size: 5rem;
+}
+
+.admin-filler {
+    height: 100%;
+}
+
+.admin-main .container .admin-login-panel .admin-login-right {
+    height: 100%;
+}
+
+.admin-login-form {
+    margin: 7rem 3rem;
+}
+
+.admin-login-panel .admin-search-btn {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.card {
+    max-width: 40%;
 }
