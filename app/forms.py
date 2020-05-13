@@ -38,6 +38,10 @@ class PostForm(FlaskForm):
     content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
 
+# class GeneralPostForm(FlaskForm):
+#     content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
+#     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])   
+
 class UserPost_CommentForm(FlaskForm):
     content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
 

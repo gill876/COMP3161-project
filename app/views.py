@@ -52,8 +52,7 @@ def friend_search():
 
     return render_template('search.html')
 
-#reminder for neisha
-#add the stuff you forgot..
+
 @app.route("/", methods=["GET", "POST"])
 def login():
     msg=''
@@ -214,11 +213,7 @@ def create_group():
         return redirect(url_for('home'))
 
 
-    return render_template('create_group.html',form =form)    
-
-
-
-   
+    return render_template('create_group.html',form =form)      
 
 
 
@@ -331,6 +326,14 @@ def new_post():
 
     return render_template('home.html',form=form)
 
+# @app.route('/gen_post', methods=["GET","POST"])
+# def gen_post():
+#     form = GeneralPostForm()
+#     if request.method =='POST' and form.validate_on_submit():
+#          content = form.content.data
+#          postphoto = form.postphoto.data 
+#     return render_template('genpost.html', form=form)
+
 
 @app.route("/groups", methods=['GET', 'POST'])
 def groups():
@@ -365,6 +368,8 @@ def groups():
     conn.close()
 
     return render_template('groups.html', groups=groups)
+
+
 
 
 @app.route('/usergroup', methods=["GET", "POST"])
@@ -623,5 +628,5 @@ def add_header(response):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """Custom 404 page."""
+    """Custom 404 page.""" 
     return render_template('404.html'), 404
