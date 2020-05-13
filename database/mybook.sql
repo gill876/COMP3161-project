@@ -55,6 +55,11 @@ DROP PROCEDURE IF EXISTS adminUserCommentTotals;
 DROP PROCEDURE IF EXISTS adminGroupName;
 DROP PROCEDURE IF EXISTS adminGroupCreatorByUserId;
 DROP PROCEDURE IF EXISTS getGrpTotalMembers;
+DROP PROCEDURE IF EXISTS adminGetUserBio;
+DROP PROCEDURE IF EXISTS getUserTotalPosts;
+DROP PROCEDURE IF EXISTS getUserTotalComments;
+DROP PROCEDURE IF EXISTS getUserTotalFriends;
+DROP PROCEDURE IF EXISTS getUserTotalGroups;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -187,6 +192,7 @@ DROP INDEX comment_id ON comment;
 DROP INDEX f_user_id ON friends;
 DROP INDEX grp_user_id ON join_group;
 DROP INDEX grp_grp_id ON join_group;
+DROP INDEX fullname ON profile;
 
 CREATE INDEX u_username ON user(username);
 CREATE INDEX u_user_id ON user(user_id);
@@ -197,6 +203,7 @@ CREATE INDEX comment_id ON comment(comment_id);
 CREATE INDEX f_user_id ON friends(user_id);
 CREATE INDEX grp_user_id ON join_group(user_id);
 CREATE INDEX grp_grp_id ON join_group(user_id);
+create index fullname on profile(firstname, lastname);
 
 
 /* TRIGGERS and STORED PROCEDURES */
@@ -572,6 +579,23 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
+    CREATE PROCEDURE adminGetUserBio(IN in_name VARCHAR(151))
+    BEGIN
+
+    SELECT user.user_id, user.username, profile.firstname, profile.lastname 
+    FROM user
+    JOIN profile
+    JOIN userProfile
+    ON user.user_id = userProfile.user_id
+    AND profile.profile_id = userProfile.profile_id
+    WHERE profile.firstname LIKE CONCAT(in_name, '%')
+    OR profile.lastname LIKE CONCAT(in_name, '%')
+    ORDER BY user.user_id;
+
+    END //
+DELIMITER ;
+
+DELIMITER //
     CREATE PROCEDURE adminUserPostTotals()
     BEGIN
 
@@ -666,4 +690,48 @@ DELIMITER //
 DELIMITER ;
 
 
+DELIMITER //
+    CREATE PROCEDURE getUserTotalPosts(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(create_post.user_id)
+        FROM (create_post)
+        WHERE create_post.user_id  = in_user_id;
+    
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalComments(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(create_comment.user_id)
+        FROM (create_comment)
+        WHERE create_comment.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalFriends(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(friends.user_id)
+        FROM (friends)
+        WHERE friends.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalGroups(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(join_group.user_id)
+        FROM (join_group)
+        WHERE join_group.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
 

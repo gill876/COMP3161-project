@@ -498,13 +498,50 @@ def admin_groups():
           
     return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
 
-@app.route('/admin/groups/users')
-def admin_search_users():
-    return render_template('test.html')
-
 @app.route('/admin/groups/search')
 def admin_search_groups():
     return render_template('test.html')
+
+''' Admin Search Users Page '''
+@app.route("/admin/user/search", methods=["GET", "POST"])
+def admin_search_users():
+    form = AdminSearchForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute('CALL adminGetUserBio(%s)', (search_value.strip()))
+        userList = cursor.fetchall()
+
+        results = []
+        for user in userList:
+            userId = user[0]
+
+            cursor.execute('CALL getUserTotalPosts(%s)', int(userId))
+            userPosts = cursor.fetchone()[0]
+
+            cursor.execute('CALL getUserTotalComments(%s)', int(userId))
+            userComments = cursor.fetchone()[0]
+
+            cursor.execute('CALL getUserTotalFriends(%s)', int(userId))
+            userFriends = cursor.fetchone()[0]
+
+            cursor.execute('CALL getUserTotalGroups(%s)', int(userId))
+            userGroups = cursor.fetchone()[0]
+
+            results.append((user[1], user[2], user[3], userPosts, userComments, userFriends, userGroups))        
+
+        cursor.close()
+        conn.close()
+
+        return render_template("admin/admin_search.html", form=form, results=results) 
+
+    return render_template("admin/admin_search.html", form=form)
+
+
 
 @app.route('/admin/logout')
 def admin_logout():
