@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS create_post;
 DROP TABLE IF EXISTS create_comment;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
+DROP TABLE IF EXISTS group_post;
 DROP TABLE IF EXISTS userProfile;
 DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS comment;
@@ -22,6 +23,8 @@ DROP TRIGGER IF EXISTS updateFriendsAmount; /*UPDATE THE # OF FRIENDS OF A USER 
 DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{LOGS A USER IN USING USERNAME OR EMAIL AND PASSWORD} INPUT:{username OR email address, password in plain text} OUTPUT:{'Login successful' OR 'Password incorrect' OR 'User does not exist'}*/
 DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{RETRIEVES USER ID FROM USERNAME OR EMAIL} INPUT:{username, email address} OUTPUT:{userID}*/
 DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{CREATE POST} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createGroupPost; /*PURPOSE:{CREATE GROUP POST} INPUT:{userID, content in plain text, location, groupID} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS getGroupPosts; /*PURPOSE:{RETRIEVES POST CREATED BY GROUP} INPUT:{groupID} OUTPUT:{postID, content, time_stamp, location}*/
 DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{CREATE IMAGE POST} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{CREATE COMMENT FOR A POST} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{CREATE A GROUP} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
@@ -52,6 +55,15 @@ DROP PROCEDURE IF EXISTS adminUserPostTotals;
 DROP PROCEDURE IF EXISTS adminUserFriendTotals;
 DROP PROCEDURE IF EXISTS adminUserGroupTotals;
 DROP PROCEDURE IF EXISTS adminUserCommentTotals;
+DROP PROCEDURE IF EXISTS adminGroupName;
+DROP PROCEDURE IF EXISTS adminGroupCreatorByUserId;
+DROP PROCEDURE IF EXISTS getGrpTotalMembers;
+DROP PROCEDURE IF EXISTS adminGetUserBio;
+DROP PROCEDURE IF EXISTS getUserTotalPosts;
+DROP PROCEDURE IF EXISTS getUserTotalComments;
+DROP PROCEDURE IF EXISTS getUserTotalFriends;
+DROP PROCEDURE IF EXISTS getUserTotalGroups;
+DROP PROCEDURE IF EXISTS getGroupId;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -79,7 +91,7 @@ CREATE TABLE profile(
     lastname VARCHAR(75) NOT NULL,
     profile_img VARCHAR(100) DEFAULT 'GENERIC' NOT NULL,
     friends INT DEFAULT 0 NOT NULL,
-    biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
+    biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, 
     gender VARCHAR(10) NOT NULL,
     PRIMARY KEY(profile_id)
 );
@@ -94,21 +106,21 @@ CREATE TABLE userProfile(
 
 CREATE TABLE post(
     post_id INT NOT NULL AUTO_INCREMENT,
-    content VARCHAR(300) NOT NULL, /*change in data dictionary*/
+    content VARCHAR(300) NOT NULL, 
     time_stamp DATETIME NOT NULL,
     post_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
     PRIMARY KEY(post_id)
 );
 
-CREATE TABLE user_group( /*change in data dictionary*/
-    group_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+CREATE TABLE user_group( 
+    group_id INT NOT NULL AUTO_INCREMENT, 
     group_name VARCHAR(90) NOT NULL,
-    group_description VARCHAR(300) NOT NULL, /*change in data dictionary*/
+    group_description VARCHAR(300) NOT NULL, 
     PRIMARY KEY(group_id)
 );
 
 CREATE TABLE comment(
-    comment_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    comment_id INT NOT NULL AUTO_INCREMENT, 
     post_id INT NOT NULL,
     comm_text VARCHAR(300),
     time_stamp DATETIME NOT NULL,
@@ -120,23 +132,24 @@ CREATE TABLE comment(
 CREATE TABLE friends(
     user_id INT NOT NULL,
     friend_id INT NOT NULL,
-    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'FRIEND', 'ACQUAINTANCE', 'OTHER') NOT NULL,/*change in data dictionary*/
+    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'FRIEND', 'ACQUAINTANCE', 'OTHER') NOT NULL,
     PRIMARY KEY(user_id, friend_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(friend_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE images(
-    image_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    image_id INT NOT NULL AUTO_INCREMENT, 
     post_id INT NOT NULL,
-    file_name VARCHAR(256) NOT NULL, /*change in data dictionary*/
+    file_name VARCHAR(256) NOT NULL, 
     PRIMARY KEY(image_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
 CREATE TABLE create_group(
-    group_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    group_id INT NOT NULL AUTO_INCREMENT, 
     user_id INT NOT NULL,
+    time_stamp DATETIME NOT NULL, /*change in data dictionary*/
     PRIMARY KEY(group_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -144,10 +157,18 @@ CREATE TABLE create_group(
 CREATE TABLE join_group(
     user_id INT NOT NULL,
     group_id INT NOT NULL,
-    mem_role ENUM('MEMBER','CONTENT EDITOR') NOT NULL,/*change in data dictionary */
+    mem_role ENUM('MEMBER','CONTENT EDITOR') NOT NULL,
     PRIMARY KEY(user_id, group_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE group_post( /*change in data dictionary*/
+    group_id INT NOT NULL,
+    post_id INT NOT NULL,
+    PRIMARY KEY(group_id, post_id),
+    FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
 CREATE TABLE create_post(
@@ -184,6 +205,7 @@ DROP INDEX comment_id ON comment;
 DROP INDEX f_user_id ON friends;
 DROP INDEX grp_user_id ON join_group;
 DROP INDEX grp_grp_id ON join_group;
+DROP INDEX fullname ON profile;
 
 CREATE INDEX u_username ON user(username);
 CREATE INDEX u_user_id ON user(user_id);
@@ -194,6 +216,7 @@ CREATE INDEX comment_id ON comment(comment_id);
 CREATE INDEX f_user_id ON friends(user_id);
 CREATE INDEX grp_user_id ON join_group(user_id);
 CREATE INDEX grp_grp_id ON join_group(user_id);
+create index fullname on profile(firstname, lastname);
 
 
 /* TRIGGERS and STORED PROCEDURES */
@@ -253,6 +276,37 @@ DELIMITER //
     END //
 DELIMITER ;
 
+
+DELIMITER //
+    CREATE PROCEDURE createGroupPost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_group_id INT)
+    BEGIN
+    INSERT INTO post(content, time_stamp, post_location) 
+    VALUES (in_content, SYSDATE(), in_post_location);
+    
+    INSERT INTO create_post 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));
+
+    INSERT INTO group_post
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_group_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));    
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getGroupPosts(IN in_group_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, post.time_stamp, post.post_location 
+    FROM post 
+    JOIN group_post
+    ON post.post_id = group_post.post_id
+    WHERE group_post.group_id = in_group_id;
+    END //
+DELIMITER ;
+
+
 DELIMITER //
     CREATE PROCEDURE createImagePost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_file_name VARCHAR(256))
     BEGIN
@@ -291,7 +345,7 @@ DELIMITER //
     INSERT INTO create_group 
     VALUES
     /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
-    ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id);
+    ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id, SYSDATE());
 
     /*INSERT INTO join_group 
     VALUES*/
@@ -363,6 +417,19 @@ DELIMITER //
     BEGIN
     SELECT friend_id, friend_type FROM friends
     WHERE user_id = in_user_id;
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE showUserGroups(IN in_user_id INT)
+    BEGIN
+    
+    SELECT * FROM join_group
+    WHERE join_group.user_id = in_user_id
+    UNION
+    SELECT user_id, group_id, 'CREATOR' AS mem_role FROM create_group
+    WHERE create_group.user_id = in_user_id;
+
     END //
 DELIMITER ;
 
@@ -552,23 +619,6 @@ DELIMITER $$
     END $$
 DELIMITER ;*/
 
-DELIMITER //
-    CREATE PROCEDURE adminUserDetails()
-    BEGIN
-
-    SELECT user.username, profile.firstname, profile.lastname, 
-    (SELECT SUM(user.user_id) FROM create_post),
-    (SELECT SUM(user.user_id) FROM friends),
-    (SELECT SUM(user.user_id) FROM join_group)
-    FROM user
-    JOIN profile
-    JOIN userProfile
-    ON user.user_id = userProfile.user_id
-    AND profile.profile_id = userProfile.profile_id;
-
-    END //
-DELIMITER ;
-
 /* ADDITIONAL PROCEDURES */
 DELIMITER //
     CREATE PROCEDURE adminUserBio()
@@ -580,6 +630,23 @@ DELIMITER //
     JOIN userProfile
     ON user.user_id = userProfile.user_id
     AND profile.profile_id = userProfile.profile_id
+    ORDER BY user.user_id;
+
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGetUserBio(IN in_name VARCHAR(151))
+    BEGIN
+
+    SELECT user.user_id, user.username, profile.firstname, profile.lastname 
+    FROM user
+    JOIN profile
+    JOIN userProfile
+    ON user.user_id = userProfile.user_id
+    AND profile.profile_id = userProfile.profile_id
+    WHERE profile.firstname LIKE CONCAT(in_name, '%')
+    OR profile.lastname LIKE CONCAT(in_name, '%')
     ORDER BY user.user_id;
 
     END //
@@ -613,22 +680,6 @@ DELIMITER //
     END //
 DELIMITER ;
 
-/*DELIMITER //
-    CREATE PROCEDURE adminUserGroupPostTotals()
-    BEGIN
-
-        SELECT COUNT(create_post.user_id)
-    FROM create_post
-    RIGHT JOIN user 
-    ON create_post.user_id = user.user_id
-    GROUP BY user.user_id
-    ORDER BY user.user_id;
-
-    END //
-DELIMITER ;
-todo group post totals - not a priority
-*/
-
 DELIMITER //
     CREATE PROCEDURE adminUserGroupTotals()
     BEGIN
@@ -653,6 +704,101 @@ DELIMITER //
     ON create_comment.user_id = user.user_id
     GROUP BY user.user_id
     ORDER BY user.user_id;
+
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGroupName()
+    BEGIN
+
+    SELECT user_group.group_name
+    FROM user_group
+    ORDER BY user_group.group_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGroupCreatorByUserId()
+    BEGIN
+
+    SELECT CONCAT(`firstname`, ' ', `lastname`)
+    FROM profile
+    JOIN userProfile
+    JOIN create_group
+    ON profile.profile_id = userProfile.profile_id
+    AND userProfile.user_id = create_group.user_id
+    ORDER BY create_group.group_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getGrpTotalMembers()
+    BEGIN
+
+    SELECT COUNT(join_group.group_id)
+    FROM (join_group)
+    GROUP BY join_group.group_id 
+    ORDER BY join_group.group_id;
+
+    END//
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalPosts(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(create_post.user_id)
+        FROM (create_post)
+        WHERE create_post.user_id  = in_user_id;
+    
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalComments(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(create_comment.user_id)
+        FROM (create_comment)
+        WHERE create_comment.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
+
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalFriends(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(friends.user_id)
+        FROM (friends)
+        WHERE friends.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getUserTotalGroups(IN in_user_id INT)
+    BEGIN
+
+        SELECT COUNT(join_group.user_id)
+        FROM (join_group)
+        WHERE join_group.user_id  = in_user_id;
+
+    END//
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getGroupId(IN in_group_name VARCHAR(90))
+    BEGIN
+    
+    SELECT group_id FROM user_group
+    WHERE group_name = in_group_name
+    LIMIT 1;
 
     END //
 DELIMITER ;

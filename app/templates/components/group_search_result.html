@@ -4,6 +4,7 @@
         <!-- <img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt=""> -->
       </a>
     </div>
+<<<<<<< HEAD
     <div class="col-md-5">
       <h3>{{name}}</h3>
       <p>{{description}}</p>
@@ -11,6 +12,17 @@
       <a class="btn btn-primary" href="{{ url_for('usergroup', group_name={{name}}) }}">View Group</a>
       {% else %}
       <a class="btn btn-primary" href="{{ url_for('usergroup', group_name={{name}}) }}">Join Group</a>
+=======
+    <div class="col-md-5 card group-card">
+        <div class="group-details-container">
+            <h3>{{name}}</h3>
+            <p>{{description}}</p>
+        </div>
+      {% if member %}
+      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup') }}">View Group</a>
+      {% else %}
+      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup') }}">Join Group</a>
+>>>>>>> fd6df6b28ba49f696e3ea3d8b1273b86aebbaffa
       {% endif %}
     </div>
   </div>

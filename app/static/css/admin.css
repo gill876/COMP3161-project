@@ -94,10 +94,11 @@
 
 .admin-header {
     text-align: center;
-    margin: 20px 0 40px;
+    margin: 2rem 0 40px;
     color: #043443;
     font-weight: bold;
-    font-size: 3rem;
+    border-bottom: none;
+    font-size: 3.2rem;
 }
 
 .admin-instructions {
@@ -356,11 +357,5 @@
 
 .admin-users-page .admin-user-stat-container .admin-card {
     max-width: 28%;
-}
-
-.admin-users-page .admin-header {
-    border-bottom: none;
-    margin-bottom: 1rem;
-    font-size: 3.2rem;
 }
 

@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
-{% block main %}
+{% block content %}
 
 <div class="container main-page-area">
     <h2 class="admin-header">Search Users</h2>
@@ -28,6 +28,7 @@
             <table class="table table-hover table-responsive-xl admin-search-results-table">
                 <thead>
                   <tr>
+                    <th scope="col">Username</th>
                     <th scope="col">Firstname</th>
                     <th scope="col">Lastname</th>
                     <th scope="col">Post</th>
@@ -39,12 +40,13 @@
                 <tbody>
                     {% for person in results %}
                     <tr>
-                        <td>{{person.firstname}}</td>
-                        <td>{{person.lastname}}</td>
-                        <td>{{person.num_posts}}</td>
-                        <td>{{person.num_comments}}</td>
-                        <td>{{person.num_friends}}</td>
-                        <td>{{person.num_groups}}</td>
+                        <td>{{person[0]}}</td>
+                        <td>{{person[1]}}</td>
+                        <td>{{person[2]}}</td>
+                        <td>{{person[3]}}</td>
+                        <td>{{person[4]}}</td>
+                        <td>{{person[5]}}</td>
+                        <td>{{person[6]}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

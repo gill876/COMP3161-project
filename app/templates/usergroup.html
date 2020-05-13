@@ -3,6 +3,11 @@
 {% block content %}
 
 <h2>Welcome to (What)</h2>
+
+    <div class="join_button">
+        <button type="submit" name="submit" class="btn btn-primary btn-block">Join Group</button>
+    </div>
+
     <div class="usergroup_post">
 
         <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">

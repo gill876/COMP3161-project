@@ -8,10 +8,13 @@
     <h1 class="my-4">Groups</h1>
     <br/>
 
-    {% for group in usergroups %}
+    <div class="group-search-results-container">
+    {% for group in groups %}
       {% with name=group.name, description=group.description, member=group.member %}
         {% include "components/group_search_result.html" %}
+      {% endwith %}
     {% endfor %}
+    </div>
 
     <hr/>   
 
