@@ -29,7 +29,7 @@
                   <tr>
                     <th scope="col">Group Name</th>
                     <th scope="col">Creator</th>
-                    <th scope="col">Create Date</th>
+                    <th scope="col">Description</th>
                     <th scope="col">Total Posts</th>
                     <th scope="col">Total Members</th>
                   </tr>
@@ -37,17 +37,19 @@
                 <tbody>
                     {% for group in results %}
                     <tr>
-                        <td class="truncate">{{group.name}}</td>
-                        <td class="truncate">{{group.creator}}</td>
-                        <td class="">{{group.create_date}}</td>
-                        <td class="">{{group.
-                            num_posts}}</td>
-                        <td class="">{{group.num_members}}</td>
+                        <td class="truncate">{{group[0]}}</td>
+                        <td class="truncate">{{group[1]}}</td>
+                        <td class="">{{group[2]}}</td>
+                        <td class="">{{group[3]}}</td>
+                        <td class="">{{group[4]}}</td>
                    </tr>
                     {% endfor %}
                 </tbody>
               </table>
         </div>
+        {% endif %}
+        {% if results == [] %}
+        <div> Group not found.</div>
         {% endif %}
     </div>
 </div>
