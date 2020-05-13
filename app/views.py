@@ -305,7 +305,38 @@ def new_post():
 
 @app.route("/groups", methods=['GET', 'POST'])
 def groups():
-    return render_template('groups.html')
+    print('in groups')
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT group_name, group_description FROM user_group')
+    allGroups = cursor.fetchall()
+    #print(allGroups)
+    #session['id'] = 2
+    cursor.execute('CALL showUserGroups(%s)', int(session['id']))
+    userGroups = cursor.fetchall()
+    #print(userGroups)
+    groupids = [item[1] for item in userGroups]
+    #print(groupids)
+
+    groups = []
+    for group in allGroups:
+        cursor.execute('CALL getGroupId(%s)', group[0])
+        groupId = cursor.fetchone()[0]
+        member = True if groupId in groupids else False
+        groups.append({
+            "name": group[0],
+            "description": group[1],
+            "member": member
+        })
+        print(groups)
+    
+    cursor.close()
+    conn.close()
+
+    return render_template('groups.html', groups=groups)
+
 
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
