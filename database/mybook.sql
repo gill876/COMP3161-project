@@ -24,7 +24,7 @@ DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{LOGS A USER IN USING USERNAME OR 
 DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{RETRIEVES USER ID FROM USERNAME OR EMAIL} INPUT:{username, email address} OUTPUT:{userID}*/
 DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{CREATE POST} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroupPost; /*PURPOSE:{CREATE GROUP POST} INPUT:{userID, content in plain text, location, groupID} OUTPUT:{NO OUTPUT}*/
-DROP PROCEDURE IF EXISTS getGroupPosts;
+DROP PROCEDURE IF EXISTS getGroupPosts; /*PURPOSE:{RETRIEVES POST CREATED BY GROUP} INPUT:{groupID} OUTPUT:{postID, content, time_stamp, location}*/
 DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{CREATE IMAGE POST} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{CREATE COMMENT FOR A POST} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{CREATE A GROUP} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
