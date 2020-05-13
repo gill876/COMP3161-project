@@ -24,6 +24,7 @@ DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{LOGS A USER IN USING USERNAME OR 
 DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{RETRIEVES USER ID FROM USERNAME OR EMAIL} INPUT:{username, email address} OUTPUT:{userID}*/
 DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{CREATE POST} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroupPost; /*PURPOSE:{CREATE GROUP POST} INPUT:{userID, content in plain text, location, groupID} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS getGroupPosts;
 DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{CREATE IMAGE POST} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{CREATE COMMENT FOR A POST} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{CREATE A GROUP} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
@@ -290,6 +291,17 @@ DELIMITER //
     VALUES
     /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
     (in_group_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));    
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE getGroupPosts(IN in_group_id INT)
+    BEGIN
+    SELECT post.post_id, post.content, post.time_stamp, post.post_location 
+    FROM post 
+    JOIN group_post
+    ON post.post_id = group_post.post_id
+    WHERE group_post.group_id = in_group_id;
     END //
 DELIMITER ;
 
