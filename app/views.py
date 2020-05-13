@@ -15,19 +15,17 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm
 from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
 #from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
 from . import mysql
 
-# from app.models import UserProfile
+
 # from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
-###
-#mysql = MySQL(app)
 
 
 @app.route('/home')
@@ -89,7 +87,7 @@ def login():
         elif data[0] == 'User does not exist': #MODIFY
             pass
         else:
-            return "fatal error" #MODIFY
+            flash('Username or password incorrect. Please try again.') #MODIFY
     return render_template("index.html", form=form,msg=msg)
 
 
@@ -204,15 +202,27 @@ def create_group():
         
         conn = mysql.connect()
         cursor =conn.cursor()
-        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        data = cursor.fetchone()
+        # cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+        # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+        # data = cursor.fetchone()
 
-        if data == None:
-            cursor.execute('CALL createGroup(%s,%s,%s)')
+        # if data == None:
+        #     cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
+        #     conn.commit()
+        #     cursor.close()
+        #     conn.close()
+        return redirect(url_for('home'))
 
 
-    return render_template('create_group.html')    
+    return render_template('create_group.html',form =form)    
+
+
+
+   
+
+
+
+# @app.route('/updateprofile'/'<userid>')
 
 
 
@@ -317,13 +327,29 @@ def new_post():
          postphoto = form.postphoto.data 
 
     #conn = mysql.connect()
-    #cursor =conn.cursor()
+    #cursor = conn.cursor()
 
     return render_template('home.html',form=form)
 
 
 @app.route("/groups", methods=['GET', 'POST'])
 def groups():
+    '''print('in groups')
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT name, description FROM user_group')
+    allGroups = cursor.fetchall()
+    print(allGroups)
+
+    cursor.execute('CALL showUserGroups(%s)', int(session['id']))
+    userGroups = cursor.fetchall()
+    print(userGroups)
+    
+
+    cursor.close()
+    conn.close()'''
     return render_template('groups.html')
 
 @app.route('/usergroup', methods=["GET", "POST"])
@@ -346,7 +372,12 @@ def userpost_comment():
 
         return redirect( url_for('userpost_comment'))
 
-    return render_template('userpost_comment.html')
+    return render_template('userpost_comment.html', form=form)
+
+
+
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
 
 
 # user_loader callback. This callback is used to reload the user object from
@@ -358,78 +389,8 @@ def load_user(id):
 
 ###
 # The functions below should be applicable to all Flask apps.
-###
 
-@app.route("/secure_page")
-@login_required
-def secure_page():    
-    return render_template('secure_page.html')
-    
-
-@app.route('/<file_name>.txt')
-def send_text_file(file_name):
-    """Send your static text file."""
-    file_dot_text = file_name + '.txt'
-    return app.send_static_file(file_dot_text)
-
-
-#Admin Routes
-
-''' Admin Login '''
-@app.route('/admin', methods=["GET", "POST"])
-def admin():
-    session['adminLoggedOut'] = True
-    form = AdminLoginForm()
-
-    if request.method == "POST":
-        if form.validate_on_submit():
-            uname = form.username.data
-            passw = form.password.data
-
-            if (uname == app.config['ADMIN_USERNAME'] and passw == app.config['ADMIN_PASSWORD']):
-                session['adminLoggedOut'] = False
-                session['adminLoggedIn'] = True
-                return redirect(url_for('admin_dashboard'))
-            else:
-                flash('Username or password incorrect. Please try again.')          
-
-            
-    return render_template("admin/admin.html", form=form)
-
-
-''' Admin Dashboard '''
-@app.route("/admin/dashboard")
-def admin_dashboard():
-
-    if session['adminLoggedIn'] == True:
-        conn = mysql.connect()
-        cursor =conn.cursor()
-
-        cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-        users = cursor.fetchone()
-        print(users)
-        cursor.execute('SELECT COUNT(group_id) AS group_amt  FROM create_group')
-        groups = cursor.fetchone()
-        print(groups)
-        cursor.close()
-        conn.close()
-        stats = {
-            "stat_users": {
-                "label": "Total Users",
-                "value": users[0]
-            },
-            "stat_groups": {
-                "label": "Total Groups",
-                "value": groups[0]
-            }
-        }
-        return render_template("admin/admin_dashboard.html", stats=stats)
-    
-    return redirect(url_for('admin'))
-
-''' Admin View User Page '''
-
-@app.route("/admin/users")
+@app.route('/admin')
 def admin_users():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -483,10 +444,6 @@ def admin_users():
             
     return render_template("admin/admin_user_report.html", stats=stats, users=users)
 
-'''@app.route('/admin/users')
-def admin_users():
-    return render_template('test.html')'''
-
 @app.route('/admin/users/search')
 def admin_search_users():
     return render_template('test.html')
@@ -506,10 +463,6 @@ def admin_logout():
         session['adminLoggedOut'] = True
     return render_template(url_for('admin'))
 
-
-@app.route("/test")
-def test():
-    return render_template("test.html")
 
 @app.after_request
 def add_header(response):

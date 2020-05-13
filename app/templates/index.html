@@ -52,6 +52,7 @@
             </div>
             <a href="{{url_for('profile')}}"></a>
             <div class="msg">{{ msg }}</div>
+            {% include 'flash_messages.html' %}
             <button type="submit" name="submit" class="btn btn-primary btn-block">Log in</button>
             <a href="{{ url_for('register') }}">Register </a>
           </form>

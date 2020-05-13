@@ -140,5 +140,9 @@ body {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
+.userpost_button button{
+    width: 75px;
+}
+
 
 
