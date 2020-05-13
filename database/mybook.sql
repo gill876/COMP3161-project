@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS create_post;
 DROP TABLE IF EXISTS create_comment;
 DROP TABLE IF EXISTS join_group;
 DROP TABLE IF EXISTS create_group;
+DROP TABLE IF EXISTS group_post;
 DROP TABLE IF EXISTS userProfile;
 DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS comment;
@@ -22,6 +23,7 @@ DROP TRIGGER IF EXISTS updateFriendsAmount; /*UPDATE THE # OF FRIENDS OF A USER 
 DROP PROCEDURE IF EXISTS loginUser; /*PURPOSE:{LOGS A USER IN USING USERNAME OR EMAIL AND PASSWORD} INPUT:{username OR email address, password in plain text} OUTPUT:{'Login successful' OR 'Password incorrect' OR 'User does not exist'}*/
 DROP PROCEDURE IF EXISTS getUserID; /*PURPOSE:{RETRIEVES USER ID FROM USERNAME OR EMAIL} INPUT:{username, email address} OUTPUT:{userID}*/
 DROP PROCEDURE IF EXISTS createPost; /*PURPOSE:{CREATE POST} INPUT:{userID, content in plain text, location} OUTPUT:{NO OUTPUT}*/
+DROP PROCEDURE IF EXISTS createGroupPost; /*PURPOSE:{CREATE GROUP POST} INPUT:{userID, content in plain text, location, groupID} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createImagePost; /*PURPOSE:{CREATE IMAGE POST} INPUT:{userID, content in plain text, location, file name with path} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createComment; /*PURPOSE:{CREATE COMMENT FOR A POST} INPUT:{userID, postID, comment in plain text, location} OUTPUT:{NO OUTPUT}*/
 DROP PROCEDURE IF EXISTS createGroup; /*PURPOSE:{CREATE A GROUP} INPUT:{userID, group name in plain text, group description in plain text} OUTPUT:{NO OUTPUT}*/
@@ -88,7 +90,7 @@ CREATE TABLE profile(
     lastname VARCHAR(75) NOT NULL,
     profile_img VARCHAR(100) DEFAULT 'GENERIC' NOT NULL,
     friends INT DEFAULT 0 NOT NULL,
-    biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, /*change in data dictionary*/
+    biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, 
     gender VARCHAR(10) NOT NULL,
     PRIMARY KEY(profile_id)
 );
@@ -103,21 +105,21 @@ CREATE TABLE userProfile(
 
 CREATE TABLE post(
     post_id INT NOT NULL AUTO_INCREMENT,
-    content VARCHAR(300) NOT NULL, /*change in data dictionary*/
+    content VARCHAR(300) NOT NULL, 
     time_stamp DATETIME NOT NULL,
     post_location VARCHAR(70) DEFAULT "Somewhere on Earth" NOT NULL,
     PRIMARY KEY(post_id)
 );
 
-CREATE TABLE user_group( /*change in data dictionary*/
-    group_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+CREATE TABLE user_group( 
+    group_id INT NOT NULL AUTO_INCREMENT, 
     group_name VARCHAR(90) NOT NULL,
-    group_description VARCHAR(300) NOT NULL, /*change in data dictionary*/
+    group_description VARCHAR(300) NOT NULL, 
     PRIMARY KEY(group_id)
 );
 
 CREATE TABLE comment(
-    comment_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    comment_id INT NOT NULL AUTO_INCREMENT, 
     post_id INT NOT NULL,
     comm_text VARCHAR(300),
     time_stamp DATETIME NOT NULL,
@@ -129,23 +131,24 @@ CREATE TABLE comment(
 CREATE TABLE friends(
     user_id INT NOT NULL,
     friend_id INT NOT NULL,
-    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'FRIEND', 'ACQUAINTANCE', 'OTHER') NOT NULL,/*change in data dictionary*/
+    friend_type ENUM('WORK', 'SCHOOL', 'RELATIVE', 'FRIEND', 'ACQUAINTANCE', 'OTHER') NOT NULL,
     PRIMARY KEY(user_id, friend_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(friend_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE images(
-    image_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    image_id INT NOT NULL AUTO_INCREMENT, 
     post_id INT NOT NULL,
-    file_name VARCHAR(256) NOT NULL, /*change in data dictionary*/
+    file_name VARCHAR(256) NOT NULL, 
     PRIMARY KEY(image_id),
     FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
 CREATE TABLE create_group(
-    group_id INT NOT NULL AUTO_INCREMENT, /*change in data dictionary*/
+    group_id INT NOT NULL AUTO_INCREMENT, 
     user_id INT NOT NULL,
+    time_stamp DATETIME NOT NULL, /*change in data dictionary*/
     PRIMARY KEY(group_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -153,10 +156,18 @@ CREATE TABLE create_group(
 CREATE TABLE join_group(
     user_id INT NOT NULL,
     group_id INT NOT NULL,
-    mem_role ENUM('MEMBER','CONTENT EDITOR') NOT NULL,/*change in data dictionary */
+    mem_role ENUM('MEMBER','CONTENT EDITOR') NOT NULL,
     PRIMARY KEY(user_id, group_id),
     FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE group_post( /*change in data dictionary*/
+    group_id INT NOT NULL,
+    post_id INT NOT NULL,
+    PRIMARY KEY(group_id, post_id),
+    FOREIGN KEY(group_id) REFERENCES user_group(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES post(post_id) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
 CREATE TABLE create_post(
@@ -264,6 +275,26 @@ DELIMITER //
     END //
 DELIMITER ;
 
+
+DELIMITER //
+    CREATE PROCEDURE createGroupPost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_group_id INT)
+    BEGIN
+    INSERT INTO post(content, time_stamp, post_location) 
+    VALUES (in_content, SYSDATE(), in_post_location);
+    
+    INSERT INTO create_post 
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_user_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));
+
+    INSERT INTO group_post
+    VALUES
+    /*THE SELECT STATEMENT BELOW FINDS LAST POST ID CREATED AND INSERTS IT INTO THE SECOND PARAMETER*/
+    (in_group_id, (SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1));    
+    END //
+DELIMITER ;
+
+
 DELIMITER //
     CREATE PROCEDURE createImagePost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70), IN in_file_name VARCHAR(256))
     BEGIN
@@ -302,7 +333,7 @@ DELIMITER //
     INSERT INTO create_group 
     VALUES
     /*THE SELECT STATEMENT BELOW FINDS LAST GROUP ID CREATED AND INSERTS IT INTO THE FIRST PARAMETER*/
-    ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id);
+    ((SELECT group_id FROM user_group ORDER BY group_id DESC LIMIT 1), in_user_id, SYSDATE());
 
     /*INSERT INTO join_group 
     VALUES*/
