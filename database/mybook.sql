@@ -63,6 +63,7 @@ DROP PROCEDURE IF EXISTS getUserTotalPosts;
 DROP PROCEDURE IF EXISTS getUserTotalComments;
 DROP PROCEDURE IF EXISTS getUserTotalFriends;
 DROP PROCEDURE IF EXISTS getUserTotalGroups;
+DROP PROCEDURE IF EXISTS getGroupId;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -432,6 +433,19 @@ DELIMITER //
     END //
 DELIMITER ;
 
+DELIMITER //
+    CREATE PROCEDURE showUserGroups(IN in_user_id INT)
+    BEGIN
+    
+    SELECT * FROM join_group
+    WHERE join_group.user_id = in_user_id
+    UNION
+    SELECT user_id, group_id, 'CREATOR' AS mem_role FROM create_group
+    WHERE create_group.user_id = in_user_id;
+
+    END //
+DELIMITER ;
+
 
 DELIMITER //
     CREATE PROCEDURE postCreator(IN postID INT)
@@ -778,3 +792,13 @@ DELIMITER //
     END//
 DELIMITER ;
 
+DELIMITER //
+    CREATE PROCEDURE getGroupId(IN in_group_name VARCHAR(90))
+    BEGIN
+    
+    SELECT group_id FROM user_group
+    WHERE group_name = in_group_name
+    LIMIT 1;
+
+    END //
+DELIMITER ;

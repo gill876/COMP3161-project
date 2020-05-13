@@ -140,5 +140,23 @@ body {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
+.group-card {
+    margin-bottom: 20px;
+    width: 600px;
+}
+
+.group-search-results-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: space-evenly;
+    padding: 2rem;
+}
+
+.group-search-results-button {
+
+}
+
+
 
 
