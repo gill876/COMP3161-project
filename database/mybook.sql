@@ -64,6 +64,7 @@ DROP PROCEDURE IF EXISTS getUserTotalComments;
 DROP PROCEDURE IF EXISTS getUserTotalFriends;
 DROP PROCEDURE IF EXISTS getUserTotalGroups;
 DROP PROCEDURE IF EXISTS getGroupId;
+DROP PROCEDURE IF EXISTS adminSearchGroup;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -653,6 +654,18 @@ DELIMITER //
 DELIMITER ;
 
 DELIMITER //
+    CREATE PROCEDURE adminSearchGroup(IN in_name VARCHAR(90))
+    BEGIN
+
+    SELECT user_group.group_id, user_group.group_name, user_group.group_description
+    FROM user_group
+    WHERE user_group.group_name LIKE CONCAT(in_name, '%')
+    ORDER BY user_group.group_id;
+
+    END //
+DELIMITER ;
+
+DELIMITER //
     CREATE PROCEDURE adminUserPostTotals()
     BEGIN
 
@@ -800,5 +813,24 @@ DELIMITER //
     WHERE group_name = in_group_name
     LIMIT 1;
 
+    END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE groupTotalMembers(IN in_group_id INT)
+    BEGIN
+        SELECT COUNT(join_group.group_id)
+        FROM join_group
+        WHERE join_group.group_id = in_group_id
+        LIMIT 1;
+    END //
+DELIMITER;
+
+DELIMITER //
+    CREATE PROCEDURE groupTotalPosts(IN in_group_id INT)
+    BEGIN
+        SELECT COUNT(group_post.group_id)
+        FROM group_post
+        WHERE group_post.group_id = in_group_id;
     END //
 DELIMITER ;

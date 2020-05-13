@@ -562,9 +562,46 @@ def admin_groups():
           
     return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
 
-@app.route('/admin/groups/search')
+''' Admin Groups Search Page '''
+@app.route('/admin/groups/search', methods=["GET", "POST"])
 def admin_search_groups():
-    return render_template('test.html')
+    form = AdminSearchForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        search_value = form.searchTerm.data
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute('CALL adminSearchGroup(%s)', (search_value.strip()))
+        groupList = cursor.fetchall()
+        print(groupList)
+
+        results = []
+        for group in groupList:
+            groupId = group[0]
+
+            cursor.execute('CALL groupTotalPosts(%s)', int(groupId))
+            groupPosts = cursor.fetchone()[0]
+            print(groupPosts)
+
+            cursor.execute('CALL groupTotalMembers(%s)', int(groupId))
+            print(groupId)
+            groupMembers = cursor.fetchone()[0]
+
+            cursor.execute('CALL groupCreator(%s)', int(groupId))
+            creator = cursor.fetchone()[0]
+            
+            results.append((group[1], creator, group[2], groupPosts, groupMembers))
+        print(results)
+        
+        cursor.close()
+        conn.close()
+
+        return render_template("admin/admin_search_groups.html", form=form, results=results) 
+
+    return render_template("admin/admin_search_groups.html", form=form)
+
 
 ''' Admin Search Users Page '''
 @app.route("/admin/user/search", methods=["GET", "POST"])
@@ -614,7 +651,10 @@ def admin_logout():
         session['adminLoggedOut'] = True
     return render_template(url_for('admin'))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 965f9741385c93432abe45c9fab79e48a9caaf84
 @app.after_request
 def add_header(response):
     """
