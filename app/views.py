@@ -643,6 +643,13 @@ def admin_search_users():
 
     return render_template("admin/admin_search.html", form=form)
 
+
+def findImageIndex(postId):
+    for i in range(len(imageList)):
+        if (imageList[i][0] == postId):
+            return i
+    return - 1
+
 ''' Get User Profile Details '''
 def getUserProfileDetails(username):
     conn = mysql.connect()
@@ -677,17 +684,76 @@ def getUserProfileDetails(username):
 
     cursor.execute('CALL adminGetUserFriends(%s)', int(userBio[0][0]))
     userFriends = cursor.fetchall()
+    print('userFriends', userFriends)
 
     cursor.execute('CALL adminUserGroups(%s)', int(userBio[0][0]))
     userGroups = cursor.fetchall()
+    print('userGroups', userGroups)
 
     cursor.execute('CALL adminGetUserPostDetails(%s)', int(userBio[0][0]))
-    userFriends = cursor.fetchall()
+    userPostsT = cursor.fetchall()
+    print('userPosts', userPosts)
 
     cursor.execute('CALL adminGetUserGroupPostDetails(%s)', int(userBio[0][0]))
-    userFriends = cursor.fetchall()
+    userGroupPostsT = cursor.fetchall()
+    print('usergRP pOST', userGroupPosts)
 
-    profileItems = (userFriends, userGroups)
+    cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userBio[0][0]))
+    userPostImages = cursor.fetchall()
+    print('userpOST IMG', userPostImages)
+
+    userPosts= []
+    for item in userPostsT:
+        imgIndex = findImageIndex(item[2])
+        if imgIndex != -1:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": userPostImages[imgIndex][0]
+                }
+            )
+        else:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                }
+            )
+
+    userGroupPosts= []
+    for item in userGroupPostsT:
+        imgIndex = findImageIndex(item[2])
+        if imgIndex != -1:
+            userGroupPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": userPostImages[imgIndex][0]
+                }
+            )
+        else:
+            userGroupPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                }
+            )           
+
+    profileItems = (userFriends, userGroups, userPosts, userGroupPosts)
+
     cursor.close()
     conn.close()
 
@@ -707,7 +773,7 @@ def admin_user_profile(username):
 def admin_user_profile2(username):
     details = getUserProfileDetails(username)
     userDetails = details[0]
-    profileItems = (details[1][2], details[1][3])
+    profileItems = (details[1][0], details[1][1])
     return render_template('admin/admin_user_profile2.html', user=userDetails, profileItems=profileItems)
 
 @app.route('/admin/logout')
@@ -717,10 +783,6 @@ def admin_logout():
         session['adminLoggedOut'] = True
     return render_template(url_for('admin'))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 965f9741385c93432abe45c9fab79e48a9caaf84
 @app.after_request
 def add_header(response):
     """

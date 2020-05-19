@@ -923,9 +923,41 @@ adminGetUserPostDetails
 DELIMITER //
 CREATE PROCEDURE adminGetUserPostDetails(IN user_id_in INT)
 BEGIN
+SELECT profile.profile_img, CONCAT(`firstname`, ' ', `lastname`), post.post_id, post.post_location, post.time_stamp, post.content FROM profile JOIN userProfile JOIN create_post JOIN post ON profile.profile_id = userProfile.profile_id AND userProfile.user_id = create_post.user_id AND create_post.post_id = post.post_id WHERE create_post.user_id = user_id_in AND create_post.post_id NOT IN (SELECT group_post.post_id FROM group_post);
 END //
 
-CREATE PROCEDURE adminGetUserPostDetails(IN user_id_in INT)
+CREATE PROCEDURE adminGetUserPostImageDetails(in user_id_in INT)
 BEGIN
+SELECT post.post_id, images.file_name
+FROM create_post
+JOIN post
+JOIN contains
+JOIN images
+ON create_post.post_id = post.post_id
+AND post.post_id = contains.post_id
+AND contains.image_id = images.image_id
+WHERE create_post.user_id = user_id_in;
+END //
+
+DELIMITER //
+CREATE PROCEDURE adminGetUserGroupPostDetails(IN user_id_in INT)
+BEGIN
+    SELECT profile.profile_img,
+    CONCAT(`firstname`, ' ', `lastname`),
+    post.post_id, post.post_location,
+    post.time_stamp, post.content
+    FROM profile
+    JOIN userProfile
+    JOIN create_post
+    JOIN post
+    ON profile.profile_id = userProfile.profile_id
+    AND userProfile.user_id = create_post.user_id
+    AND create_post.post_id = post.post_id  
+    WHERE create_post.user_id = user_id_in
+    AND create_post.post_id
+    NOT IN (
+        SELECT group_post.post_id
+        FROM group_post
+        );
 END //
 DELIMITER ;

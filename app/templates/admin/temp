@@ -59,3 +59,8 @@
                 
             </div>
     </div>-->
+
+    {% with details = {"commenter":"John", "timestamp":"Thurs Apr 4, 2020", "text": "I am a girl"} %}
+    {% include "components/comment_input.html" %}
+{% endwith %}
+<!-- To do - add loop for comments-->

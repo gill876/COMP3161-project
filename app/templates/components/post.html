@@ -2,25 +2,16 @@
     <div class="post-header flex-row">
         <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg" alt="profile-photo"/>
         <div class="flex-column text-left text-capitalize">
-            <div class="post-poster-name">Jimmy Fallon</div>
-            <div class="post-timestamp"> Thurs Apr 4, 2019</div>
+            <div class="post-poster-name">{{poster}}</div>
+            <div class="post-location">{{location}}</div>
+            <div class="post-timestamp">{{timestamp}}</div>
         </div>
     </div>
-    <div class="post-content">
-
- 
- 
- 
-        <div> I love my life </div>
-
+    <div class="post-content"> 
+        <div>{{content}}</div>
+            {% if image %}
             <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg"/>
-
-        
-        <button class="btn-primary">Comment</button>
+            {% endif %}
     </div>
     <hr/>
-    {% with details = {"commenter":"John", "timestamp":"Thurs Apr 4, 2020", "text": "I am a girl"} %}
-        {% include "components/comment_input.html" %}
-    {% endwith %}
-    <!-- To do - add loop for comments-->
 </div>
