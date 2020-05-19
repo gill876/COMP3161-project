@@ -3,6 +3,7 @@
 {% block content %}
 
 <h2>Welcome to (What)</h2>
+
     <div class="usergroup_post">
 
         <form action= "{{ url_for('comment_group')}}" method="POST" enctype="multipart/form-data">
@@ -17,6 +18,7 @@
         </form>
     </div>
     <!-- Some sort of for loop to get multiple post from users-->
+    <!--Would be great if we got the like button to work -->
     <div class="card mb-8">
         <div class="card-body">
             <h3> Username </h3>

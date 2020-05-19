@@ -3,6 +3,10 @@
 {% block content %}
 
 <h2>Welcome to (What)</h2>
+<hr>
+        <button type="submit" name="submit" id="join_button" class="btn btn-primary btn-block">Join Group</button>
+   
+
     <div class="usergroup_post">
 
         <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">
@@ -31,9 +35,7 @@
             <hr>
             <p>
                 <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
-                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment
-                
-                </a>
+                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
                 <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
                 <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
             </p>
@@ -50,4 +52,4 @@
  
 
 
-{% endblock %}n
+{% endblock %}

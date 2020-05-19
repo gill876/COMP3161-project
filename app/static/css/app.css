@@ -153,8 +153,16 @@ body {
     padding: 2rem;
 }
 
-.group-search-results-button {
 
+
+#join_button{
+    width: 75px;
+    
+    
+}
+
+.userpost_button button{
+    width: 75px;
 }
 
 

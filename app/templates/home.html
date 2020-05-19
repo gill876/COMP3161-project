@@ -4,9 +4,55 @@
 
 {% block content %}
 <h2>Welcome Back: {{ session.username }}</h2>
-<p>Welcome back, {{ session['username'] }}!</p>
-<p>Welcome back, {{ session['id'] }}!</p>
-<p>Welcome back, {{ session.username }}!</p>
 
+
+<div class="row">
+    <div class="col-md-0">
+      <a href="#">
+       
+      </a>
+    </div>
+    <div class="col-md-5">
+      <h3>Search for Friends</h3>
+      <p>Go Where your Friends are. Go - Search .</p>
+      <a class="btn btn-primary" href="{{ url_for('friend_search') }}">Search Now</a>
+    </div>
+  </div>
+  <!-- /.row -->
+
+  <hr>
+
+  <!-- Project Two -->
+  <div class="row">
+    <div class="col-md-0">
+      <a href="#">
+        
+      </a>
+    </div>
+    <div class="col-md-5">
+      <h3>Make Posts</h3>
+      <p>Come and make some Memories with us. Share Moments, Share.
+          Post now
+    </p>
+      <a href="{{ url_for('profile') }}"><button class="btn btn-primary" >Go Post</button></a>
+    </div>
+  </div>
+  <!-- /.row -->
+
+  <hr>
+
+  <!-- Project Three -->
+  <div class="row">
+    <div class="col-md-0">
+      <a href="#">
+        <!-- <img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt=""> -->
+      </a>
+    </div>
+    <div class="col-md-5">
+      <h3>Make Groups</h3>
+      <p> Make Groups and add your friends. Share Moments, Share Groups.</p>
+      <a class="btn btn-primary" href="{{ url_for('create_group') }}">Make Group Now</a>
+    </div>
+  </div>
 
 {% endblock %}

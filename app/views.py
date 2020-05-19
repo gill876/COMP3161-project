@@ -15,19 +15,17 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm
 from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
 #from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
 from . import mysql
 
-# from app.models import UserProfile
+
 # from flask_bootstrap import Bootstrap
 ###
 # Routing for your application.
-###
-#mysql = MySQL(app)
 
 
 @app.route('/home')
@@ -54,8 +52,7 @@ def friend_search():
 
     return render_template('search.html')
 
-#reminder for neisha
-#add the stuff you forgot..
+
 @app.route("/", methods=["GET", "POST"])
 def login():
     msg=''
@@ -89,7 +86,7 @@ def login():
         elif data[0] == 'User does not exist': #MODIFY
             pass
         else:
-            return "fatal error" #MODIFY
+            flash('Username or password incorrect. Please try again.') #MODIFY
     return render_template("index.html", form=form,msg=msg)
 
 
@@ -195,6 +192,33 @@ def register():
             print("The account already exits")#MODIFY ADD APPROPRIATE RESPONSE
     return render_template('register.html', form=form)
 
+@app.route('/create/group',methods=["GET","POST"])
+def create_group():
+    form = GroupForm()
+    if request.method == "POST" and form.validate_on_submit():
+        groupname = form.groupname.data
+        description = form.description.data
+        
+        conn = mysql.connect()
+        cursor =conn.cursor()
+        # cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+        # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+        # data = cursor.fetchone()
+
+        # if data == None:
+        #     cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
+        #     conn.commit()
+        #     cursor.close()
+        #     conn.close()
+        return redirect(url_for('home'))
+
+
+    return render_template('create_group.html',form =form)      
+
+
+
+# @app.route('/updateprofile'/'<userid>')
+
 
 
 # @app.route('/updateprofile'/'<userid>')
@@ -298,9 +322,17 @@ def new_post():
          postphoto = form.postphoto.data 
 
     #conn = mysql.connect()
-    #cursor =conn.cursor()
+    #cursor = conn.cursor()
 
     return render_template('home.html',form=form)
+
+# @app.route('/gen_post', methods=["GET","POST"])
+# def gen_post():
+#     form = GeneralPostForm()
+#     if request.method =='POST' and form.validate_on_submit():
+#          content = form.content.data
+#          postphoto = form.postphoto.data 
+#     return render_template('genpost.html', form=form)
 
 
 @app.route("/groups", methods=['GET', 'POST'])
@@ -338,6 +370,8 @@ def groups():
     return render_template('groups.html', groups=groups)
 
 
+
+
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
     form = PostForm()
@@ -351,7 +385,19 @@ def usergroup():
 
 @app.route('/userpost_comment', methods=["GET", "POST"])
 def userpost_comment():
-    return render_template('userpost_comment.html')
+    form = UserPost_CommentForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        content_posted = form.content.data
+
+        return redirect( url_for('userpost_comment'))
+
+    return render_template('userpost_comment.html', form=form)
+
+
+
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
 
 
 # user_loader callback. This callback is used to reload the user object from
@@ -363,19 +409,6 @@ def load_user(id):
 
 ###
 # The functions below should be applicable to all Flask apps.
-###
-
-@app.route("/secure_page")
-@login_required
-def secure_page():    
-    return render_template('secure_page.html')
-    
-
-@app.route('/<file_name>.txt')
-def send_text_file(file_name):
-    """Send your static text file."""
-    file_dot_text = file_name + '.txt'
-    return app.send_static_file(file_dot_text)
 
 
 #Admin Routes
@@ -684,6 +717,10 @@ def admin_logout():
         session['adminLoggedOut'] = True
     return render_template(url_for('admin'))
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 965f9741385c93432abe45c9fab79e48a9caaf84
 @app.after_request
 def add_header(response):
     """
@@ -697,5 +734,5 @@ def add_header(response):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """Custom 404 page."""
+    """Custom 404 page.""" 
     return render_template('404.html'), 404

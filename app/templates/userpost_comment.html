@@ -11,19 +11,34 @@
       </div>
     </div>
 
+  <div class="card mb-8">
+    <div class="card-body">
+      <form action="{{ url_for('userpost_comment')}}" method="POST" enctype="multipart/form-data">
 
+        <div class="form-group">
+          {{ form.content.label }}
+          {{ form.content(class='form-control', placeholder="Whats your comment?") }}
+        </div>
 
-  <!--Somebody gonna have to for loop this from thr db-->
-    <div class="card mb-8">
-      <div class="Card-body">
-          <p> Username</p>
-          
+        <div class="userpost_button">
+          <button type="submit" name="submit" class="btn btn-primary btn-block">Post</button>
+        </div>
+
+      </form>
+      <hr>
+
+      <!-- another for loop to print out the users comments-->
+      <div class="card-mb-8">
+        <div class="card-body">
+          <h3>Username</h3>
+          <p>user's comment here</p>
+          <hr>
+           <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
+          <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit Comment</a>
+        </div>
       </div>
     </div>
+  </div>
 
- 
+{% endblock %}
 
-
-
-
-{% endblock%}
