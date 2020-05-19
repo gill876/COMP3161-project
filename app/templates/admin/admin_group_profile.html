@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container main-page-area">
+    <h2 class="admin-header">View User Details</h2>
+    <!--img src={{profile_image}})-->
+    <div class="admin-profile-header">
+        <img class="admin-profile-header-pic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRTB35OKWH3HGkEQBrD691tWO29m1YtVJSXzvU7lFRpgjy6RZvT&usqp=CAU"/>
+        <div class="admin-profile-user-details">
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Username</div>
+                <div class="admin-user-detail-value">{{user[0]}}</div>
+            </div>
+           <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Name</div>
+                <div class="admin-user-detail-value">{{user[1]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Gender</div>
+                <div class="admin-user-detail-value">{{user[2]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Friends</div>
+                <div class="admin-user-detail-value">{{user[3]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Groups</div>
+                <div class="admin-user-detail-value">{{user[4]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Group Posts</div>
+                <div class="admin-user-detail-value">{{user[7]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                    <div class="admin-user-detail-label">Posts</div>
+                     <div class="admin-user-detail-value">{{user[5]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Comments</div>
+                <div class="admin-user-detail-value">{{user[6]}}</div>
+            </div>
+        </div>
+        <div class="admin-profile-btn-container">
+            {% if view_posts %}
+                {% with text = "View Friends and Groups", on_submit_action = "" %}
+                    {% include "components/admin_profile_button.html" %}
+                {%  endwith %}
+            {% else %}
+                {% with text = "View Posts and Comments", on_submit_action = "" %}
+                    {% include "components/admin_profile_button.html" %}
+                {%  endwith %}
+            {% endif %}
+        </div>
+    </div>
+            <div class="admin-profile-boxes-container">        
+                    <div class="admin-profile-friend-table">
+                        <table class="table table-hover table-responsive-xl admin-profile-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Groups</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in profileItems[1] %}
+                                        <tr>
+                                            <td>{{row[0]}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                        </table>
+                    </div>
+                    <div class="admin-profile-friend-table">
+                        <table class="table table-hover table-responsive-xl admin-profile-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Friend</th>
+                                    <th scope="col">Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in profileItems[0] %}
+                                <tr>
+                                    <td><a href="{{url_for('admin_user_profile', username=row[0])}}">{{row[1]}}</a></td>
+                                    <td><a>{{row[2]}}</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        
+</div>
+
+{% endblock %}

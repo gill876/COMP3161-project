@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% set view_posts = False %}
+
+<div class="container main-page-area">
+    <h2 class="admin-header">View User Details</h2>
+    <!--img src={{profile_image}})-->
+    <div class="admin-profile-header">
+        <img class="admin-profile-header-pic"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRTB35OKWH3HGkEQBrD691tWO29m1YtVJSXzvU7lFRpgjy6RZvT&usqp=CAU" />
+        <div class="admin-profile-user-details">
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Username</div>
+                <div class="admin-user-detail-value">{{user[0]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Name</div>
+                <div class="admin-user-detail-value">{{user[1]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Gender</div>
+                <div class="admin-user-detail-value">{{user[2]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Friends</div>
+                <div class="admin-user-detail-value">{{user[3]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Groups</div>
+                <div class="admin-user-detail-value">{{user[4]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Group Posts</div>
+                <div class="admin-user-detail-value">{{user[7]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Posts</div>
+                <div class="admin-user-detail-value">{{user[5]}}</div>
+            </div>
+            <div class="admin-user-detail">
+                <div class="admin-user-detail-label">Comments</div>
+                <div class="admin-user-detail-value">{{user[6]}}</div>
+            </div>
+        </div>
+        <div class="admin-profile-btn-container">
+            <a class="btn-primary admin-menu-btn" href="{{url_for('admin_user_profile', username=user[0])}}">View Friends and Groups</a>
+        </div>
+    </div>
+    <div class="admin-profile-boxes-container">
+        <div class="post-box">
+            {% for post in profileItems[0] %}
+                <div>1</div>
+            {% endfor %}               
+        </div>
+        <div class="post-box">
+            {% for gp in profileItems[1] %}
+                <div class="comment-stream">1</div>
+            {% endfor %}               
+        </div>
+    </div>
+</div>
+{% endblock %}

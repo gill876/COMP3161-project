@@ -396,7 +396,7 @@ def admin():
                 session['adminLoggedIn'] = True
                 return redirect(url_for('admin_dashboard'))
             else:
-                flash('Username or password incorrect. Please try again.')          
+                flash('Username or password incorrect. Please try again.', 'error')          
 
             
     return render_template("admin/admin.html", form=form)
@@ -529,6 +529,7 @@ def admin_groups():
           
     return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
 
+
 ''' Admin Groups Search Page '''
 @app.route('/admin/groups/search', methods=["GET", "POST"])
 def admin_search_groups():
@@ -609,7 +610,72 @@ def admin_search_users():
 
     return render_template("admin/admin_search.html", form=form)
 
+''' Get User Profile Details '''
+def getUserProfileDetails(username):
+    conn = mysql.connect()
+    cursor = conn.cursor()
 
+    cursor.execute('CALL adminGetUserBioByUname(%s)', username)
+    userBio = cursor.fetchall()
+
+    cursor.execute('CALL getUserTotalPosts(%s)', int(userBio[0][0]))
+    userPostCount = cursor.fetchone()[0]
+
+    cursor.execute('CALL getUserTotalComments(%s)', int(userBio[0][0]))
+    userCommentCount = cursor.fetchone()[0]
+
+    cursor.execute('CALL numFriends(%s)', int(userBio[0][0]))
+    userFriendCount = cursor.fetchone()[0]
+
+    cursor.execute('CALL getUserTotalGroups(%s)', int(userBio[0][0]))
+    userGroupCount = cursor.fetchone()[0]
+
+    cursor.execute('CALL getUserTotalGroupPosts(%s)', int(userBio[0][0]))
+    userGroupPostCount = cursor.fetchone()[0]
+
+    userDetails = (userBio[0][1],
+               (userBio[0][2] + ' ' + userBio[0][3]),
+               userBio[0][4],
+               userPostCount,
+               userCommentCount,
+               userFriendCount,
+               userGroupCount,
+               userGroupPostCount)
+
+    cursor.execute('CALL adminGetUserFriends(%s)', int(userBio[0][0]))
+    userFriends = cursor.fetchall()
+
+    cursor.execute('CALL adminUserGroups(%s)', int(userBio[0][0]))
+    userGroups = cursor.fetchall()
+
+    cursor.execute('CALL adminGetUserPostDetails(%s)', int(userBio[0][0]))
+    userFriends = cursor.fetchall()
+
+    cursor.execute('CALL adminGetUserGroupPostDetails(%s)', int(userBio[0][0]))
+    userFriends = cursor.fetchall()
+
+    profileItems = (userFriends, userGroups)
+    cursor.close()
+    conn.close()
+
+    return(userDetails, profileItems) 
+
+
+''' Admin User Profile View 1 '''
+@app.route("/admin/users/profile/<username>")
+def admin_user_profile(username):
+    details = getUserProfileDetails(username)
+    userDetails = details[0]
+    profileItems = (details[1][0], details[1][1])
+    return render_template('admin/admin_user_profile.html', user=userDetails, profileItems=profileItems)
+
+''' Admin User Profile View 2 '''
+@app.route("/admin/users/profile/2/<username>")
+def admin_user_profile2(username):
+    details = getUserProfileDetails(username)
+    userDetails = details[0]
+    profileItems = (details[1][2], details[1][3])
+    return render_template('admin/admin_user_profile2.html', user=userDetails, profileItems=profileItems)
 
 @app.route('/admin/logout')
 def admin_logout():

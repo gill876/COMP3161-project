@@ -24,6 +24,7 @@
                     <th scope="col">Username</th>
                     <th scope="col">Firstname</th>
                     <th scope="col">Lastname</th>
+                    <th scope="col">Gender</th>
                     <th scope="col">Post</th>
                     <th scope="col">Comments</th>
                     <th scope="col">Friends</th>
@@ -32,14 +33,15 @@
                 </thead>
                 <tbody>
                     {% for person in users %}
-                    <tr onclick=''>
-                        <td>{{person[0][0]}}</td>
-                        <td>{{person[0][1]}}</td>
-                        <td>{{person[0][2]}}</td>
-                        <td>{{person[1][0]}}</td>
-                        <td>{{person[2][0]}}</td>
-                        <td>{{person[3][0]}}</td>
-                        <td>{{person[4][0]}}</td>
+                <tr class="results-row">
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[0][0]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[0][1]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[0][2]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[0][3]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[1][0]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[2][0]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[3][0]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0][0])}}">{{person[4][0]}}</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

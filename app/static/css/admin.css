@@ -17,34 +17,35 @@
     padding-right: 10%;
     width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
 .admin-menu-btn {
-    flex: 1 0 40%;
-    margin: 20px;
+    margin: 20px 30px;
     border-radius: 6px;
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     -ms-border-radius: 6px;
     -o-border-radius: 6px;
     font-weight: 400;
-    color: #FAFAF7;
-    background-color: #9AD0E0;
+    color: #fff;
+    background-color: #279FC3;
     border: 1px solid #279FC3;
     height: 40px;
+    width: 250px;
 }
 
 .admin-menu-btn:hover {
-    border: 1px solid #279FC3;
     background-color: #279FC3;
+    border: 1px solid #279FC3;
+    color: #fff;
     font-weight: bold;
 }
 
 .admin-card {
-    background-color:  #279FC3;
-    border: 2px solid #707070;
+    background-color:  #fff;
+    border: 1px solid #043443;
     flex: 1 0 40%;
     border-radius: 15px;
     -webkit-border-radius: 15px;
@@ -58,13 +59,13 @@
     padding: 15px 0 !important;
     font-size: 4rem !important;
     font-weight: bold;
-    color: #F4EED7 !important;
+    color: #043443 !important;
     justify-content: center;
     display: flex !important;
 }
 
 .admin-stat-card-label {
-    color: #F4EED7;
+    color: #043443;
     justify-content: center;
     display: flex !important;
     font-size: 2rem !important;
@@ -117,7 +118,7 @@
     background-color: #279FC3;
     border: 1px solid #279FC3;
     height: 40px;
-    width: 200px;
+    width: 250px;
 }
 
 .admin-search-btn:hover {
@@ -186,6 +187,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
+}
+
+.admin-search-results-table thead tr th {
+    text-align: center;
 }
 
 .admin-search-results-table.truncate {
@@ -233,7 +239,9 @@
 
 .admin-profile-btn-container {
     display: flex;
-    justify-content: center;
+    flex: 40%;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
 }
 
@@ -359,3 +367,154 @@
     max-width: 28%;
 }
 
+.content .admin-users-page h2 .admin-header {
+    font-size: 3rem !important;
+    border-bottom: none !important;
+}
+
+.admin-users-page h2, .admin-groups-page h2, .amin-page-area h2 {
+    border-bottom: none;
+    font-size: 3rem;
+}
+
+.results-row td a {
+    text-decoration: none;
+    color: #161613;
+}
+
+.results-row td a:hover {
+    text-decoration: none;
+    color: #161613;
+}
+
+.admin-profile-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.admin-profile-user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 30%;
+}
+
+.admin-user-detail {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-user-detail-value {
+    margin-left: 5px;
+    text-align: left;
+    flex: 50%;
+}
+
+.admin-user-detail-label {
+    margin-right: 5px;
+    text-align: right;
+    flex: 50%;
+    font-weight: bold;
+}
+
+.admin-profile-header-pic {
+    display: flex;
+    align-self: flex-start;
+    flex: 29%;
+    max-width: 250px;
+    max-height: 250px;
+}
+
+.admin-profile-btn-container {
+    display: flex;
+    flex: 29%;
+    align-items: center;
+    justify-content: center;;
+}
+
+.admin-profile-boxes-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 4rem;
+}
+
+.admin-profile-friend-table {
+    display: flex;
+    flex: 47%;
+    text-align: center;
+}
+
+.admin-profile-friend-table th {
+    text-align: center;
+}
+
+.admin-profile-friend-table a {
+    color: #161613;
+    text-decoration: none;
+}
+
+.admin-profile-friend-table a:hover {
+    color: #161613;
+    text-decoration: none;
+}
+
+.admin-profile-friend-table a:link {
+    color: #161613;
+    text-decoration: none;
+}
+
+.admin-profile-friend-table a:visited {
+    color: #161613;
+    text-decoration: none;
+}
+
+.admin-profile-btn-container a {
+    padding-top: 8px;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff !important;
+    border: 1px solid #279FC3;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.admin-profile-btn-container a:hover {
+    color: #fff !important;
+    background-color: #279FC3;
+    border: 1px solid #279FC3;
+    text-decoration: none;
+}
+
+
+.admin-profile-btn-container a:after {
+    background-color: #279FC3;
+    border: 1px solid #279FC3;
+    text-decoration: none;
+}
+
+.admin-profile-btn-container a:link {
+    background-color: #279FC3;
+    border: 1px solid #279FC3;
+    text-decoration: none;
+}
+
+.admin-profile-btn-container a:visited {
+    background-color: #279FC3;
+    border: 1px solid #279FC3;
+    text-decoration: none;
+}
+
+.admin-profile-btn-container a:active {
+    background-color: #279FC3;
+    border: 1px solid #279FC3;
+    text-decoration: none;
+}
