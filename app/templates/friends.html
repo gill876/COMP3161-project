@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container main-page-area">
+    <h2 class="admin-header">Find Friends</h2>
+    <hr class="divider" />
+    <div class="admin-search-results-container">
+        {% if results %}
+        <div class="admin-search-results-container">
+            <table class="table table-hover table-responsive-xl admin-search-results-table">
+                <tbody>
+                    {% for person in results %}
+                    <form method="POST" action="{{url_for('add_friend', id=person[0])}}" enctype="multipart/
+                    form-data">
+                    <tr>
+                        <td scope="col">{{person[1]}} {{person[2]}}</td>
+                        <td scope="col">{{form.ftype(class="form-control")}}</td>
+                        <td scope="col">{{form.submitBtn(class="admin-search-btn")}}</td>
+                    </tr>
+                    </form>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if results == [] %}
+        <div> Noone else is here. Tell a friend to signup</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
