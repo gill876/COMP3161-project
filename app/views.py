@@ -335,17 +335,17 @@ def create_group():
         groupname = form.groupname.data
         description = form.description.data
         
-        # conn = mysql.connect()
-        # cursor =conn.cursor()
-        # cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        # data = cursor.fetchone()
+        conn = mysql.connect()
+        cursor =conn.cursor()
+        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+        cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+        data = cursor.fetchone()
 
-        # if data == None:
-        #     cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
-        #     conn.commit()
-        #     cursor.close()
-        #     conn.close()
+        if data == None:
+            cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
+            conn.commit()
+            cursor.close()
+            conn.close()
         # return redirect(url_for('home'))
 
         return redirect(url_for('groups'))
