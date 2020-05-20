@@ -62,3 +62,7 @@ class GroupForm(FlaskForm):
     
      groupname=StringField('Group Name',validators=[InputRequired(message='A Group Name is required')])
      description = TextAreaField('Description',validators=[InputRequired(message='Need a description of Group')])
+
+class FriendForm(FlaskForm):
+    ftype=SelectField('', choices=[('WORK','Work'),('SCHOOL','School'),('RELATIVE', 'Relative')])
+    submitBtn = SubmitField('Add Friend')

@@ -16,7 +16,7 @@ from mysql.connector import errorcode,connection
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash,session
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm
+from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm, FriendForm
 from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
 #from flask_mysqldb import MySQL
@@ -523,11 +523,63 @@ def usergroup():
     
     return render_template('usergroup.html',form=form)
 
+
+def isFriend(friends, userid):
+    for i in friends:
+        if i[0] == userid:
+            return True
+    return False
+
+@app.route('/find/friends', methods=["GET", "POST"])
+def find_friends():
+    if 'loggedin' in session:
+        form = FriendForm()
+        
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute('CALL adminUserBio')
+        bioData = cursor.fetchall()
+        results = bioData
+
+        cursor.close()
+        conn.close()
+        print(bioData)
+        
+        return render_template('friends.html', results=results, form=form )
+    return redirect (url_for('login'))
+
+@app.route('/add/friend/<id>', methods=["GET", "POST"])
+def add_friend(id):
+    if 'loggedin' in session:
+        form = FriendForm()
+        
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        if request.method == "POST":
+            print(form.ftype.data)
+            print(form)
+            ftype = form.ftype.data
+            cursor.execute('CALL adminGetUserBioByUname(%s)', id)
+            newId = cursor.fetchone()[0]
+
+            print('newId', newId)
+            cursor.execute('call addFriend(%s, %s, %s)', (int(session['id']), newId, ftype))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+        
+        return redirect(url_for('home'))
+    return redirect (url_for('login'))
+
+
 @app.route('/userpost_comment/<post_id>', methods=["GET", "POST"])
 def userpost_comment(post_id):
 
     if 'loggedin' in session:
         form = UserPost_CommentForm()
+        print('post if', post_id)
 
         if request.method == "POST" and form.validate_on_submit():
             content_posted = form.content.data
