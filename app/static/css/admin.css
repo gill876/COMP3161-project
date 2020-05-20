@@ -258,7 +258,7 @@
     overflow-y: scroll;
     justify-content: space-between;
     align-items: center;
-    margin: 20px 10px 20px 0;
+    margin: 0 10px 20px 0;
 }
 
 .comment-stream {
@@ -436,7 +436,6 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    margin-top: 4rem;
 }
 
 .admin-profile-friend-table {
@@ -565,4 +564,12 @@
     padding-left: 10px;
     padding-top: 10px;
     font-size: 1.3rem;
+}
+
+.admin-posts-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 4rem;
 }

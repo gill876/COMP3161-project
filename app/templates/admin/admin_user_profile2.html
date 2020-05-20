@@ -47,6 +47,11 @@
             <a class="btn-primary admin-menu-btn" href="{{url_for('admin_user_profile', username=user[0])}}">View Friends and Groups</a>
         </div>
     </div>
+    <div class="admin-posts-header" style="font-weight: bold; font-size: 2rem;">
+        <div>Profile Posts</div>
+        <div> </div>
+        <div>Group Posts</div>
+    </div>
     <div class="admin-profile-boxes-container">
         <div class="post-box">
             {% for post in profileItems[0] %}
