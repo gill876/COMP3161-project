@@ -8,19 +8,20 @@
         <form action= "{{ url_for('create_group')}}" method="POST" enctype="multipart/form-data">
 
             <div class="form-group">
-                {{ form.groupname.label }}
-                {{ form.groupname(class='form-control', placeholder="Enter the name of the Group") }}
+              {{ form.groupname.label }}
+              {{ form.groupname(class='form-control', placeholder="Enter the name of the Group") }}
               </div>
-              <div class="form-group">
-                {{ form.description.label }}
-                {{ form.description(class='form-control', placeholder="Enter description of Group") }}
-              </div>
+            <div class="form-group">
+              {{ form.description.label }}
+              {{ form.description(class='form-control', placeholder="Enter description of Group") }}
+            </div>
 
             <div class="userpost_button">
-                <button type="submit" name="submit" class="btn btn-primary btn-block">Create Group</button>
+             <a href="{{ url_for('groups') }}"></a> 
+            <button type="submit" name="submit" class="btn btn-primary btn-block">Create Group</button>
             </div>
 
         </form>
-
+    </div>
 
 {% endblock %}
