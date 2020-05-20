@@ -18,7 +18,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm
 from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
-#from flask_mysqldb import MySQL
+from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
 from . import mysql
 
@@ -199,8 +199,8 @@ def create_group():
         groupname = form.groupname.data
         description = form.description.data
         
-        conn = mysql.connect()
-        cursor =conn.cursor()
+        # conn = mysql.connect()
+        # cursor =conn.cursor()
         # cursor.execute('CALL userDetails(%s)', (int(session['id']),))
         # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
         # data = cursor.fetchone()
@@ -210,7 +210,9 @@ def create_group():
         #     conn.commit()
         #     cursor.close()
         #     conn.close()
-        return redirect(url_for('home'))
+        # return redirect(url_for('home'))
+
+        return redirect(url_for('groups'))
 
 
     return render_template('create_group.html',form =form)      
@@ -389,6 +391,8 @@ def userpost_comment():
 
     if request.method == "POST" and form.validate_on_submit():
         content_posted = form.content.data
+
+        #connect to db
 
         return redirect( url_for('userpost_comment'))
 
