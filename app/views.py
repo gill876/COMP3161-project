@@ -332,25 +332,32 @@ def register():
 @app.route('/create/group',methods=["GET","POST"])
 def create_group():
     form = GroupForm()
-    if request.method == "POST" and form.validate_on_submit():
-        groupname = form.groupname.data
-        description = form.description.data
-        
-        conn = mysql.connect()
-        cursor =conn.cursor()
-        # cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        # data = cursor.fetchone()
 
-        # if data == None:
-        #     cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
-        #     conn.commit()
-        #     cursor.close()
-        #     conn.close()
-        return redirect(url_for('home'))
+    print("Entered create group")
+    if request.method == "POST":
+        print("***method is post***")
+        form.groupname.data = request.form['groupname']
+        form.description.data = request.form['description']
+        if request.form['description'] != "" and request.form['groupname'] !="":
+            print("Form is received")
+            groupname = form.groupname.data
+            description = form.description.data
+            
+            conn = mysql.connect()
+            cursor =conn.cursor()
+            #cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+            # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+            # data = cursor.fetchone()
+
+            # if data == None:
+            cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(url_for('home'))
 
 
-    return render_template('create_group.html',form =form)      
+    return render_template('create_group.html',form=form)      
 
 
 # @app.route('/updateprofile'/'<userid>')
