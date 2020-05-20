@@ -1,6 +1,6 @@
 <div class="card post">
-    <div class="post-header flex-row">
-        <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg" alt="profile-photo"/>
+    <div class="post-header">
+        <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg" class="post-photo" alt="profile-photo" width="50" height="50"/>
         <div class="flex-column text-left text-capitalize">
             <div class="post-poster-name">{{poster}}</div>
             <div class="post-location">{{location}}</div>
@@ -9,9 +9,8 @@
     </div>
     <div class="post-content"> 
         <div>{{content}}</div>
-            {% if image %}
-            <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg"/>
+            {% if not (image == "") %}
+                <img src="https://gpluseurope.com/wp-content/uploads/Mauro-profile-picture.jpg" class="post-content-photo"/>
             {% endif %}
     </div>
-    <hr/>
 </div>

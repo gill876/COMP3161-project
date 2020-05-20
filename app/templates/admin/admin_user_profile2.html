@@ -50,13 +50,27 @@
     <div class="admin-profile-boxes-container">
         <div class="post-box">
             {% for post in profileItems[0] %}
-                <div>1</div>
+                {% with poster=post.poster,
+                        location=post.location,
+                        timestamp=post.timestamp,
+                        content=post.content,
+                        image=post.image
+                %}
+                {% include 'components/admin_post.html' %}
+                {% endwith %}
             {% endfor %}               
         </div>
         <div class="post-box">
-            {% for gp in profileItems[1] %}
-                <div class="comment-stream">1</div>
-            {% endfor %}               
+            {% for post in profileItems[1] %}
+                {% with poster=post.poster,
+                        location=post.location,
+                        timestamp=post.timestamp,
+                        content=post.content,
+                        image=post.image
+                %}
+                {% include 'components/admin_post.html' %}
+                {% endwith %}
+            {% endfor %}
         </div>
     </div>
 </div>

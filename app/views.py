@@ -469,182 +469,192 @@ def admin_dashboard():
 ''' Admin View User Page '''
 @app.route("/admin/users")
 def admin_users():
-    conn = mysql.connect()
-    cursor = conn.cursor()
+    if session['adminLoggedIn'] == True:
+        conn = mysql.connect()
+        cursor = conn.cursor()
 
-    cursor.execute('CALL adminUserBio')
-    bioData = cursor.fetchall()
+        cursor.execute('CALL adminUserBio')
+        bioData = cursor.fetchall()
 
-    cursor.execute('CALL adminUserPostTotals')
-    postTotals = cursor.fetchall()
+        cursor.execute('CALL adminUserPostTotals')
+        postTotals = cursor.fetchall()
 
-    cursor.execute('CALL adminUserFriendTotals')
-    friendTotals = cursor.fetchall()
+        cursor.execute('CALL adminUserFriendTotals')
+        friendTotals = cursor.fetchall()
 
-    cursor.execute('CALL adminUserGroupTotals')
-    groupTotals = cursor.fetchall()
+        cursor.execute('CALL adminUserGroupTotals')
+        groupTotals = cursor.fetchall()
 
-    cursor.execute('CALL adminUserCommentTotals')
-    commentTotals = cursor.fetchall()
+        cursor.execute('CALL adminUserCommentTotals')
+        commentTotals = cursor.fetchall()
 
-    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="FEMALE"')
-    females = cursor.fetchone()
+        cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="FEMALE"')
+        females = cursor.fetchone()
 
-    cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="MALE"')
-    males = cursor.fetchone()
+        cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="MALE"')
+        males = cursor.fetchone()
 
-    cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
-    totalUsers = cursor.fetchone()
+        cursor.execute('SELECT COUNT(user_id) AS user_amt FROM userProfile')
+        totalUsers = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
+        cursor.close()
+        conn.close()
     
-    users = zip(bioData, postTotals, friendTotals, groupTotals, commentTotals)
+        users = zip(bioData, postTotals, friendTotals, groupTotals, commentTotals)
 
-    stats = [
-        {
-            "value": totalUsers[0],
-            "label": "Total Users"
-        },
-        {
-            "value": females[0],
-            "label": "Total Female Users"
-        },
-        {
-            "value": males[0],
-            "label": "Total Male Users"
-        },
-    ]
+        stats = [
+            {
+                "value": totalUsers[0],
+                "label": "Total Users"
+            },
+            {
+                "value": females[0],
+                "label": "Total Female Users"
+            },
+            {
+                "value": males[0],
+                "label": "Total Male Users"
+            },
+        ]
             
-    return render_template("admin/admin_user_report.html", stats=stats, users=users)
+        return render_template("admin/admin_user_report.html", stats=stats, users=users)
+
+    return redirect(url_for('admin'))
 
 
 ''' Admin View Groups Page '''
 @app.route("/admin/groups")
 def admin_groups():
-    conn = mysql.connect()
-    cursor = conn.cursor()
+    if session['adminLoggedIn'] == True:
+        conn = mysql.connect()
+        cursor = conn.cursor()
 
-    cursor.execute('CALL adminGroupName')
-    groupNames = cursor.fetchall()
-    #print(groupNames)
+        cursor.execute('CALL adminGroupName')
+        groupNames = cursor.fetchall()
+        #print(groupNames)
 
-    cursor.execute('CALL adminGroupCreatorByUserId')
-    creators = cursor.fetchall()
-    #print(creators)
+        cursor.execute('CALL adminGroupCreatorByUserId')
+        creators = cursor.fetchall()
+        #print(creators)
 
-    cursor.execute('CALL getGrpTotalMembers')
-    grpTotals = cursor.fetchall()
-    #print(grpTotals)
+        cursor.execute('CALL getGrpTotalMembers')
+        grpTotals = cursor.fetchall()
+        #print(grpTotals)
 
-    cursor.execute('SELECT COUNT(group_id) FROM user_group')
-    grpTotal = cursor.fetchone()
-    #print(grpTotal)
+        cursor.execute('SELECT COUNT(group_id) FROM user_group')
+        grpTotal = cursor.fetchone()
+        #print(grpTotal)
 
-    '''cursor.execute('SELECT COUNT(profile_id) FROM profile WHERE gender="Male"')
-    males = cursor.fetchone()'''
+        cursor.close()
+        conn.close()
 
-    cursor.close()
-    conn.close()
+        groups = zip(groupNames, creators, grpTotals)
 
-    groups = zip(groupNames, creators, grpTotals)
-
-    stats = [
-        {
-            "value": grpTotal[0],
-            "label": "Total Groups"
-        },
-        {
-            "value": 234,
-            "label": "Total Group Posts"
-        },
-    ]
+        stats = [
+            {
+                "value": grpTotal[0],
+                "label": "Total Groups"
+            },
+            {
+                "value": 234,
+                "label": "Total Group Posts"
+            },
+        ]
           
-    return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
+        return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
+
+    return redirect(url_for('admin'))
 
 
 ''' Admin Groups Search Page '''
 @app.route('/admin/groups/search', methods=["GET", "POST"])
 def admin_search_groups():
-    form = AdminSearchForm()
+
+    if session['adminLoggedIn'] == True: 
     
-    if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
+        if request.method == "POST" and form.validate_on_submit():
+            form = AdminSearchForm()
+            search_value = form.searchTerm.data
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-        cursor.execute('CALL adminSearchGroup(%s)', (search_value.strip()))
-        groupList = cursor.fetchall()
-        print(groupList)
+            cursor.execute('CALL adminSearchGroup(%s)', (search_value.strip()))
+            groupList = cursor.fetchall()
+            #print(groupList)
 
-        results = []
-        for group in groupList:
-            groupId = group[0]
+            results = []
+            for group in groupList:
+                groupId = group[0]
 
-            cursor.execute('CALL groupTotalPosts(%s)', int(groupId))
-            groupPosts = cursor.fetchone()[0]
-            print(groupPosts)
+                cursor.execute('CALL groupTotalPosts(%s)', int(groupId))
+                groupPosts = cursor.fetchone()[0]
+                print(groupPosts)
 
-            cursor.execute('CALL groupTotalMembers(%s)', int(groupId))
-            print(groupId)
-            groupMembers = cursor.fetchone()[0]
+                cursor.execute('CALL groupTotalMembers(%s)', int(groupId))
+                print(groupId)
+                groupMembers = cursor.fetchone()[0]
 
-            cursor.execute('CALL groupCreator(%s)', int(groupId))
-            creator = cursor.fetchone()[0]
+                cursor.execute('CALL groupCreator(%s)', int(groupId))
+                creator = cursor.fetchone()[0]
             
-            results.append((group[1], creator, group[2], groupPosts, groupMembers))
-        print(results)
+                results.append((group[1], creator, group[2], groupPosts, groupMembers))
+                #print(results)
         
-        cursor.close()
-        conn.close()
+            cursor.close()
+            conn.close()
 
-        return render_template("admin/admin_search_groups.html", form=form, results=results) 
+            return render_template("admin/admin_search_groups.html", form=form, results=results) 
 
-    return render_template("admin/admin_search_groups.html", form=form)
+        return render_template("admin/admin_search_groups.html", form=form)
+    
+    return redirect(url_for('admin'))
 
 
 ''' Admin Search Users Page '''
 @app.route("/admin/user/search", methods=["GET", "POST"])
 def admin_search_users():
-    form = AdminSearchForm()
-    
-    if request.method == "POST" and form.validate_on_submit():
-        search_value = form.searchTerm.data
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+    if session['adminLoggedIn'] == True:    
+        if request.method == "POST" and form.validate_on_submit():
+            form = AdminSearchForm()
+            search_value = form.searchTerm.data
 
-        cursor.execute('CALL adminGetUserBio(%s)', (search_value.strip()))
-        userList = cursor.fetchall()
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-        results = []
-        for user in userList:
-            userId = user[0]
+            cursor.execute('CALL adminGetUserBio(%s)', (search_value.strip()))
+            userList = cursor.fetchall()
 
-            cursor.execute('CALL getUserTotalPosts(%s)', int(userId))
-            userPosts = cursor.fetchone()[0]
+            results = []
+            for user in userList:
+                userId = user[0]
 
-            cursor.execute('CALL getUserTotalComments(%s)', int(userId))
-            userComments = cursor.fetchone()[0]
+                cursor.execute('CALL getUserTotalPosts(%s)', int(userId))
+                userPosts = cursor.fetchone()[0]
 
-            cursor.execute('CALL getUserTotalFriends(%s)', int(userId))
-            userFriends = cursor.fetchone()[0]
+                cursor.execute('CALL getUserTotalComments(%s)', int(userId))
+                userComments = cursor.fetchone()[0]
 
-            cursor.execute('CALL getUserTotalGroups(%s)', int(userId))
-            userGroups = cursor.fetchone()[0]
+                cursor.execute('CALL getUserTotalFriends(%s)', int(userId))
+                userFriends = cursor.fetchone()[0]
 
-            results.append((user[1], user[2], user[3], userPosts, userComments, userFriends, userGroups))        
+                cursor.execute('CALL getUserTotalGroups(%s)', int(userId))
+                userGroups = cursor.fetchone()[0]
 
-        cursor.close()
-        conn.close()
+                results.append((user[1], user[2], user[3], userPosts, userComments, userFriends, userGroups))        
 
-        return render_template("admin/admin_search.html", form=form, results=results) 
+            cursor.close()
+            conn.close()
 
-    return render_template("admin/admin_search.html", form=form)
+            return render_template("admin/admin_search.html", form=form, results=results) 
+
+        return render_template("admin/admin_search.html", form=form)
+
+    return redirect(url_for('admin'))
 
 
-def findImageIndex(postId):
+def findImageIndex(postId, imageList):
     for i in range(len(imageList)):
         if (imageList[i][0] == postId):
             return i
@@ -652,6 +662,7 @@ def findImageIndex(postId):
 
 ''' Get User Profile Details '''
 def getUserProfileDetails(username):
+
     conn = mysql.connect()
     cursor = conn.cursor()
 
@@ -684,27 +695,27 @@ def getUserProfileDetails(username):
 
     cursor.execute('CALL adminGetUserFriends(%s)', int(userBio[0][0]))
     userFriends = cursor.fetchall()
-    print('userFriends', userFriends)
+    #print('userFriends', userFriends)
 
     cursor.execute('CALL adminUserGroups(%s)', int(userBio[0][0]))
     userGroups = cursor.fetchall()
-    print('userGroups', userGroups)
+    #print('userGroups', userGroups)
 
     cursor.execute('CALL adminGetUserPostDetails(%s)', int(userBio[0][0]))
     userPostsT = cursor.fetchall()
-    print('userPosts', userPosts)
+    #print('userPosts', userPostsT)
 
     cursor.execute('CALL adminGetUserGroupPostDetails(%s)', int(userBio[0][0]))
     userGroupPostsT = cursor.fetchall()
-    print('usergRP pOST', userGroupPosts)
+    #print('usergRP pOST', userGroupPostsT)
 
     cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userBio[0][0]))
     userPostImages = cursor.fetchall()
-    print('userpOST IMG', userPostImages)
+    #print('userpOST IMG', userPostImages)
 
     userPosts= []
     for item in userPostsT:
-        imgIndex = findImageIndex(item[2])
+        imgIndex = findImageIndex(item[2], userPostImages)
         if imgIndex != -1:
             userPosts.append(
                 {
@@ -724,12 +735,13 @@ def getUserProfileDetails(username):
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
                     "content": item[5],
+                    "image": ""
                 }
             )
 
     userGroupPosts= []
     for item in userGroupPostsT:
-        imgIndex = findImageIndex(item[2])
+        imgIndex = findImageIndex(item[2], userPostImages)
         if imgIndex != -1:
             userGroupPosts.append(
                 {
@@ -749,32 +761,42 @@ def getUserProfileDetails(username):
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
                     "content": item[5],
+                    "image": ""
                 }
-            )           
+            )
+
+    #print(userPosts)
+    #print('next')
+    #print(userGroupPosts)         
 
     profileItems = (userFriends, userGroups, userPosts, userGroupPosts)
 
     cursor.close()
     conn.close()
 
-    return(userDetails, profileItems) 
+    return (userDetails, profileItems)
+    
 
 
 ''' Admin User Profile View 1 '''
 @app.route("/admin/users/profile/<username>")
 def admin_user_profile(username):
-    details = getUserProfileDetails(username)
-    userDetails = details[0]
-    profileItems = (details[1][0], details[1][1])
-    return render_template('admin/admin_user_profile.html', user=userDetails, profileItems=profileItems)
+    if session['adminLoggedIn'] == True: 
+        details = getUserProfileDetails(username)
+        userDetails = details[0]
+        profileItems = (details[1][0], details[1][1])
+        return render_template('admin/admin_user_profile.html', user=userDetails, profileItems=profileItems)
+    return redirect(url_for('admin'))
 
 ''' Admin User Profile View 2 '''
 @app.route("/admin/users/profile/2/<username>")
 def admin_user_profile2(username):
-    details = getUserProfileDetails(username)
-    userDetails = details[0]
-    profileItems = (details[1][0], details[1][1])
-    return render_template('admin/admin_user_profile2.html', user=userDetails, profileItems=profileItems)
+    if session['adminLoggedIn'] == True: 
+        details = getUserProfileDetails(username)
+        userDetails = details[0]
+        profileItems = (details[1][2], details[1][3])
+        return render_template('admin/admin_user_profile2.html', user=userDetails, profileItems=profileItems)
+    return redirect(url_for('admin'))
 
 @app.route('/admin/logout')
 def admin_logout():
