@@ -1,10 +1,10 @@
-{% extends 'layout.html'%}
+{% extends 'layout.html' %}
 
 {% block content %}
 
      <div class="gen_post">
-
-        <form action= "{{ url_for('gen_post')}}" method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('gen_post') }}" enctype="multipart/form-data">
+            {{ form.csrf_token }}
 
             <div class="form-group">
                 {{ form.content.label }}
@@ -12,8 +12,16 @@
             </div>
 
             <div class="form-group">
+                {{ form.location.label }}
+                {{ form.location(class='form-control', placeholder="Where are you posting from") }}
+            </div>
+
+            <div class="form-group">
                 {{ form.postphoto.label }}
                 {{ form.postphoto(class='form-control') }}
             </div>
+            {{ form.submitBtn(class="btn btn-secondary") }}
+        </form>
+    </div>
 
 {% endblock %}

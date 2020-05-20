@@ -1,15 +1,11 @@
 <div class="card comment">
     <div class="comment-header text-left text-capitalize flex-column"></div>
-            <div class="comment-commenter-name">{{ commenter }}Jimmy Fallon</div>
-            <div class="comment-timestamp">{{ timestamp }} Thurs Apr 4, 2019</div>
+            <div class="comment-commenter-name">{{ comment.commenter }}</div>
+            <div class="comment-timestamp">{{ comment.location }}</div>
+            <div class="comment-timestamp">{{ comment.timestamp }}</div>
         </div>
     </div>
     <div class="comment-content">
-
-        {% if text %}
-            <div>{{text}}</div>
-        {% endif %}
-        <div> I love my life </div>
-
+            <div>{{ comment.text }}</div>
     </div>
 </div>

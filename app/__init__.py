@@ -43,7 +43,8 @@ mysql.init_app(app)
 
 #adding images to respective folders
 
-app.config["PROFILEPHOTO_FOLDER"] ='./app/static/profileimages'
+app.config["PROFILEPHOTO_FOLDER"] = './app/static/profileimages'
+app.config["POSTSPHOTO_FOLDER"] = './app/static/postimages'
 
 # IMAGE_UPLOAD_FOLDER= './app/static/userprofileimages'
 

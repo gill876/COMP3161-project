@@ -10,6 +10,7 @@ import uuid
 import datetime 
 import MySQLdb.cursors
 import re
+import datetime
 import mysql.connector
 from mysql.connector import errorcode,connection
 from app import app, login_manager
@@ -30,8 +31,15 @@ from . import mysql
 
 @app.route('/home')
 def home():
+    form = UserPost_CommentForm()
     if 'loggedin' in session:
-        return render_template('home.html',username=session['username'])
+        userProfileDetails = getProfileDetails(session['id'])
+        friends = getUserFriends(session['id'])
+        postDetails = getUserProfilePostDetails(session['id'])
+        groups = getUserGroupDetails(session['id'])
+
+        return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form)
+        
     return redirect(url_for('login'))
 
 @app.route('/search',methods=['GET','POST'])
@@ -99,54 +107,182 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+def getUserFriends(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminGetUserFriends(%s)', int(userId))
+    allFriends = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    relatives = []
+    schoolFriends = []
+    workFriends = []
+
+    print(allFriends)
+
+    for fr in allFriends:
+        if fr[2] == "RELATIVE":
+            relatives.append(fr)
+        elif fr[2] == "WORK":
+            workFriends.append(fr)
+        else:
+            schoolFriends.append(fr)
+
+    return (relatives, schoolFriends, workFriends)
+
+def getProfileDetails(userId):
+    conn= mysql.connect()
+    cursor =conn.cursor()
+
+    cursor.execute('CALL userDetails(%s)', int(userId))
+    data = cursor.fetchone()
+  
+    username = data[0]
+    email_address = data[1]
+    datejoined = data[2]
+    firstname = data[3]
+    lastname = data[4]
+    profile_img = data[5]
+    friends = data[6]
+    biography = data[7]
+    gender = data[8]
+
+    year = datejoined.year
+    month = datejoined.strftime("%B")
+    day = datejoined.day
+
+    cursor.close()
+    conn.close()
+
+    finalDets = (username, email_address, datejoined.strftime("%m/%d/%Y"), firstname, lastname, profile_img, friends, biography, gender)
+
+    return finalDets
+
+def getProfileTotals(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL getUserTotalPosts(%s)', int(userId))
+    totalProfilePosts = cursor.fetchone()[0]
+
+    cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userId))
+    photos = cursor.fetchall()
+    totalPhotos = len(photos)
+
+    return {
+        "posts": totalProfilePosts,
+        "photos": totalPhotos
+    }
+
+def getUserGroupDetails(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminUserGroups(%s)', int(userId))
+    userGroups = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return userGroups
+
+def getUserProfilePostDetails(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminGetUserPostDetails(%s)', int(userId))
+    userPostsT = cursor.fetchall()
+    print('userPosts', userPostsT)
+
+    cursor.execute('CALL adminGetAllCommentDetails()')
+    allComments = cursor.fetchall()
+    print('usercomments', allComments)
+
+    cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userId))
+    userPostImages = cursor.fetchall()
+    print('userpOST IMG', userPostImages)
+
+    userPosts= []
+    for item in userPostsT:
+        comments = getCommentsObject(item[2], allComments)
+        print(comments)
+        imgIndex = findImageIndex(item[2], userPostImages)
+        if imgIndex != -1:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "id": str(item[2]),
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": userPostImages[imgIndex][1],
+                    "comments": comments
+                }
+            )
+        else:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "id": str(item[2]),
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": "",
+                    "comments": comments
+                }
+            )     
+
+    cursor.close()
+    conn.close()
+
+    return userPosts
+
+
 @app.route('/profile')
 def profile():
     
     if 'loggedin' in session:
         #print(session['id'])
         #print(session['username'])
-        
-        username = None
-        email_address = None
-        datejoined = None
-        firstname = None
-        lastname = None
-        profile_img = None
-        friends = None
-        biography = None
-        gender = None
 
-        year = None
-        month = None
-        day = None
+        userProfileDetails = getProfileDetails(session['id'])
+        friends = getUserFriends(session['id'])
+        profileTotals = getProfileTotals(session['id'])
+        profileTotals.update({"friends": len(friends)})
+        postDetails = getUserProfilePostDetails(session['id'])
+
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails)
+
+    return redirect(url_for('login'))  #MODIFY FLASH APPROPRIATE MESSAGES
+
+@app.route('/profile/<friend_uname>')
+def friend_profile(friend_uname):
+    
+    if 'loggedin' in session:
 
         conn = mysql.connect()
-        cursor =conn.cursor()
+        cursor = conn.cursor()
 
-        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        data = cursor.fetchone()
-  
-        username = data[0]
-        email_address = data[1]
-        datejoined = data[2]
-        firstname = data[3]
-        lastname = data[4]
-        profile_img = data[5]
-        friends = data[6]
-        biography = data[7]
-        gender = data[8]
+        cursor.execute('SELECT user_id FROM user WHERE username = (%s)', friend_uname)
+        userId = cursor.fetchone()[0]
 
-        year = datejoined.year
-        month = datejoined.strftime("%B")
-        day = datejoined.day
         cursor.close()
         conn.close()
-        # print(username, "**", email_address, "**", datejoined, "**", firstname, "**",lastname, "**", profile_img, "**",friends, "**",biography, "**", gender, "**", year, "**", month, "**", day)
-        #return "pass"
-        return render_template('profile.html', username=username, email_address=email_address, year=year, month=month, day=day, firstname=firstname, lastname=lastname, profile_img=profile_img, friends=friends, biography=biography, gender=gender)
+
+        userProfileDetails = getProfileDetails(userId)
+        friends = getUserFriends(userId)
+        profileTotals = getProfileTotals(userId)
+        profileTotals.update({"friends": len(friends)})
+        postDetails = getUserProfilePostDetails(userId)
+
+        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails) 
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
-
 
 
 @app.route("/register", methods=["GET","POST"])
@@ -187,7 +323,7 @@ def register():
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect(url_for('home')) #MODIFY ADD REDIRECTION WITH FLASH MESSAGE
+            return redirect(url_for('login')) #MODIFY ADD REDIRECTION WITH FLASH MESSAGE
         else:
             print("The account already exits")#MODIFY ADD APPROPRIATE RESPONSE
     return render_template('register.html', form=form)
@@ -216,11 +352,6 @@ def create_group():
 
 
     return render_template('create_group.html',form =form)      
-
-
-
-# @app.route('/updateprofile'/'<userid>')
-
 
 
 # @app.route('/updateprofile'/'<userid>')
@@ -300,41 +431,53 @@ def get_images():
             plst = plst+[os.path.join(file)]
     return plst
 
-# def get_uploaded_images():
-#     rootdir = os.getcwd()
-#     pictures = []
-#     print (rootdir)
 
-#     for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
-#         print(dirs)
+@app.route('/gen_post', methods=["GET","POST"])
+def gen_post():
+    print(session['loggedin'])
+    if 'loggedin' in session:
+        form = PostForm()
+        if request.method == 'POST' and form.validate_on_submit():
+            content = form.content.data
+            location = form.location.data
+            postphoto = form.postphoto.data
+            photonam= ""
 
-#         for file in pictures:
-#             print (os.path.join(subdir, files))
-#             files.append("userprofileimages/" + file)
+            if not (postphoto == None):
+                print('saving file')
+                filename = str(uuid.uuid4())
+                old_filename = postphoto.filename
+                ext = old_filename.split(".")
+                ext = ext[1]
+                new_filename = filename + "." + ext
+                new_filename = new_filename.replace('-', '_')
+                postphoto.save(os.path.join(app.config["POSTSPHOTO_FOLDER"], new_filename))
+                photonam = new_filename
 
-#             return files
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-#     return render_template("profile.html"  )
+            if not (postphoto == None):
+                print('post photo')
+                cursor.execute('CALL createImagePost(%s, %s, %s, %s)', (session['id'], content, location, photonam))
+            else:
+                print('no photo')
+                cursor.execute('INSERT INTO post(content, time_stamp, post_location) VALUES (%s,%s,%s)', (content, datetime.datetime.now(), location))
 
-@app.route('/post', methods=["GET","POST"])
-def new_post():
-    form = PostForm()
-    if request.method =='POST' and form.validate_on_submit():
-         content = form.content.data
-         postphoto = form.postphoto.data 
+                cursor.execute('SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1')
+                postId = cursor.fetchone()[0]
+                print(postId)
 
-    #conn = mysql.connect()
-    #cursor = conn.cursor()
+                cursor.execute('INSERT INTO create_post VALUES(%s, %s)', (session['id'], postId))
 
-    return render_template('home.html',form=form)
+            conn.commit()
+            cursor.close()
+            conn.close()
 
-# @app.route('/gen_post', methods=["GET","POST"])
-# def gen_post():
-#     form = GeneralPostForm()
-#     if request.method =='POST' and form.validate_on_submit():
-#          content = form.content.data
-#          postphoto = form.postphoto.data 
-#     return render_template('genpost.html', form=form)
+            return redirect(url_for('home'))
+
+        return render_template ('gen_post.html', form=form)
+    return redirect (url_for('login'))
 
 
 @app.route("/groups", methods=['GET', 'POST'])
@@ -371,9 +514,6 @@ def groups():
 
     return render_template('groups.html', groups=groups)
 
-
-
-
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
     form = PostForm()
@@ -385,18 +525,28 @@ def usergroup():
     
     return render_template('usergroup.html',form=form)
 
-@app.route('/userpost_comment', methods=["GET", "POST"])
-def userpost_comment():
-    form = UserPost_CommentForm()
+@app.route('/userpost_comment/<post_id>', methods=["GET", "POST"])
+def userpost_comment(post_id):
 
-    if request.method == "POST" and form.validate_on_submit():
-        content_posted = form.content.data
+    if 'loggedin' in session:
+        form = UserPost_CommentForm()
 
-        #connect to db
+        if request.method == "POST" and form.validate_on_submit():
+            content_posted = form.content.data
+            location = "Kingston"
 
-        return redirect( url_for('userpost_comment'))
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-    return render_template('userpost_comment.html', form=form)
+            cursor.execute('CALL createComment(%s,%s, %s, %s)', (int(session['id']), int(post_id), content_posted, location))
+            conn.commit() 
+            cursor.close()
+            conn.close()
+
+            return redirect( url_for('home'))
+
+        return redirect(url_for('home'))
+    return redirect (url_for('login'))
 
 
 
@@ -664,6 +814,32 @@ def findImageIndex(postId, imageList):
             return i
     return - 1
 
+
+def getCommentsObject(postId, commentList):
+    indices = findCommentIndices(postId, commentList)
+
+    if indices == []:
+        return ""
+    else:
+        comments = []
+        for i in indices:
+            comments.append(
+                {
+                    "commenter": commentList[i][1],
+                    "location": commentList[i][4],
+                    "timestamp": commentList[i][3],
+                    "text": commentList[i][2],
+                }
+            )
+        return comments
+
+def findCommentIndices(postId, commentList):
+    indices = []
+    for i in range(len(commentList)):
+        if (commentList[i][0] == postId):
+            indices.append(i)
+    return []
+
 ''' Get User Profile Details '''
 def getUserProfileDetails(username):
 
@@ -780,7 +956,6 @@ def getUserProfileDetails(username):
 
     return (userDetails, profileItems)
     
-
 
 ''' Admin User Profile View 1 '''
 @app.route("/admin/users/profile/<username>")

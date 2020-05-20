@@ -1,66 +1,121 @@
-          <!-- <div class="admin-user-detail">
-               <div class="admin-user-detail-label">Friends</div>
-               <div class="admin-user-detail-value">{{user.friends}}</div>
-           </div>
-           <div class="admin-user-detail">
-               <div class="admin-user-detail-label">Groups</div>
-               <div class="admin-user-detail-value">{{user.groups}}</div>
-           </div>
-           <div class="admin-user-detail">
-               <div class="admin-user-detail-label">Posts</div>
-               <div class="admin-user-detail-value">{{user.posts}}</div>
-           </div>
-           <div class="admin-user-detail">
-                   <div class="admin-user-detail-label">Comments</div>
-           <div class="admin-user-detail-value">{{user.comments}}</div>
-           </div>-->
 
-        <!--<div class="admin-profile-btn-container">
-            {% if view_posts %}
-                {% with text = "View Friends and Groups" on_submit_action = "" %}
-                    {% include "components/admin_profile_button.html" %}
-                {%  endwith %}
-            {% else %}
-                {% with text = "View Posts and Comments" on_submit_action = "" %}
-                    {% include "components/admin_profile_button.html" %}
-                {%  endwith %}
-            {% endif %}
-        </div>
-    </div>
-    <div class="admin-profile-boxes-container">
-        {% if view_posts and (posts is not None) %}
-            <div class="post-box">
-                {% for post in posts%}
-                    {% with  %}
-                        {% include "components/post.html" %}
-                    {% endwith %}
-                {% endfor %}               
-            </div>
-            <div class="post-box">
-                {% for comment_stream in comments%}
-                <div class="comment-stream">
-                    {% with  %} 
-                        {% include "components/post.html" %}
-                    {% endwith %}
+profile.html
 
-                    {% for comment in comment_stream.comments %}
-                        {% with %}
-                            {% include "components/comment.html" %}
-                        {% endwith %}
-                    {% endfor %}
+                           <!-- <img class="thumbnail img-responsive" src="{{url_for('static', filename='profileimages/' + userProfileDetails)}}" />
+                            
+                             <img class="thumbnail img-responsive" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="300px" 
+height="300px"> 
+
+                            <div class= "userimages">
+                                <p><a href= "{{ url_for('images') }}">Pictures/Images</a></p>
+                            </div>
+                        </div>
+                        <div class="media-body">
+                            
+                        </div>
+                    </div>
                 </div>
-                {% endfor %}               
             </div>
-        {% else %}
-            <div class="admin-profile-friend-table">
-
-            </div>
-            <div class="admin-profile-group-table">
+    </div>
+    <div class="profile-feed col-lg-9 col-md-9 col-sm-12 col-xs-12">                 <span class="pull-left">
+                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-files-o" aria-hidden="true"></i> 
+Posts</a>
+                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-picture-o" aria-hidden="true"></i> 
+Photos <span class="badge">42</span></a>
+                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-users" aria-hidden="true"></i> Friends 
+<span class="badge">{{ friends }}</span></a>
+                    </span>
                 
+                </div>
             </div>
-    </div>-->
+            <hr>
+              <div class="general_post">
 
-    {% with details = {"commenter":"John", "timestamp":"Thurs Apr 4, 2020", "text": "I am a girl"} %}
-    {% include "components/comment_input.html" %}
-{% endwith %}
-<!-- To do - add loop for comments-->
+
+            </div>
+            <hr>
+             Simple post content example.
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="pull-left">
+                        <a href="#">
+                            <img class="media-object img-circle" src="{{url_for('static', filename='profileimages/' + profile_img)}}" width="50px" 
+height="50px" style="margin-right:8px; margin-top:-5px;">
+                        </a>
+                    </div>
+                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" 
+style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></
+small></h4>
+                    <span>
+                  
+                    </span>
+                    <hr>
+                    <div class="post-content">
+                        <p>Simple post content example.</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel gravida 
+                            metus, non ultrices sapien. Morbi odio metus, dapibus non nibh id amet.</p>
+                        
+                    </div>
+                    <hr>
+
+                    <div class="media">
+                        <div class="pull-left">
+                            <a href="#">
+                                <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="35px" 
+height="35px" style="margin-left:3px; margin-right:-5px;">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            
+                            <p>
+                                <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
+                                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
+                                <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
+                                <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <!-- Reshare Example -->
+    
+            <!-- Sample post content with picture. -->
+            <!--<div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="pull-left">
+                        <a href="#">
+                            <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="50px" height="50px" 
+style="margin-right:8px; margin-top:-5px;">
+                        </a>
+                    </div>
+                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" 
+style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></
+small></h4>
+                    <span>
+                  
+                    </span>
+                    <hr>
+                    <div class="post-content">
+                        <p>Sample post content with picture.</p>
+                        <img class="img-responsive" src="https://media.giphy.com/media/j1QQj6To9Pbxu/giphy.gif">
+                        <p><br><a href="/tags/christmas" class="tag">#Christmas</a> <a href="/tags/caturday" class="tag">#Caturday</a></p>
+                    </div>
+                    
+                    <div>
+                        <hr>
+                        <p>
+                            <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
+                            <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
+                            <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
+                            <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
+                        </p>
+                      
+                       
+                        </div>
+                        <br>
+                    </div>
+                    <hr>
+
+                    
+                </div>
+        </div>-->
