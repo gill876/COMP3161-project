@@ -36,10 +36,11 @@ def home():
         userProfileDetails = getProfileDetails(session['id'])
         friends = getUserFriends(session['id'])
         postDetails = getUserProfilePostDetails(session['id'])
+        postDetails2 = getUserProfilePostDetails(3)
         groups = getUserGroupDetails(session['id'])
         print("***", postDetails)
 
-        return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form)
+        return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form, postDetails2=postDetails2)
         
     return redirect(url_for('login'))
 
@@ -246,6 +247,8 @@ def getUserProfilePostDetails(userId):
 
 @app.route('/profile')
 def profile():
+
+    form = PostForm()
     
     if 'loggedin' in session:
         #print(session['id'])
@@ -267,6 +270,7 @@ def profile():
 def friend_profile(friend_uname):
     
     if 'loggedin' in session:
+        form = UserPost_CommentForm()
 
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -283,7 +287,7 @@ def friend_profile(friend_uname):
         profileTotals.update({"friends": len(friends)})
         postDetails = getUserProfilePostDetails(userId)
 
-        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails) 
+        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails, form=form) 
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -486,6 +490,56 @@ def gen_post():
 
         return render_template ('gen_post.html', form=form)
     return redirect (url_for('login'))
+
+
+
+@app.route('/gen_group_post', methods=["GET","POST"])
+def gen_group_post():
+    print(session['loggedin'])
+    if 'loggedin' in session:
+        form = PostForm()
+        if request.method == 'POST' and form.validate_on_submit():
+            content = form.content.data
+            location = form.location.data
+            postphoto = form.postphoto.data
+            photonam= ""
+
+            if not (postphoto == None):
+                print('saving file')
+                filename = str(uuid.uuid4())
+                old_filename = postphoto.filename
+                ext = old_filename.split(".")
+                ext = ext[1]
+                new_filename = filename + "." + ext
+                new_filename = new_filename.replace('-', '_')
+                postphoto.save(os.path.join(app.config["POSTSPHOTO_FOLDER"], new_filename))
+                photonam = new_filename
+
+            conn = mysql.connect()
+            cursor = conn.cursor()
+
+            if not (postphoto == None):
+                print('post photo')
+                cursor.execute('CALL createImagePost(%s, %s, %s, %s)', (session['id'], content, location, photonam))
+            else:
+                print('no photo')
+                cursor.execute('INSERT INTO post(content, time_stamp, post_location) VALUES (%s,%s,%s)', (content, datetime.datetime.now(), location))
+
+                cursor.execute('SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1')
+                postId = cursor.fetchone()[0]
+                print(postId)
+
+                cursor.execute('INSERT INTO create_post VALUES(%s, %s)', (session['id'], postId))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return redirect(url_for('home'))
+
+        return render_template ('gen_post.html', form=form)
+    return redirect (url_for('login'))
+
 
 
 @app.route("/groups", methods=['GET', 'POST'])

@@ -48,6 +48,13 @@
         {% endwith %}
       {% endfor %}
     {% endif %}
+    {% if postDetails2|length > 0 %}
+    {% for post in postDetails2 %}
+    {% with post=post, form=form %}
+    {% include 'components/post.html' %}
+    {% endwith %}
+    {% endfor %}
+    {% endif %}
   </div>
   {% if friends|length > 0 %}
   {% with friends=friends %}
