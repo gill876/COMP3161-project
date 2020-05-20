@@ -651,10 +651,6 @@ def admin_logout():
         session['adminLoggedOut'] = True
     return render_template(url_for('admin'))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 965f9741385c93432abe45c9fab79e48a9caaf84
 @app.after_request
 def add_header(response):
     """

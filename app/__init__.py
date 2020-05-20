@@ -17,8 +17,8 @@ manager = Manager(app)
 
 
 #app.config['MYSQL_HOST'] = 'localhost'
-#app.config['MYSQL_USER'] = 'mybook'
-#app.config['MYSQL_PASSWORD'] = 'password'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = 'mantis101'
 #app.config['MYSQL_DB'] = 'mybook'
 
 #mysql = MySQL(app)
