@@ -37,6 +37,7 @@ def home():
         friends = getUserFriends(session['id'])
         postDetails = getUserProfilePostDetails(session['id'])
         groups = getUserGroupDetails(session['id'])
+        print("***", postDetails)
 
         return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form)
         
@@ -525,17 +526,21 @@ def usergroup():
 
 @app.route('/userpost_comment/<post_id>', methods=["GET", "POST"])
 def userpost_comment(post_id):
-
+    print("###############")
     if 'loggedin' in session:
         form = UserPost_CommentForm()
-
-        if request.method == "POST" and form.validate_on_submit():
+        form.content.data = request.form['content']
+        print("$$$", request.form['content'])
+       
+        print("@@@", form.validate_on_submit())
+        print("***************")
+        if request.method == "POST" and form.content.data != "" :
             content_posted = form.content.data
             location = "Kingston"
 
             conn = mysql.connect()
             cursor = conn.cursor()
-
+            print("comments section ****")
             cursor.execute('CALL createComment(%s,%s, %s, %s)', (int(session['id']), int(post_id), content_posted, location))
             conn.commit() 
             cursor.close()
