@@ -256,8 +256,9 @@ def profile():
         profileTotals = getProfileTotals(session['id'])
         profileTotals.update({"friends": len(friends)})
         postDetails = getUserProfilePostDetails(session['id'])
+        form = UserPost_CommentForm()
 
-        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails)
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails, form=form)
 
     return redirect(url_for('login'))  #MODIFY FLASH APPROPRIATE MESSAGES
 
