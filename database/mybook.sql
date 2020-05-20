@@ -65,7 +65,19 @@ DROP PROCEDURE IF EXISTS getUserTotalFriends;
 DROP PROCEDURE IF EXISTS getUserTotalGroups;
 DROP PROCEDURE IF EXISTS getGroupId;
 DROP PROCEDURE IF EXISTS adminSearchGroup;
-DROP PROCEDURE IF EXISTS adminGetUserBioByUname;
+DROP PROCEDURE IF EXISTS adminGetUserBio;
+DROP PROCEDURE IF EXISTS groupTotalMembers;
+DROP PROCEDURE IF EXISTS groupTotalPosts;
+DROP PROCEDURE IF EXISTS adminGetUserFriends;
+DROP PROCEDURE IF EXISTS getUserTotalGroupPosts;
+DROP PROCEDURE IF EXISTS adminUserGroupsInfo;
+DROP PROCEDURE IF EXISTS adminUserGroups;
+DROP PROCEDURE IF EXISTS adminGetUserPostImageDetails;
+DROP PROCEDURE IF EXISTS adminGetUserGroupPostDetails;
+DROP PROCEDURE IF EXISTS adminGetUserPostDetails;
+DROP PROCEDURE IF EXISTS adminGetUserPostDetails;
+DROP PROCEDURE IF EXISTS adminGetUserCommentDetails;
+
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -860,7 +872,7 @@ DELIMITER ;
 DELIMITER //
     CREATE PROCEDURE adminGetUserFriends(IN in_user_id INT)
     BEGIN
-        SELECT user.username, CONCAT(`firstname`, ' ', `lastname`), friends.friend_type
+        SELECT user.username, CONCAT(`firstname`, ' ', `lastname`), friends.friend_id, friends.friend_type
         FROM friends
         JOIN user 
         JOIN userProfile
@@ -868,12 +880,11 @@ DELIMITER //
         ON friends.user_id = user.user_id
         AND user.user_id = userProfile.user_id
         AND userProfile.profile_id = profile.profile_id
-        WHERE user.user_id
-        IN (
-            SELECT friends.friend_id AS usId
+        WHERE user.user_id IN (
+            SELECT friends.friend_id AS fId
             FROM friends
             WHERE friends.user_id = in_user_id
-            );
+        );
     END //
 DELIMITER ;
 
@@ -918,12 +929,10 @@ BEGIN
 END //
 DELIMITER ;
 
-adminGetUserPostDetails
-
 DELIMITER //
 CREATE PROCEDURE adminGetUserPostDetails(IN user_id_in INT)
 BEGIN
-SELECT profile.profile_img, CONCAT(`firstname`, ' ', `lastname`), post.post_id, post.post_location, post.time_stamp, post.content FROM profile JOIN userProfile JOIN create_post JOIN post ON profile.profile_id = userProfile.profile_id AND userProfile.user_id = create_post.user_id AND create_post.post_id = post.post_id WHERE create_post.user_id = user_id_in AND create_post.post_id NOT IN (SELECT group_post.post_id FROM group_post);
+SELECT profile.profile_img, CONCAT(`firstname`, ' ', `lastname`), post.post_id, post.post_location, post.time_stamp, post.content FROM profile JOIN userProfile JOIN create_post JOIN post ON profile.profile_id = userProfile.profile_id AND userProfile.user_id = create_post.user_id AND create_post.post_id = post.post_id WHERE create_post.user_id = user_id_in AND create_post.post_id NOT IN (SELECT group_post.post_id FROM group_post) ORDER BY post.time_stamp;
 END //
 
 CREATE PROCEDURE adminGetUserPostImageDetails(in user_id_in INT)
@@ -939,7 +948,6 @@ AND contains.image_id = images.image_id
 WHERE create_post.user_id = user_id_in;
 END //
 
-DELIMITER //
 CREATE PROCEDURE adminGetUserGroupPostDetails(IN user_id_in INT)
 BEGIN
     SELECT profile.profile_img,
@@ -958,6 +966,20 @@ BEGIN
     NOT IN (
         SELECT group_post.post_id
         FROM group_post
-        );
+        )
+    ORDER BY post.time_stamp;
 END //
-DELIMITER ;
+
+CREATE PROCEDURE adminGetUserCommentDetails(IN user_id_in INT)
+BEGIN
+    SELECT comment.post_id, CONCAT(`firstname`, ' ', `lastname`), comment.comm_text, comment.time_stamp, comment.c_location
+    FROM comment 
+    JOIN create_comment
+    JOIN userProfile 
+    JOIN profile
+    ON comment.comment_id = create_comment.comment_id
+    AND create_comment.user_id = userProfile.user_id
+    AND userProfile.profile_id = profile.profile_id
+    WHERE create_comment.user_id = user_id_in 
+    ORDER BY comment.time_stamp;
+END //

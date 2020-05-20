@@ -1,160 +1,62 @@
 {% extends 'layout.html' %}
 
 {% block content%}
-<!-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> -->
-
-<!------ Include the above in your HEAD tag ---------->
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
-<div class="mainbody container-fluid" style="
-margin-top: 0px;
-margin-bottom: 0px;
-padding-right: 0px;
-padding-left: 0px;
-padding-top: 10px;
-padding-bottom: 10px;
-" >
-   
+<div class="profile-main" >     
+    <div class="container-fluid profile-left-sidebar">
+            <div class="profile-details-panel panel">
+                <img class="profile-photo img-responsive media-object img-circle" src="{{url_for('static', filename='profileimages/' + userProfileDetails[5])}}" />
+                <div class="profile-user-name">{{ userProfileDetails[3] }} {{ userProfileDetails[4] }}</div>
+                <a class="edit-profile-link" href= "{{url_for('updateprofile')}}">Edit Profile</a>
+                <div class="profile-details-container">
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Username</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[0] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Gender</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[8] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Email</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[1] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label" id="profile-bio">Biography</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[7] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Member Since</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[2] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="container-fluid profile-feed ">
+        <span class="pull-left profile-feed-head">
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-files-o" aria-hidden="true"></i>
+                Posts
+                <span class="badge">{{ totals.posts }}</span>
+            </a>
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-picture-o" aria-hidden="true"></i>
+                Photos
+                <span class="badge">{{ totals.photos }}</span>
+            </a>
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-users" aria-hidden="true"></i>
+                Friends
+                <span class="badge"> {{ totals.friends }}</span>
+            </a>
+        </span>
+        <hr class="divider"/>
+        <br/>
         
-      
-        <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="media">
-                        <div align="center">
-                            
-                            <img class="thumbnail img-responsive" src="{{url_for('static', filename='profileimages/' + profile_img)}}" />
-                            
-                            <!-- <img class="thumbnail img-responsive" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="300px" height="300px"> --> 
+    </div>
+    {% with friends=friends %}
+    {% include 'components/app_right_sidebar.html' %}
+    {% endwith %}
 
-                            <div class= "userimages">
-                                <p><a href= "{{ url_for('images') }}">Pictures/Images</a></p>
-                            </div>
-                        </div>
-                        <div class="media-body">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <span>
-                        <h1 class="panel-title pull-left" style="font-size:30px;">{{ firstname }} {{ lastname }} <small>{{email_address}}</small> </h1>
-                    </span>
-                    <br>
-                    <br>
-                    <h4 >Username: {{username}}</h4>
-                    <h5 >Gender: {{gender}}</h5>
-                    <h5>Date joined: {{month}} {{day}}, {{year}}</h5>
-                    <br>
-                    <h4>Biography</h4>
-                    <h5>{{biography}}</h5>
-
-                    <br><br>
-                    <a href = "{{url_for('updateprofile')}}">
-                        <button type="button" class="btn btn-secondary">Edit Profile</button>
-                    <!-- <button type="button" class="btn btn-secondary">Edit profile</button> -->
-                    <br><br><hr>
-                    <span class="pull-left">
-                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-files-o" aria-hidden="true"></i> Posts</a>
-                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-picture-o" aria-hidden="true"></i> Photos <span class="badge">42</span></a>
-                        <a href="#" class="btn btn-link" style="text-decoration:none;"><i class="fa fa-fw fa-users" aria-hidden="true"></i> Friends <span class="badge">{{ friends }}</span></a>
-                    </span>
-                
-                </div>
-            </div>
-            <hr>
-              <div class="general_post">
-
-
-            </div>
-            <hr>
-            <!-- Simple post content example. -->
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="pull-left">
-                        <a href="#">
-                            <img class="media-object img-circle" src="{{url_for('static', filename='profileimages/' + profile_img)}}" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;">
-                        </a>
-                    </div>
-                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
-                    <span>
-                  
-                    </span>
-                    <hr>
-                    <div class="post-content">
-                        <p>Simple post content example.</p>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel gravida 
-                            metus, non ultrices sapien. Morbi odio metus, dapibus non nibh id amet.</p>
-                        
-                    </div>
-                    <hr>
-
-                    <div class="media">
-                        <div class="pull-left">
-                            <a href="#">
-                                <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="35px" height="35px" style="margin-left:3px; margin-right:-5px;">
-                            </a>
-                        </div>
-                        <div class="media-body">
-                            
-                            <p>
-                                <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
-                                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
-                                <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
-                                <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Reshare Example -->
-    
-            <!-- Sample post content with picture. -->
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="pull-left">
-                        <a href="#">
-                            <img class="media-object img-circle" src="https://lut.im/7JCpw12uUT/mY0Mb78SvSIcjvkf.png" width="50px" height="50px" style="margin-right:8px; margin-top:-5px;">
-                        </a>
-                    </div>
-                    <h4><a href="#" style="text-decoration:none;"><strong>{{ session.username }}</strong></a> – <small><small><a href="#" style="text-decoration:none; color:grey;"><i><i class="fa fa-clock-o" aria-hidden="true"></i> 42 minutes ago</i></a></small></small></h4>
-                    <span>
-                  
-                    </span>
-                    <hr>
-                    <div class="post-content">
-                        <p>Sample post content with picture.</p>
-                        <img class="img-responsive" src="https://media.giphy.com/media/j1QQj6To9Pbxu/giphy.gif">
-                        <p><br><a href="/tags/christmas" class="tag">#Christmas</a> <a href="/tags/caturday" class="tag">#Caturday</a></p>
-                    </div>
-                    
-                    <div>
-                        <hr>
-                        <p>
-                            <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
-                            <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
-                            <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
-                            <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
-                        </p>
-                      
-                       
-                        </div>
-                        <br>
-                    </div>
-                    <hr>
-
-                    
-                </div>
-            </div>
-
- 
-        </div>
-    
 </div>
 
 

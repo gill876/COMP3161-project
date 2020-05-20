@@ -99,51 +99,102 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+def getUserFriends(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL adminGetUserFriends(%s)', int(userId))
+    allFriends = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    relatives = []
+    schoolFriends = []
+    workFriends = []
+
+    print(allFriends)
+
+    for fr in allFriends:
+        if fr[2] == "RELATIVE":
+            relatives.append(fr)
+        elif fr[2] == "WORK":
+            workFriends.append(fr)
+        else:
+            schoolFriends.append(fr)
+
+    return (relatives, schoolFriends, workFriends)
+
+def getProfileDetails(userId):
+    conn= mysql.connect()
+    cursor =conn.cursor()
+
+    cursor.execute('CALL userDetails(%s)', int(userId))
+    data = cursor.fetchone()
+  
+    username = data[0]
+    email_address = data[1]
+    datejoined = data[2]
+    firstname = data[3]
+    lastname = data[4]
+    profile_img = data[5]
+    friends = data[6]
+    biography = data[7]
+    gender = data[8]
+
+    year = datejoined.year
+    month = datejoined.strftime("%B")
+    day = datejoined.day
+
+    cursor.close()
+    conn.close()
+
+    finalDets = (username, email_address, datejoined.strftime("%m/%d/%Y"), firstname, lastname, profile_img, friends, biography, gender)
+
+    return finalDets
+
+def getProfileTotals(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL getUserTotalPosts(%s)', int(userId))
+    totalProfilePosts = cursor.fetchone()[0]
+
+    cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userId))
+    photos = cursor.fetchall()
+    totalPhotos = len(photos)
+
+    return {
+        "posts": totalProfilePosts,
+        "photos": totalPhotos
+    }
+
 @app.route('/profile')
 def profile():
     
     if 'loggedin' in session:
         #print(session['id'])
         #print(session['username'])
-        
-        username = None
-        email_address = None
-        datejoined = None
-        firstname = None
-        lastname = None
-        profile_img = None
-        friends = None
-        biography = None
-        gender = None
 
-        year = None
-        month = None
-        day = None
+        userProfileDetails = getProfileDetails(session['id'])
+        friends = getUserFriends(session['id'])
+        profileTotals = getProfileTotals(session['id'])
+        profileTotals.update({"friends": len(friends)})
 
-        conn = mysql.connect()
-        cursor =conn.cursor()
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals)
 
-        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        data = cursor.fetchone()
-  
-        username = data[0]
-        email_address = data[1]
-        datejoined = data[2]
-        firstname = data[3]
-        lastname = data[4]
-        profile_img = data[5]
-        friends = data[6]
-        biography = data[7]
-        gender = data[8]
+    return redirect(url_for('login'))  #MODIFY FLASH APPROPRIATE MESSAGES
 
-        year = datejoined.year
-        month = datejoined.strftime("%B")
-        day = datejoined.day
-        cursor.close()
-        conn.close()
-        # print(username, "**", email_address, "**", datejoined, "**", firstname, "**",lastname, "**", profile_img, "**",friends, "**",biography, "**", gender, "**", year, "**", month, "**", day)
-        #return "pass"
-        return render_template('profile.html', username=username, email_address=email_address, year=year, month=month, day=day, firstname=firstname, lastname=lastname, profile_img=profile_img, friends=friends, biography=biography, gender=gender)
+@app.route('/profile/<friend_uname>')
+def friend_profile(friend_uname):
+    
+    if 'loggedin' in session:
+
+        userProfileDetails = getProfileDetails(session['id'])
+        friends = getUserFriends(session['id'])
+        profileTotals = getProfileTotals(session['id'])
+
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals)
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -776,7 +827,6 @@ def getUserProfileDetails(username):
 
     return (userDetails, profileItems)
     
-
 
 ''' Admin User Profile View 1 '''
 @app.route("/admin/users/profile/<username>")
