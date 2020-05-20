@@ -51,11 +51,19 @@
         </span>
         <hr class="divider"/>
         <br/>
-        
+        {% if posts|length > 0 %}
+            {% for post in posts %}
+                {% with post=post %}
+                    {% include 'components/post.html' %}
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
     </div>
-    {% with friends=friends %}
-    {% include 'components/app_right_sidebar.html' %}
-    {% endwith %}
+    {% if friends|length > 0 %}
+        {% with friends=friends %}
+            {% include 'components/app_right_sidebar.html' %}
+        {% endwith %}
+    {% endif %}
 
 </div>
 

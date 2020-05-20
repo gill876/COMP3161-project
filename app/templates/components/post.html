@@ -1,0 +1,26 @@
+<div class="card post">
+    <div class="post-header">
+        <img src="{{url_for('static', filename='profileimages/'+ post.profile_img)}}" class="post-photo" alt="profile-photo" width="50" height="50" />
+        <div class="flex-column text-left text-capitalize">
+            <div class="post-poster-name">{{post.poster}}</div>
+            <div class="post-location">{{post.location}}</div>
+            <div class="post-timestamp">{{post.timestamp}}</div>
+        </div>
+    </div>
+    <div class="post-content">
+        <div>{{post.content}}</div>
+        {% if not (post.image == "") %}
+        <img src="{{url_for('static', filename='postimages/'+ post.image)}}" class="post-content-photo" />
+        {% endif %}
+    </div>
+    <hr class="divder"/>
+    <div class="comments-container">
+        {% if not (post.comments == "") %}
+            {% for comm in post.comments %}
+                {% with comment = comm %}
+                    {% include 'components/comment.html' %}
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>

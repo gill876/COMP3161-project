@@ -173,28 +173,25 @@ def getUserProfilePostDetails(userId):
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    '''cursor.execute('CALL adminGetUserFriends(%s)', int(userBio[0][0]))
-    userFriends = cursor.fetchall()
-    #print('userFriends', userFriends)'''
-
     cursor.execute('CALL adminUserGroups(%s)', int(userId))
     userGroups = cursor.fetchall()
-    #print('userGroups', userGroups)
+    print('userGroups', userGroups)
 
     cursor.execute('CALL adminGetUserPostDetails(%s)', int(userId))
     userPostsT = cursor.fetchall()
-    #print('userPosts', userPostsT)
+    print('userPosts', userPostsT)
 
-    cursor.execute('CALL adminGetUserCommentDetails(%s)', int(userId))
-    userComments = cursor.fetchall()
-    #print('usercomments', userComments)
+    cursor.execute('CALL adminGetAllCommentDetails()')
+    allComments = cursor.fetchall()
+    print('usercomments', allComments)
 
     cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userId))
     userPostImages = cursor.fetchall()
-    #print('userpOST IMG', userPostImages)
+    print('userpOST IMG', userPostImages)
 
     userPosts= []
     for item in userPostsT:
+        comments = getCommentsObject(item[2], allComments)
         imgIndex = findImageIndex(item[2], userPostImages)
         if imgIndex != -1:
             userPosts.append(
@@ -204,7 +201,8 @@ def getUserProfilePostDetails(userId):
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
                     "content": item[5],
-                    "image": userPostImages[imgIndex][0]
+                    "image": userPostImages[imgIndex][0],
+                    "comments": comments
                 }
             )
         else:
@@ -215,46 +213,17 @@ def getUserProfilePostDetails(userId):
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
                     "content": item[5],
-                    "image": ""
+                    "image": "",
+                    "comments": comments
                 }
-            )
-
-    userGroupPosts= []
-    for item in userGroupPostsT:
-        imgIndex = findImageIndex(item[2], userPostImages)
-        if imgIndex != -1:
-            userGroupPosts.append(
-                {
-                    "profile_img": item[0],
-                    "poster": item[1],
-                    "location": item[3],
-                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
-                    "content": item[5],
-                    "image": userPostImages[imgIndex][0]
-                }
-            )
-        else:
-            userGroupPosts.append(
-                {
-                    "profile_img": item[0],
-                    "poster": item[1],
-                    "location": item[3],
-                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
-                    "content": item[5],
-                    "image": ""
-                }
-            )
-
-    #print(userPosts)
-    #print('next')
-    #print(userGroupPosts)         
-
-    profileItems = (userFriends, userGroups, userPosts, userGroupPosts)
+            )     
 
     cursor.close()
     conn.close()
 
-    return (userDetails, profileItems)
+    return (userGroups, userPosts)
+
+
 @app.route('/profile')
 def profile():
     
@@ -266,8 +235,9 @@ def profile():
         friends = getUserFriends(session['id'])
         profileTotals = getProfileTotals(session['id'])
         profileTotals.update({"friends": len(friends)})
+        postDetails = getUserProfilePostDetails(session['id'])
 
-        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals)
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails[1])
 
     return redirect(url_for('login'))  #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -279,8 +249,10 @@ def friend_profile(friend_uname):
         userProfileDetails = getProfileDetails(session['id'])
         friends = getUserFriends(session['id'])
         profileTotals = getProfileTotals(session['id'])
+        profileTotals.update({"friends": len(friends)})
+        postDetails = getUserProfilePostDetails(session['id'])
 
-        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals)
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends=friends, totals=profileTotals, posts=postDetails)
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -796,6 +768,32 @@ def findImageIndex(postId, imageList):
         if (imageList[i][0] == postId):
             return i
     return - 1
+
+
+def getCommentsObject(postId, commentList):
+    indices = findCommentIndices(postId, commentList)
+
+    if indices == []:
+        return ""
+    else:
+        comments = []
+        for i in indices:
+            comments.append(
+                {
+                    "commenter": commentList[i][1],
+                    "location": commentList[i][4],
+                    "timestamp": commentList[i][3],
+                    "text": commentList[i][2],
+                }
+            )
+        return comments
+
+def findCommentIndices(postId, commentList):
+    indices = []
+    for i in range(len(commentList)):
+        if (commentList[i][0] == postId):
+            indices.append(i)
+    return []
 
 ''' Get User Profile Details '''
 def getUserProfileDetails(username):
