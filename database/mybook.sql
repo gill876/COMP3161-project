@@ -105,7 +105,7 @@ CREATE TABLE profile(
     profile_id INT NOT NULL AUTO_INCREMENT,
     firstname VARCHAR(75) NOT NULL,
     lastname VARCHAR(75) NOT NULL,
-    profile_img VARCHAR(100) DEFAULT 'GENERIC' NOT NULL,
+    profile_img VARCHAR(100) DEFAULT 'unnamed.png' NOT NULL,
     friends INT DEFAULT 0 NOT NULL,
     biography VARCHAR(300) DEFAULT "Hey there! I'm using MyBook" NOT NULL, 
     gender VARCHAR(10) NOT NULL,
