@@ -37,6 +37,7 @@ def home():
         friends = getUserFriends(session['id'])
         postDetails = getUserProfilePostDetails(session['id'])
         groups = getUserGroupDetails(session['id'])
+        print("***", postDetails)
 
         return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form)
         
@@ -331,27 +332,32 @@ def register():
 @app.route('/create/group',methods=["GET","POST"])
 def create_group():
     form = GroupForm()
-    if request.method == "POST" and form.validate_on_submit():
-        groupname = form.groupname.data
-        description = form.description.data
-        
-        conn = mysql.connect()
-        cursor =conn.cursor()
-        cursor.execute('CALL userDetails(%s)', (int(session['id']),))
-        cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
-        data = cursor.fetchone()
 
-        if data == None:
+    print("Entered create group")
+    if request.method == "POST":
+        print("***method is post***")
+        form.groupname.data = request.form['groupname']
+        form.description.data = request.form['description']
+        if request.form['description'] != "" and request.form['groupname'] !="":
+            print("Form is received")
+            groupname = form.groupname.data
+            description = form.description.data
+            
+            conn = mysql.connect()
+            cursor =conn.cursor()
+            #cursor.execute('CALL userDetails(%s)', (int(session['id']),))
+            # cursor.execute('SELECT user_id FROM user WHERE username = %s OR email_address = %s', (username, username,))
+            # data = cursor.fetchone()
+
+            # if data == None:
             cursor.execute('CALL createGroup(%s,%s,%s)',(int(session['id']),groupname,description,))
             conn.commit()
             cursor.close()
             conn.close()
-        # return redirect(url_for('home'))
-
-        return redirect(url_for('groups'))
+            return redirect(url_for('home'))
 
 
-    return render_template('create_group.html',form =form)      
+    return render_template('create_group.html',form=form)      
 
 
 # @app.route('/updateprofile'/'<userid>')
@@ -527,17 +533,21 @@ def usergroup():
 
 @app.route('/userpost_comment/<post_id>', methods=["GET", "POST"])
 def userpost_comment(post_id):
-
+    print("###############")
     if 'loggedin' in session:
         form = UserPost_CommentForm()
-
-        if request.method == "POST" and form.validate_on_submit():
+        form.content.data = request.form['content']
+        print("$$$", request.form['content'])
+       
+        print("@@@", form.validate_on_submit())
+        print("***************")
+        if request.method == "POST" and form.content.data != "" :
             content_posted = form.content.data
             location = "Kingston"
 
             conn = mysql.connect()
             cursor = conn.cursor()
-
+            print("comments section ****")
             cursor.execute('CALL createComment(%s,%s, %s, %s)', (int(session['id']), int(post_id), content_posted, location))
             conn.commit() 
             cursor.close()
