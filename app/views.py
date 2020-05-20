@@ -169,6 +169,92 @@ def getProfileTotals(userId):
         "photos": totalPhotos
     }
 
+def getUserProfilePostDetails(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    '''cursor.execute('CALL adminGetUserFriends(%s)', int(userBio[0][0]))
+    userFriends = cursor.fetchall()
+    #print('userFriends', userFriends)'''
+
+    cursor.execute('CALL adminUserGroups(%s)', int(userId))
+    userGroups = cursor.fetchall()
+    #print('userGroups', userGroups)
+
+    cursor.execute('CALL adminGetUserPostDetails(%s)', int(userId))
+    userPostsT = cursor.fetchall()
+    #print('userPosts', userPostsT)
+
+    cursor.execute('CALL adminGetUserCommentDetails(%s)', int(userId))
+    userComments = cursor.fetchall()
+    #print('usercomments', userComments)
+
+    cursor.execute('CALL adminGetUserPostImageDetails(%s)', int(userId))
+    userPostImages = cursor.fetchall()
+    #print('userpOST IMG', userPostImages)
+
+    userPosts= []
+    for item in userPostsT:
+        imgIndex = findImageIndex(item[2], userPostImages)
+        if imgIndex != -1:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": userPostImages[imgIndex][0]
+                }
+            )
+        else:
+            userPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": ""
+                }
+            )
+
+    userGroupPosts= []
+    for item in userGroupPostsT:
+        imgIndex = findImageIndex(item[2], userPostImages)
+        if imgIndex != -1:
+            userGroupPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": userPostImages[imgIndex][0]
+                }
+            )
+        else:
+            userGroupPosts.append(
+                {
+                    "profile_img": item[0],
+                    "poster": item[1],
+                    "location": item[3],
+                    "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                    "content": item[5],
+                    "image": ""
+                }
+            )
+
+    #print(userPosts)
+    #print('next')
+    #print(userGroupPosts)         
+
+    profileItems = (userFriends, userGroups, userPosts, userGroupPosts)
+
+    cursor.close()
+    conn.close()
+
+    return (userDetails, profileItems)
 @app.route('/profile')
 def profile():
     

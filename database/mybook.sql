@@ -983,3 +983,17 @@ BEGIN
     WHERE create_comment.user_id = user_id_in 
     ORDER BY comment.time_stamp;
 END //
+
+CREATE PROCEDURE adminGetAllCommentDetails()
+BEGIN
+    SELECT comment.post_id, CONCAT(`firstname`, ' ', `lastname`), comment.comm_text, comment.time_stamp, comment.c_location
+    FROM comment
+        JOIN create_comment
+        JOIN userProfile
+        JOIN profile
+        ON comment.comment_id = create_comment.comment_id
+            AND create_comment.user_id = userProfile.user_id
+            AND userProfile.profile_id = profile.profile_id  
+    ORDER BY comment.time_stamp;
+END //
+DELIMITER ;
