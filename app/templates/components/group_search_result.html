@@ -10,9 +10,9 @@
             <p>{{description}}</p>
         </div>
       {% if member %}
-      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup') }}">View Group</a>
+      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup', name=name) }}">View Group</a>
       {% else %}
-      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup') }}">Join Group</a>
+      <a class="btn btn-primary group-search-result-button" href="{{ url_for('usergroup', name=name) }}">Join Group</a>
       {% endif %}
     </div>
   </div>

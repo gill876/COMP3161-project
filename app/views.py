@@ -251,6 +251,7 @@ def profile():
         #print(session['id'])
         #print(session['username'])
 
+
         userProfileDetails = getProfileDetails(session['id'])
         friends = getUserFriends(session['id'])
         profileTotals = getProfileTotals(session['id'])
@@ -521,16 +522,24 @@ def groups():
 
     return render_template('groups.html', groups=groups)
 
-@app.route('/usergroup', methods=["GET", "POST"])
-def usergroup():
+@app.route('/usergroup/<name>', methods=["GET", "POST"])
+def usergroup(name):
     form = PostForm()
-    if request.method and form.validate_on_submit():
-        content = form.content.data
-        postphoto = form.postphoto.data 
 
-        #connect to db 
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute('CALL getGroupId(%s)', name)
+    id = cursor.fetchone()[0]
+
+    cursor.execute('CALL getGroupPosts(%s)', int(id))
+    posts = cursor.fetchall()
+    print(posts)
+
+    cursor.close()
+    conn.close()
     
-    return render_template('usergroup.html',form=form)
+    return render_template('usergroup.html',form=form, posts=posts)
 
 
 def isFriend(friends, userid):

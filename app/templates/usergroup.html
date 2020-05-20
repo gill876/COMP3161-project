@@ -2,14 +2,14 @@
 
 {% block content %}
 
-<h2>Welcome to (What)</h2>
+<h2>Welcome to Oberlin Psa</h2>
 <hr>
         <button type="submit" name="submit" id="join_button" class="btn btn-primary btn-block">Join Group</button>
    
 
     <div class="usergroup_post">
 
-        <form action= "{{ url_for('usergroup')}}" method="POST" enctype="multipart/form-data">
+        <form action= "" method="POST" enctype="multipart/form-data">
 
             <div class="form-group">
                 {{ form.content.label }}
@@ -27,29 +27,27 @@
 
         </form>
     </div>
-    <!-- Some sort of for loop to get multiple post from users-->
-    <div class="card mb-8">
-        <div class="card-body">
-            <h3> Username </h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium veniam exercitationem expedita laborum at voluptate. Labore, voluptates totam at aut nemo deserunt rem magni pariatur quos perspiciatis atque eveniet unde.</p>
-            <hr>
-            <p>
-                <a href="#"><i class="fa fa-heart" aria-hidden="true"></i>Like</a>
-                <a href="{{ url_for('userpost_comment')}}"><i class="fa fa-comments" aria-hidden="true"></i>Comment</a>
-                <a href="#"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Edit</a>
-                <a href="#"><i class="fa fa-share" aria-hidden="true"></i>Share</a>    
-            </p>
-      </div>
-    </div>
-
-    <!--<div class="timeline">
-        <div class="card" id="content_post">
-        <p> Hello there !</p>
+    {% for post in posts %}
+    <div class="card post">
+    <div class="post-header">
+        <img src="{{url_for('static', filename='appimages/admin.png')}}" class="post-photo" alt="profile-photo"
+            width="50" height="50" />
+        <div class="flex-column text-left text-capitalize">
+            <div class="post-poster-name">Dean Subratie</div>
+            <div class="post-location">{{post[3]}}</div>
+            <div class="post-timestamp">{{post[2]}}</div>
         </div>
-    </div> -->
+    </div>
+    <div class="post-content">
+        <div>{{post[1]}}</div>
+        <img src="{{url_for('static', filename='profileimages/john.png')}}" class="post-content-photo" />
+        <hr class="divider mb-4 mt-4" />
+    </div>
+    </div>
+    {% endfor %}
 
 
  
-
+</div>
 
 {% endblock %}
