@@ -256,8 +256,6 @@ def friend_profile(friend_uname):
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
-
-
 @app.route("/register", methods=["GET","POST"])
 def register():
     form = RegisterForm()
@@ -323,11 +321,6 @@ def create_group():
 
 
     return render_template('create_group.html',form =form)      
-
-
-
-# @app.route('/updateprofile'/'<userid>')
-
 
 
 # @app.route('/updateprofile'/'<userid>')
@@ -477,9 +470,6 @@ def groups():
     conn.close()
 
     return render_template('groups.html', groups=groups)
-
-
-
 
 @app.route('/usergroup', methods=["GET", "POST"])
 def usergroup():
