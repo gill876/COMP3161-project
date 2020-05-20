@@ -246,15 +246,25 @@ def friend_profile(friend_uname):
     
     if 'loggedin' in session:
 
-        userProfileDetails = getProfileDetails(session['id'])
-        friends = getUserFriends(session['id'])
-        profileTotals = getProfileTotals(session['id'])
-        profileTotals.update({"friends": len(friends)})
-        postDetails = getUserProfilePostDetails(session['id'])
+        conn = mysql.connect()
+        cursor = conn.cursor()
 
-        return render_template('profile.html', userProfileDetails = userProfileDetails, friends=friends, totals=profileTotals, posts=postDetails)
+        cursor.execute('SELECT user_id FROM user WHERE username = (%s)', friend_uname)
+        userId = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        userProfileDetails = getProfileDetails(userId)
+        friends = getUserFriends(userId)
+        profileTotals = getProfileTotals(userId)
+        profileTotals.update({"friends": len(friends)})
+        postDetails = getUserProfilePostDetails(userId)
+
+        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails[1]) 
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
+
 
 @app.route("/register", methods=["GET","POST"])
 def register():

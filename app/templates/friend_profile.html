@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block content%}
+<div class="profile-main" >     
+    <div class="container-fluid profile-left-sidebar">
+            <div class="profile-details-panel panel">
+                <img class="profile-photo img-responsive media-object img-circle" src="{{url_for('static', filename='profileimages/' + userProfileDetails[5])}}" />
+                <div class="profile-user-name">{{ userProfileDetails[3] }} {{ userProfileDetails[4] }}</div>
+                <div class="profile-details-container">
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Username</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[0] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Gender</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[8] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label" id="profile-bio">Biography</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[7] }}</div>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="profile-detail-label">Member Since</div>
+                        <div class="profile-detail-value">{{ userProfileDetails[2] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="container-fluid profile-feed ">
+        <span class="pull-left profile-feed-head">
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-files-o" aria-hidden="true"></i>
+                Posts
+                <span class="badge">{{ totals.posts }}</span>
+            </a>
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-picture-o" aria-hidden="true"></i>
+                Photos
+                <span class="badge">{{ totals.photos }}</span>
+            </a>
+            <a href="#" class="btn btn-link" style="text-decoration:none;">
+                <i class="fa fa-fw fa-users" aria-hidden="true"></i>
+                Friends
+                <span class="badge"> {{ totals.friends }}</span>
+            </a>
+        </span>
+        <hr class="divider"/>
+        <br/>
+        {% if posts|length > 0 %}
+            {% for post in posts %}
+                {% with post=post %}
+                    {% include 'components/post.html' %}
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="app-right-sidebar" style ="display: flex; flex: 29%; background-color: transparent;"></div>
+</div>
+</div>
+
+
+
+{% endblock %}

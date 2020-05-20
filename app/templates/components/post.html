@@ -13,14 +13,14 @@
         <img src="{{url_for('static', filename='postimages/'+ post.image)}}" class="post-content-photo" />
         {% endif %}
     </div>
+    {% if not (post.comments == "") %}
     <hr class="divder"/>
     <div class="comments-container">
-        {% if not (post.comments == "") %}
             {% for comm in post.comments %}
                 {% with comment = comm %}
                     {% include 'components/comment.html' %}
                 {% endwith %}
             {% endfor %}
-        {% endif %}
     </div>
+    {% endif %}
 </div>
