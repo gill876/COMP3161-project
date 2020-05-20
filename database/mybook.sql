@@ -343,7 +343,7 @@ DELIMITER //
     CREATE PROCEDURE createComment(IN in_user_id INT, IN in_post_id INT, IN in_comm_text VARCHAR(300), IN in_c_location VARCHAR(70))
     BEGIN
     INSERT INTO comment(post_id, comm_text, time_stamp, c_location) 
-    VALUES (in_post_id, in_comm_text, SYSDATE(), in_c_location);
+    VALUES (in_post_id, in_comm_text, CURDATE(), in_c_location);
     
     INSERT INTO create_comment
     VALUES

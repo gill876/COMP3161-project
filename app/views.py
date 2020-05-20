@@ -208,11 +208,13 @@ def getUserProfilePostDetails(userId):
     userPosts= []
     for item in userPostsT:
         comments = getCommentsObject(item[2], allComments)
+        print(comments)
         imgIndex = findImageIndex(item[2], userPostImages)
         if imgIndex != -1:
             userPosts.append(
                 {
                     "profile_img": item[0],
+                    "id": str(item[2]),
                     "poster": item[1],
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
@@ -225,6 +227,7 @@ def getUserProfilePostDetails(userId):
             userPosts.append(
                 {
                     "profile_img": item[0],
+                    "id": str(item[2]),
                     "poster": item[1],
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
@@ -520,16 +523,28 @@ def usergroup():
     
     return render_template('usergroup.html',form=form)
 
-@app.route('/userpost_comment', methods=["GET", "POST"])
-def userpost_comment():
-    form = UserPost_CommentForm()
+@app.route('/userpost_comment/<post_id>', methods=["GET", "POST"])
+def userpost_comment(post_id):
 
-    if request.method == "POST" and form.validate_on_submit():
-        content_posted = form.content.data
+    if 'loggedin' in session:
+        form = UserPost_CommentForm()
 
-        return redirect( url_for('userpost_comment'))
+        if request.method == "POST" and form.validate_on_submit():
+            content_posted = form.content.data
+            location = "Kingston"
 
-    return render_template('userpost_comment.html', form=form)
+            conn = mysql.connect()
+            cursor = conn.cursor()
+
+            cursor.execute('CALL createComment(%s,%s, %s, %s)', (int(session['id']), int(post_id), content_posted, location))
+            conn.commit() 
+            cursor.close()
+            conn.close()
+
+            return redirect( url_for('home'))
+
+        return redirect(url_for('home'))
+    return redirect (url_for('login'))
 
 
 
