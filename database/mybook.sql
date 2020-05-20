@@ -65,6 +65,7 @@ DROP PROCEDURE IF EXISTS getUserTotalFriends;
 DROP PROCEDURE IF EXISTS getUserTotalGroups;
 DROP PROCEDURE IF EXISTS getGroupId;
 DROP PROCEDURE IF EXISTS adminSearchGroup;
+DROP PROCEDURE IF EXISTS adminGetUserBioByUname;
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
 CREATE TABLE csv_users(
@@ -625,7 +626,7 @@ DELIMITER //
     CREATE PROCEDURE adminUserBio()
     BEGIN
 
-    SELECT user.username, profile.firstname, profile.lastname 
+    SELECT user.username, profile.firstname, profile.lastname, profile.gender, profile.friends
     FROM user
     JOIN profile
     JOIN userProfile
@@ -640,7 +641,7 @@ DELIMITER //
     CREATE PROCEDURE adminGetUserBio(IN in_name VARCHAR(151))
     BEGIN
 
-    SELECT user.user_id, user.username, profile.firstname, profile.lastname 
+    SELECT user.user_id, user.username, profile.firstname, profile.lastname, profile.gender
     FROM user
     JOIN profile
     JOIN userProfile
@@ -651,6 +652,22 @@ DELIMITER //
     ORDER BY user.user_id;
 
     END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE adminGetUserBioByUname(IN in_user_name VARCHAR(151))
+BEGIN
+
+    SELECT user.user_id, user.username, profile.firstname, profile.lastname, profile.gender, profile.profile_img 
+    FROM user
+    JOIN profile
+    JOIN userProfile
+    ON user.user_id = userProfile.user_id
+    AND profile.profile_id = userProfile.profile_id 
+    WHERE user.username = in_user_name
+    LIMIT 1;
+
+END //
 DELIMITER ;
 
 DELIMITER //
@@ -766,7 +783,12 @@ DELIMITER //
 
         SELECT COUNT(create_post.user_id)
         FROM (create_post)
-        WHERE create_post.user_id  = in_user_id;
+        WHERE create_post.user_id  = in_user_id
+        AND create_post.post_id
+        NOT IN (
+            SELECT group_post.post_id
+            FROM group_post
+        );
     
     END//
 DELIMITER ;
@@ -833,4 +855,109 @@ DELIMITER //
         FROM group_post
         WHERE group_post.group_id = in_group_id;
     END //
+DELIMITER ;
+
+DELIMITER //
+    CREATE PROCEDURE adminGetUserFriends(IN in_user_id INT)
+    BEGIN
+        SELECT user.username, CONCAT(`firstname`, ' ', `lastname`), friends.friend_type
+        FROM friends
+        JOIN user 
+        JOIN userProfile
+        JOIN profile
+        ON friends.user_id = user.user_id
+        AND user.user_id = userProfile.user_id
+        AND userProfile.profile_id = profile.profile_id
+        WHERE user.user_id
+        IN (
+            SELECT friends.friend_id AS usId
+            FROM friends
+            WHERE friends.user_id = in_user_id
+            );
+    END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE getUserTotalGroupPosts(IN in_user_id INT)
+BEGIN
+    SELECT COUNT(create_post.post_id)
+    FROM group_post
+    JOIN create_post
+    ON create_post.post_id = group_post.post_id
+    WHERE create_post.user_id = in_user_id;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE adminUserGroupsInfo(IN in_user_id INT)
+BEGIN
+    SELECT user_group.group_name, CONCAT(`firstname`, ' ', `lastname`), DATE(time_stamp)
+    FROM user_group
+    JOIN create_group
+    JOIN userProfile
+    JOIN profile
+    ON user_group.group_id = create_group.group_id 
+    AND create_group.user_id = userProfile.user_id
+    AND userProfile.profile_id = profile.profile_id
+    WHERE userProfile.user_id IN (
+        SELECT join_group.user_id
+        FROM join_group
+        WHERE join_group.user_id = in_user_id
+    );
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE adminUserGroups(IN in_user_id INT)
+BEGIN
+    SELECT user_group.group_name
+    FROM user_group
+    JOIN create_group
+    ON create_group.group_id = user_group.group_id
+    WHERE create_group.user_id = in_user_id;
+END //
+DELIMITER ;
+
+adminGetUserPostDetails
+
+DELIMITER //
+CREATE PROCEDURE adminGetUserPostDetails(IN user_id_in INT)
+BEGIN
+SELECT profile.profile_img, CONCAT(`firstname`, ' ', `lastname`), post.post_id, post.post_location, post.time_stamp, post.content FROM profile JOIN userProfile JOIN create_post JOIN post ON profile.profile_id = userProfile.profile_id AND userProfile.user_id = create_post.user_id AND create_post.post_id = post.post_id WHERE create_post.user_id = user_id_in AND create_post.post_id NOT IN (SELECT group_post.post_id FROM group_post);
+END //
+
+CREATE PROCEDURE adminGetUserPostImageDetails(in user_id_in INT)
+BEGIN
+SELECT post.post_id, images.file_name
+FROM create_post
+JOIN post
+JOIN contains
+JOIN images
+ON create_post.post_id = post.post_id
+AND post.post_id = contains.post_id
+AND contains.image_id = images.image_id
+WHERE create_post.user_id = user_id_in;
+END //
+
+DELIMITER //
+CREATE PROCEDURE adminGetUserGroupPostDetails(IN user_id_in INT)
+BEGIN
+    SELECT profile.profile_img,
+    CONCAT(`firstname`, ' ', `lastname`),
+    post.post_id, post.post_location,
+    post.time_stamp, post.content
+    FROM profile
+    JOIN userProfile
+    JOIN create_post
+    JOIN post
+    ON profile.profile_id = userProfile.profile_id
+    AND userProfile.user_id = create_post.user_id
+    AND create_post.post_id = post.post_id  
+    WHERE create_post.user_id = user_id_in
+    AND create_post.post_id
+    NOT IN (
+        SELECT group_post.post_id
+        FROM group_post
+        );
+END //
 DELIMITER ;

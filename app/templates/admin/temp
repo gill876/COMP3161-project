@@ -1,0 +1,66 @@
+          <!-- <div class="admin-user-detail">
+               <div class="admin-user-detail-label">Friends</div>
+               <div class="admin-user-detail-value">{{user.friends}}</div>
+           </div>
+           <div class="admin-user-detail">
+               <div class="admin-user-detail-label">Groups</div>
+               <div class="admin-user-detail-value">{{user.groups}}</div>
+           </div>
+           <div class="admin-user-detail">
+               <div class="admin-user-detail-label">Posts</div>
+               <div class="admin-user-detail-value">{{user.posts}}</div>
+           </div>
+           <div class="admin-user-detail">
+                   <div class="admin-user-detail-label">Comments</div>
+           <div class="admin-user-detail-value">{{user.comments}}</div>
+           </div>-->
+
+        <!--<div class="admin-profile-btn-container">
+            {% if view_posts %}
+                {% with text = "View Friends and Groups" on_submit_action = "" %}
+                    {% include "components/admin_profile_button.html" %}
+                {%  endwith %}
+            {% else %}
+                {% with text = "View Posts and Comments" on_submit_action = "" %}
+                    {% include "components/admin_profile_button.html" %}
+                {%  endwith %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="admin-profile-boxes-container">
+        {% if view_posts and (posts is not None) %}
+            <div class="post-box">
+                {% for post in posts%}
+                    {% with  %}
+                        {% include "components/post.html" %}
+                    {% endwith %}
+                {% endfor %}               
+            </div>
+            <div class="post-box">
+                {% for comment_stream in comments%}
+                <div class="comment-stream">
+                    {% with  %} 
+                        {% include "components/post.html" %}
+                    {% endwith %}
+
+                    {% for comment in comment_stream.comments %}
+                        {% with %}
+                            {% include "components/comment.html" %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+                {% endfor %}               
+            </div>
+        {% else %}
+            <div class="admin-profile-friend-table">
+
+            </div>
+            <div class="admin-profile-group-table">
+                
+            </div>
+    </div>-->
+
+    {% with details = {"commenter":"John", "timestamp":"Thurs Apr 4, 2020", "text": "I am a girl"} %}
+    {% include "components/comment_input.html" %}
+{% endwith %}
+<!-- To do - add loop for comments-->

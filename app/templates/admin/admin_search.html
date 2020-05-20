@@ -40,13 +40,13 @@
                 <tbody>
                     {% for person in results %}
                     <tr>
-                        <td>{{person[0]}}</td>
-                        <td>{{person[1]}}</td>
-                        <td>{{person[2]}}</td>
-                        <td>{{person[3]}}</td>
-                        <td>{{person[4]}}</td>
-                        <td>{{person[5]}}</td>
-                        <td>{{person[6]}}</td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}">{{person[0]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[1]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[2]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[3]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[4]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[5]}}</a></td>
+                        <td><a href="{{url_for('admin_user_profile', username=person[0])}}"></a>{{person[6]}}</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
