@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm 
-from wtforms import StringField, PasswordField,FileField,SelectField,TextAreaField
+from wtforms import StringField, PasswordField,FileField,SelectField,TextAreaField, SubmitField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired,DataRequired,Email
 from wtforms.fields.html5 import DateField
+from wtforms.csrf.session import SessionCSRF
 
 
 class LoginForm(FlaskForm):
@@ -35,15 +36,20 @@ class UpdateForm(FlaskForm):
       
     
 class PostForm(FlaskForm):
-    content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
-    postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])
+    content = TextAreaField('Content', validators=[InputRequired(message='Need content to post')])
+    location = TextAreaField('Location',validators=[InputRequired(message='Need a location to post')])
+    postphoto = FileField('Post photo', validators=[FileAllowed(['jpg', 'jpeg', 'png'], 'Images Only')])
+    submitBtn = SubmitField('Post Now')
+    csrf = True
+    csrf_class = SessionCSRF
+    csrf_secret = "5C2TJCKILM4I2Q5YZPZ2"
 
 # class GeneralPostForm(FlaskForm):
 #     content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
 #     postphoto = FileField('Post photo',validators=[FileAllowed(['jpg','jpeg','png'],'Images Only')])   
 
 class UserPost_CommentForm(FlaskForm):
-    content = TextAreaField('Content',validators=[InputRequired(message='Need content to post')])
+    content = TextAreaField('Add Comment',validators=[InputRequired(message='Need content to post')])
 
 
 class ImageForm(FlaskForm):

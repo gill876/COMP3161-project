@@ -77,6 +77,8 @@ DROP PROCEDURE IF EXISTS adminGetUserGroupPostDetails;
 DROP PROCEDURE IF EXISTS adminGetUserPostDetails;
 DROP PROCEDURE IF EXISTS adminGetUserPostDetails;
 DROP PROCEDURE IF EXISTS adminGetUserCommentDetails;
+DROP PROCEDURE IF EXISTS addPost; 
+DROP PROCEDURE IF EXISTS createPost; 
 
 
 /*USED TO POPULATE USER AND PROFILE TABLE FROM CSV*/
@@ -281,7 +283,7 @@ DELIMITER //
     CREATE PROCEDURE createPost(IN in_user_id INT, IN in_content VARCHAR(300), IN in_post_location VARCHAR(70))
     BEGIN
     INSERT INTO post(content, time_stamp, post_location) 
-    VALUES (in_content, SYSDATE(), in_post_location);
+    VALUES (in_content, CURDATE(), in_post_location);
     
     INSERT INTO create_post 
     VALUES
@@ -858,7 +860,7 @@ DELIMITER //
         WHERE join_group.group_id = in_group_id
         LIMIT 1;
     END //
-DELIMITER;
+DELIMITER ;
 
 DELIMITER //
     CREATE PROCEDURE groupTotalPosts(IN in_group_id INT)

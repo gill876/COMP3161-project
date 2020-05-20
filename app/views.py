@@ -10,6 +10,7 @@ import uuid
 import datetime 
 import MySQLdb.cursors
 import re
+import datetime
 import mysql.connector
 from mysql.connector import errorcode,connection
 from app import app, login_manager
@@ -30,8 +31,15 @@ from . import mysql
 
 @app.route('/home')
 def home():
+    form = UserPost_CommentForm()
     if 'loggedin' in session:
-        return render_template('home.html',username=session['username'])
+        userProfileDetails = getProfileDetails(session['id'])
+        friends = getUserFriends(session['id'])
+        postDetails = getUserProfilePostDetails(session['id'])
+        groups = getUserGroupDetails(session['id'])
+
+        return render_template('home.html', userProfileDetails=userProfileDetails, friends=friends, posts=postDetails, groups=groups, form=form)
+        
     return redirect(url_for('login'))
 
 @app.route('/search',methods=['GET','POST'])
@@ -169,13 +177,21 @@ def getProfileTotals(userId):
         "photos": totalPhotos
     }
 
-def getUserProfilePostDetails(userId):
+def getUserGroupDetails(userId):
     conn = mysql.connect()
     cursor = conn.cursor()
 
     cursor.execute('CALL adminUserGroups(%s)', int(userId))
     userGroups = cursor.fetchall()
-    print('userGroups', userGroups)
+
+    cursor.close()
+    conn.close()
+
+    return userGroups
+
+def getUserProfilePostDetails(userId):
+    conn = mysql.connect()
+    cursor = conn.cursor()
 
     cursor.execute('CALL adminGetUserPostDetails(%s)', int(userId))
     userPostsT = cursor.fetchall()
@@ -201,7 +217,7 @@ def getUserProfilePostDetails(userId):
                     "location": item[3],
                     "timestamp": item[4].strftime("%m/%d/%Y, %H:%M:%S"),
                     "content": item[5],
-                    "image": userPostImages[imgIndex][0],
+                    "image": userPostImages[imgIndex][1],
                     "comments": comments
                 }
             )
@@ -221,7 +237,7 @@ def getUserProfilePostDetails(userId):
     cursor.close()
     conn.close()
 
-    return (userGroups, userPosts)
+    return userPosts
 
 
 @app.route('/profile')
@@ -237,7 +253,7 @@ def profile():
         profileTotals.update({"friends": len(friends)})
         postDetails = getUserProfilePostDetails(session['id'])
 
-        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails[1])
+        return render_template('profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails)
 
     return redirect(url_for('login'))  #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -261,7 +277,7 @@ def friend_profile(friend_uname):
         profileTotals.update({"friends": len(friends)})
         postDetails = getUserProfilePostDetails(userId)
 
-        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails[1]) 
+        return render_template('friend_profile.html', userProfileDetails = userProfileDetails, friends = friends, totals = profileTotals, posts = postDetails) 
 
     return redirect(url_for('login')) #MODIFY FLASH APPROPRIATE MESSAGES
 
@@ -304,7 +320,7 @@ def register():
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect(url_for('home')) #MODIFY ADD REDIRECTION WITH FLASH MESSAGE
+            return redirect(url_for('login')) #MODIFY ADD REDIRECTION WITH FLASH MESSAGE
         else:
             print("The account already exits")#MODIFY ADD APPROPRIATE RESPONSE
     return render_template('register.html', form=form)
@@ -410,41 +426,53 @@ def get_images():
             plst = plst+[os.path.join(file)]
     return plst
 
-# def get_uploaded_images():
-#     rootdir = os.getcwd()
-#     pictures = []
-#     print (rootdir)
 
-#     for subdir, dirs, files in os.walk(rootdir + './app/static/userprofileimages'):
-#         print(dirs)
+@app.route('/gen_post', methods=["GET","POST"])
+def gen_post():
+    print(session['loggedin'])
+    if 'loggedin' in session:
+        form = PostForm()
+        if request.method == 'POST' and form.validate_on_submit():
+            content = form.content.data
+            location = form.location.data
+            postphoto = form.postphoto.data
+            photonam= ""
 
-#         for file in pictures:
-#             print (os.path.join(subdir, files))
-#             files.append("userprofileimages/" + file)
+            if not (postphoto == None):
+                print('saving file')
+                filename = str(uuid.uuid4())
+                old_filename = postphoto.filename
+                ext = old_filename.split(".")
+                ext = ext[1]
+                new_filename = filename + "." + ext
+                new_filename = new_filename.replace('-', '_')
+                postphoto.save(os.path.join(app.config["POSTSPHOTO_FOLDER"], new_filename))
+                photonam = new_filename
 
-#             return files
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-#     return render_template("profile.html"  )
+            if not (postphoto == None):
+                print('post photo')
+                cursor.execute('CALL createImagePost(%s, %s, %s, %s)', (session['id'], content, location, photonam))
+            else:
+                print('no photo')
+                cursor.execute('INSERT INTO post(content, time_stamp, post_location) VALUES (%s,%s,%s)', (content, datetime.datetime.now(), location))
 
-@app.route('/post', methods=["GET","POST"])
-def new_post():
-    form = PostForm()
-    if request.method =='POST' and form.validate_on_submit():
-         content = form.content.data
-         postphoto = form.postphoto.data 
+                cursor.execute('SELECT post_id FROM post ORDER BY post_id DESC LIMIT 1')
+                postId = cursor.fetchone()[0]
+                print(postId)
 
-    #conn = mysql.connect()
-    #cursor = conn.cursor()
+                cursor.execute('INSERT INTO create_post VALUES(%s, %s)', (session['id'], postId))
 
-    return render_template('home.html',form=form)
+            conn.commit()
+            cursor.close()
+            conn.close()
 
-# @app.route('/gen_post', methods=["GET","POST"])
-# def gen_post():
-#     form = GeneralPostForm()
-#     if request.method =='POST' and form.validate_on_submit():
-#          content = form.content.data
-#          postphoto = form.postphoto.data 
-#     return render_template('genpost.html', form=form)
+            return redirect(url_for('home'))
+
+        return render_template ('gen_post.html', form=form)
+    return redirect (url_for('login'))
 
 
 @app.route("/groups", methods=['GET', 'POST'])

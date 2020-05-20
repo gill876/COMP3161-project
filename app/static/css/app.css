@@ -85,7 +85,7 @@ overflow: hidden;
 }
 
 .post-content {
-    margin-left:58px;
+    margin-left: 20px;
 }
 
 .badge-important {
@@ -265,6 +265,7 @@ body {
 }
 
 .app-right-sidebar {
+    align-self: self-start;
     display: flex;
     flex-direction: column;
     width: 400px;
@@ -276,7 +277,7 @@ body {
     -moz-border-radius: 10px;
     -ms-border-radius: 10px;
     -o-border-radius: 10px;
-    padding-top: 10px;
+    padding-top: 10px 2px;
 }
 
 .friend-heading {
@@ -291,11 +292,11 @@ body {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .friend-friend {
-    margin: 10px;
+    margin: 10px 2px;
     color: #1988a9;
 }
 
@@ -305,15 +306,49 @@ body {
 
 .profile-feed-head {
     align-self: center;
-    margin: 20px;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
 }
 
-.profile-feed {
+.profile-feed, .official-feed {
     align-self: self-start;
 }
 
 
+.content .profile-left-sidebar {
+    align-self: self-start;
+}
+
+.feed-subtitle {
+    font-size: 1.8rem;
+}
+
+.feed-text {
+    font-size: 1.2rem;
+}
+
+.profile-feed-head .row {
+    background-color: #fff;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    margin: 2px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 3px;
+}
+
+.post-content-photo {
+    max-width: 350px;
+    align-self: center;
+    height: auto;
+    margin-top: 10px;
+}
+
+.comment-form {
+    max-width: 350px;
+}

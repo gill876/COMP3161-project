@@ -12,6 +12,18 @@
         {% if not (post.image == "") %}
         <img src="{{url_for('static', filename='postimages/'+ post.image)}}" class="post-content-photo" />
         {% endif %}
+        <hr class="divider mb-4 mt-4"/>
+        <div class="comment-form">
+            <form action="{{ url_for('userpost_comment')}}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    {{ form.content.label }}
+                    {{ form.content(class='form-control', placeholder="Whats your comment?") }}
+                </div>
+                <div class="usergroup_button">
+                <button type="submit" name="submit" class="btn btn-primary btn-block" style="max-width: 200px;">Post Comment</button>
+                </div>
+            </form>
+    </div>
     </div>
     {% if not (post.comments == "") %}
     <hr class="divder"/>
