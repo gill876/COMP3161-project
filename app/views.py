@@ -19,7 +19,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, RegisterForm, UpdateForm, ImageForm, PostForm,GroupForm, UserPost_CommentForm
 from app.admin_forms import AdminLoginForm,  AdminSearchForm
 from werkzeug.utils import secure_filename 
-#from flask_mysqldb import MySQL
+from flask_mysqldb import MySQL
 from flaskext.mysql import MySQL
 from . import mysql
 
