@@ -372,7 +372,7 @@ def create_group():
 def updateprofile():
     form = UpdateForm()
 
-    if request.method and form.validate_on_submit():
+    if request.method =="POST" and form.validate_on_submit():
 
         firstname = form.firstname.data  
         lastname = form.lastname.data
@@ -810,24 +810,27 @@ def admin_groups():
 
         cursor.execute('CALL adminGroupName')
         groupNames = cursor.fetchall()
-        #print(groupNames)
+        print(groupNames)
 
         cursor.execute('CALL adminGroupCreatorByUserId')
         creators = cursor.fetchall()
-        #print(creators)
+        print('c', creators)
+
 
         cursor.execute('CALL getGrpTotalMembers')
         grpTotals = cursor.fetchall()
-        #print(grpTotals)
+        print('g', grpTotals)
+        grpTotas = [0 for i in groupNames] if grpTotals == () else grpTotals
 
         cursor.execute('SELECT COUNT(group_id) FROM user_group')
         grpTotal = cursor.fetchone()
-        #print(grpTotal)
+        print(grpTotal)
 
         cursor.close()
         conn.close()
 
-        groups = zip(groupNames, creators, grpTotals)
+        groups = zip(groupNames, creators)
+        print(groups)
 
         stats = [
             {
@@ -835,11 +838,11 @@ def admin_groups():
                 "label": "Total Groups"
             },
             {
-                "value": 234,
+                "value": 1,
                 "label": "Total Group Posts"
             },
         ]
-          
+        print('groups', list(groups))
         return render_template("admin/admin_group_report.html", stats=stats, groups=groups)
 
     return redirect(url_for('admin'))
@@ -848,11 +851,10 @@ def admin_groups():
 ''' Admin Groups Search Page '''
 @app.route('/admin/groups/search', methods=["GET", "POST"])
 def admin_search_groups():
-
+    form = AdminSearchForm()
     if session['adminLoggedIn'] == True: 
     
         if request.method == "POST" and form.validate_on_submit():
-            form = AdminSearchForm()
             search_value = form.searchTerm.data
 
             conn = mysql.connect()
@@ -893,10 +895,9 @@ def admin_search_groups():
 ''' Admin Search Users Page '''
 @app.route("/admin/user/search", methods=["GET", "POST"])
 def admin_search_users():
-
+    form = AdminSearchForm()
     if session['adminLoggedIn'] == True:    
         if request.method == "POST" and form.validate_on_submit():
-            form = AdminSearchForm()
             search_value = form.searchTerm.data
 
             conn = mysql.connect()

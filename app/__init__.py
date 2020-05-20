@@ -37,8 +37,8 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 #admin configs
-# app.config['ADMIN_USERNAME'] = 'admin'
-# app.config['ADMIN_PASSWORD'] = 'lope2345'
+app.config['ADMIN_USERNAME'] = 'admin'
+app.config['ADMIN_PASSWORD'] = 'lope2345'
 
 
 #adding images to respective folders

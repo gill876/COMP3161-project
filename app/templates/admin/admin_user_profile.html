@@ -7,7 +7,7 @@
     <h2 class="admin-header">View User Details</h2>
     <!--img src={{profile_image}})-->
     <div class="admin-profile-header">
-        <img class="admin-profile-header-pic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRTB35OKWH3HGkEQBrD691tWO29m1YtVJSXzvU7lFRpgjy6RZvT&usqp=CAU"/>
+        <img class="admin-profile-header-pic" src="{{ url_for('static', filename='/profileimages/john.png') }}"/>
         <div class="admin-profile-user-details">
             <div class="admin-user-detail">
                 <div class="admin-user-detail-label">Username</div>
@@ -75,7 +75,7 @@
                         {% for row in profileItems[0] %}
                             <tr>
                                 <td><a href="{{url_for('admin_user_profile', username=row[0])}}">{{row[1]}}</a></td>
-                                <td><a>{{row[2]}}</a></td>
+                                <td><a>{{row[3]}}</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
